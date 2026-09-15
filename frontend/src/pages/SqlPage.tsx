@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   BookOpen,
@@ -49,6 +49,7 @@ import {
 import { Button, CopyButton, ErrorBanner, Panel, SectionLabel } from '../components/ui'
 import { ConnectionDialog } from '../components/ConnectionDialog'
 import { ResizablePanel } from '../components/ResizablePanel'
+import { getCaretCoordinates } from '../lib/textareaCaret'
 
 type Tab = 'queries' | 'schema' | 'er-diagram' | 'runs' | 'samples'
 
@@ -77,7 +78,23 @@ export function SqlPage() {
   const [sampleView, setSampleView] = useState<{ label: string; columns: string[]; rows: unknown[][] } | null>(null)
   const [resultView, setResultView] = useState<'table' | 'chart'>('table')
 
+  const sqlRef = useRef<HTMLTextAreaElement>(null)
+  const [ac, setAc] = useState<{ start: number; end: number; pos: { top: number; left: number } } | null>(null)
+  const [acIndex, setAcIndex] = useState(0)
+
   const activeConnection = useMemo(() => connections.find((c) => c.id === connectionId) ?? null, [connections, connectionId])
+
+  const acSuggestions = useMemo(() => {
+    type Item = { label: string; detail: string }
+    const items: Item[] = []
+    for (const s of schema) {
+      for (const t of s.tables) {
+        items.push({ label: t.name, detail: 'table' })
+        for (const c of t.columns) items.push({ label: c.name, detail: t.name })
+      }
+    }
+    return items
+  }, [schema])
 
   const lintIssues: LintIssue[] = useMemo(
     () => lintSql(sql, { readOnlyConnection: activeConnection?.readOnly }),
@@ -106,18 +123,99 @@ export function SqlPage() {
   }, [])
 
   useEffect(() => {
-    if ((tab === 'schema' || tab === 'er-diagram') && connectionId != null) {
+    // Fetched for any tab, not just Schema/ER Diagram — the query editor's autocomplete needs it too.
+    if (connectionId != null) {
       getSchema(connectionId)
         .then((r) => {
           setSchema(r.schemas)
           setErSchemaName((prev) => (prev && r.schemas.some((s) => s.name === prev) ? prev : r.schemas[0]?.name ?? null))
         })
-        .catch((e) => setError(String(e)))
+        .catch((e) => { if (tab === 'schema' || tab === 'er-diagram') setError(String(e)) })
+    } else {
+      setSchema([])
     }
-  }, [tab, connectionId])
+  }, [connectionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const erActiveSchema = useMemo(() => schema.find((s) => s.name === erSchemaName) ?? null, [schema, erSchemaName])
   const erFkCount = useMemo(() => erActiveSchema?.tables.reduce((n, t) => n + t.foreignKeys.length, 0) ?? 0, [erActiveSchema])
+
+  const sqlRef = useRef<HTMLTextAreaElement>(null)
+  const [suggest, setSuggest] = useState<{ start: number; query: string; pos: { top: number; left: number } } | null>(null)
+  const [suggestIndex, setSuggestIndex] = useState(0)
+
+  type Suggestion = { label: string; detail: string; insert: string }
+  const allSuggestions = useMemo<Suggestion[]>(() => {
+    const out: Suggestion[] = []
+    for (const s of schema) {
+      for (const t of s.tables) {
+        out.push({ label: t.name, detail: 'table', insert: t.name })
+        for (const c of t.columns) {
+          out.push({ label: c.name, detail: `${t.name}.${c.name} — ${c.type}`, insert: c.name })
+        }
+      }
+    }
+    return out
+  }, [schema])
+
+  const filteredSuggestions = useMemo(() => {
+    if (!suggest || !suggest.query) return []
+    const q = suggest.query.toLowerCase()
+    const seen = new Set<string>()
+    return allSuggestions
+      .filter((s) => s.label.toLowerCase().startsWith(q))
+      .filter((s) => (seen.has(s.label) ? false : (seen.add(s.label), true)))
+      .slice(0, 12)
+  }, [suggest, allSuggestions])
+
+  function updateSuggestState() {
+    const el = sqlRef.current
+    if (!el || allSuggestions.length === 0) {
+      setSuggest(null)
+      return
+    }
+    const caret = el.selectionStart
+    const upToCaret = el.value.slice(0, caret)
+    const match = upToCaret.match(/[A-Za-z_][A-Za-z0-9_]*$/)
+    if (!match || match[0].length < 2) {
+      setSuggest(null)
+      return
+    }
+    const start = caret - match[0].length
+    const caretPx = getCaretCoordinates(el, caret)
+    setSuggestIndex(0)
+    setSuggest({ start, query: match[0], pos: { top: caretPx.top + caretPx.height + 4, left: caretPx.left } })
+  }
+
+  function applySuggestion(s: Suggestion) {
+    if (!suggest) return
+    const el = sqlRef.current
+    const caret = el?.selectionStart ?? suggest.start + suggest.query.length
+    const next = sql.slice(0, suggest.start) + s.insert + sql.slice(caret)
+    setSql(next)
+    setSuggest(null)
+    requestAnimationFrame(() => {
+      el?.focus()
+      const pos = suggest.start + s.insert.length
+      el?.setSelectionRange(pos, pos)
+    })
+  }
+
+  function handleSqlKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (!suggest || filteredSuggestions.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setSuggestIndex((i) => (i + 1) % filteredSuggestions.length)
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setSuggestIndex((i) => (i - 1 + filteredSuggestions.length) % filteredSuggestions.length)
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      applySuggestion(filteredSuggestions[suggestIndex])
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setSuggest(null)
+    }
+  }
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -397,14 +495,48 @@ export function SqlPage() {
       ) : (
       <Panel className="flex flex-1 flex-col">
         <div className="flex flex-1 flex-col gap-3 p-4">
-          <textarea
-            value={sql}
-            onChange={(e) => setSql(e.target.value)}
-            spellCheck={false}
-            rows={7}
-            placeholder="SELECT * FROM orders WHERE status = :status"
-            className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
-          />
+          <div className="relative">
+            <textarea
+              ref={sqlRef}
+              value={sql}
+              onChange={(e) => {
+                setSql(e.target.value)
+                updateSuggestState()
+              }}
+              onKeyDown={handleSqlKeyDown}
+              onKeyUp={(e) => {
+                if (!['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(e.key)) updateSuggestState()
+              }}
+              onClick={updateSuggestState}
+              onBlur={() => setTimeout(() => setSuggest(null), 150)}
+              spellCheck={false}
+              rows={7}
+              placeholder="SELECT * FROM orders WHERE status = :status"
+              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
+            />
+            {suggest && filteredSuggestions.length > 0 && (
+              <div
+                className="absolute z-50 flex max-h-56 w-64 flex-col gap-0.5 overflow-auto rounded-xl border border-rule bg-surface p-1.5 shadow-2xl"
+                style={{ top: suggest.pos.top, left: suggest.pos.left }}
+              >
+                {filteredSuggestions.map((s, i) => (
+                  <button
+                    key={s.label + i}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      applySuggestion(s)
+                    }}
+                    className={`flex items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs transition-colors ${
+                      i === suggestIndex ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'
+                    }`}
+                  >
+                    <span className="truncate font-mono text-cyan">{s.label}</span>
+                    <span className="shrink-0 truncate text-[10px] text-ink-faint">{s.detail}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {lintIssues.length > 0 && (
             <div className="flex flex-col gap-1">
