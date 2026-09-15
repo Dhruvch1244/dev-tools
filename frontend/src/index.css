@@ -154,6 +154,19 @@ textarea, pre, code, .font-mono {
 }
 .wiki-link:hover { background: rgba(47, 230, 242, 0.22); }
 
+/* Syntax highlighting tokens for Notes code blocks — mapped onto the app's own theme tokens so
+   it auto-adapts between dark/light instead of shipping a fixed-color hljs theme. */
+.hljs-block { background: var(--panel); border: 1px solid var(--rule); border-radius: 0.9em; padding: 0.9em 1em; overflow-x: auto; }
+.hljs-block code { background: none; padding: 0; }
+.hljs-comment, .hljs-quote { color: var(--ink-faint); font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-type { color: var(--violet); }
+.hljs-string, .hljs-attr, .hljs-symbol, .hljs-bullet, .hljs-addition { color: var(--emerald); }
+.hljs-number, .hljs-meta, .hljs-built_in { color: var(--warm); }
+.hljs-title, .hljs-name, .hljs-section, .hljs-selector-id { color: var(--cyan); }
+.hljs-variable, .hljs-template-variable, .hljs-attribute, .hljs-regexp, .hljs-deletion { color: var(--rose); }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 600; }
+
 @keyframes drift {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
   50% { transform: translate3d(2%, -3%, 0) scale(1.05); }

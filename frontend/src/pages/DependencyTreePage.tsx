@@ -80,7 +80,7 @@ export function DependencyTreePage() {
               ) : (
                 <div className="flex flex-col gap-2">
                   {paths.map((path, i) => (
-                    <div key={i} className="rounded-xl border border-rule-soft bg-white/[0.02] p-2.5 font-mono text-[12px] text-ink-soft">
+                    <div key={i} className="rounded-xl border border-rule-soft bg-glass p-2.5 font-mono text-[12px] text-ink-soft">
                       {path.map((seg, si) => (
                         <div key={si} style={{ paddingLeft: si * 16 }} className={si === path.length - 1 ? 'text-cyan' : ''}>
                           {si > 0 && '↳ '}{seg}

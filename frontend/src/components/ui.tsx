@@ -7,7 +7,7 @@ const spring = { type: 'spring', stiffness: 400, damping: 28 } as const
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <div className={`rounded-[1.75rem] bg-glass p-1.5 ring-1 ring-glass-strong ${className}`}>
-      <div className="h-full rounded-[calc(1.75rem-0.375rem)] border border-rule-soft bg-surface">
+      <div className="flex h-full flex-col rounded-[calc(1.75rem-0.375rem)] border border-rule-soft bg-surface">
         {children}
       </div>
     </div>

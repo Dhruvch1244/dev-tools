@@ -17,7 +17,7 @@ import java.util.Set;
 @Service
 public class ImageProcessingService {
 
-    private static final Set<String> SUPPORTED_FORMATS = Set.of("png", "jpg", "jpeg", "bmp", "gif");
+    private static final Set<String> SUPPORTED_FORMATS = Set.of("png", "jpg", "jpeg", "bmp", "gif", "webp");
 
     public record Converted(byte[] bytes, String contentType, String fileName) {}
 
@@ -70,7 +70,7 @@ public class ImageProcessingService {
     private String normalizeFormat(String format) {
         String f = format == null ? "" : format.trim().toLowerCase();
         if (!SUPPORTED_FORMATS.contains(f)) {
-            throw new IllegalArgumentException("Unsupported target format '" + format + "' (use png, jpg, bmp, or gif).");
+            throw new IllegalArgumentException("Unsupported target format '" + format + "' (use png, jpg, bmp, gif, or webp).");
         }
         return f.equals("jpeg") ? "jpg" : f;
     }
@@ -135,6 +135,7 @@ public class ImageProcessingService {
             case "jpg", "jpeg" -> "image/jpeg";
             case "bmp" -> "image/bmp";
             case "gif" -> "image/gif";
+            case "webp" -> "image/webp";
             default -> "image/png";
         };
     }

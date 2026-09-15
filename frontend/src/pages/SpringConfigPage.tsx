@@ -41,7 +41,7 @@ export function SpringConfigPage() {
             key={f}
             onClick={() => setFormat(f)}
             className={`flex-1 rounded-xl py-2 text-xs font-medium transition-colors ${
-              format === f ? 'bg-white/[0.08] text-ink' : 'text-ink-faint hover:text-ink-soft'
+              format === f ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
             }`}
           >
             {f === 'yaml' ? 'YAML' : 'Properties'}

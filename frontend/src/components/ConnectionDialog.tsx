@@ -144,7 +144,7 @@ export function ConnectionDialog({
                   key={c.id}
                   onClick={() => startEdit(c)}
                   className={`mb-1 flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-left text-xs transition-colors ${
-                    editingId === c.id ? 'bg-white/[0.08] text-ink' : 'text-ink-soft hover:bg-white/[0.04]'
+                    editingId === c.id ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'
                   }`}
                 >
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: c.colorTag ?? '#2fe6f2' }} />

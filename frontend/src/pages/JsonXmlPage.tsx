@@ -131,16 +131,16 @@ export function JsonXmlPage() {
             )}
 
             {mode === 'json' && (
-              <div className="mt-3 flex gap-1 rounded-xl bg-white/[0.03] p-1">
+              <div className="mt-3 flex gap-1 rounded-xl bg-glass p-1">
                 <button
                   onClick={() => setView('tree')}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-colors ${view === 'tree' ? 'bg-white/[0.08] text-ink' : 'text-ink-faint'}`}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-colors ${view === 'tree' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}
                 >
                   <TreeStructure size={13} weight="light" /> Tree
                 </button>
                 <button
                   onClick={() => setView('text')}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-colors ${view === 'text' ? 'bg-white/[0.08] text-ink' : 'text-ink-faint'}`}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs transition-colors ${view === 'text' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}
                 >
                   <TextAlignLeft size={13} weight="light" /> Text
                 </button>

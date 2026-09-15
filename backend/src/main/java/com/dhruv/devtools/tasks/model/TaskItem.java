@@ -49,7 +49,7 @@ public class TaskItem {
 
     private Instant dueDate;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "task_checklist_item", joinColumns = @JoinColumn(name = "task_id"))
     @OrderColumn(name = "position")
     private List<ChecklistItem> checklist = new ArrayList<>();

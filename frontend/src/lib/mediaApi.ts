@@ -1,4 +1,4 @@
-export type ImageFormat = 'png' | 'jpg' | 'bmp' | 'gif'
+export type ImageFormat = 'png' | 'jpg' | 'bmp' | 'gif' | 'webp'
 
 async function downloadFetch(url: string, body: FormData): Promise<{ blob: Blob; fileName: string }> {
   const res = await fetch(url, { method: 'POST', body })

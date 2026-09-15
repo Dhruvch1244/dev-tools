@@ -81,7 +81,7 @@ export function ImageToolsPage() {
               </span>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,.webp"
                 multiple
                 onChange={(e) => pickFiles(Array.from(e.target.files ?? []))}
                 className="hidden"
@@ -95,7 +95,7 @@ export function ImageToolsPage() {
               <>
                 <SectionLabel>Target format</SectionLabel>
                 <div className="flex flex-wrap gap-1.5">
-                  {(['png', 'jpg', 'bmp', 'gif'] as const).map((f) => (
+                  {(['png', 'jpg', 'bmp', 'gif', 'webp'] as const).map((f) => (
                     <button
                       key={f}
                       onClick={() => setFormat(f)}

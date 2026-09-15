@@ -40,7 +40,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
   }
 
   function handleCanvasClick(e: React.MouseEvent) {
-    if (e.target !== containerRef.current) return
+    if ((e.target as HTMLElement).dataset.canvasBg !== 'true') return
     if (tool === 'select' || tool === 'connect') {
       setSelected(null)
       setConnectSource(null)
@@ -266,7 +266,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
         className="relative flex-1 overflow-auto"
         style={{ background: 'radial-gradient(var(--rule) 1px, transparent 1px) 0 0 / 20px 20px', cursor: tool !== 'select' && tool !== 'connect' ? 'crosshair' : 'default' }}
       >
-        <div style={{ width: CANVAS_W, height: CANVAS_H, position: 'relative' }}>
+        <div data-canvas-bg="true" style={{ width: CANVAS_W, height: CANVAS_H, position: 'relative' }}>
           <svg width={CANVAS_W} height={CANVAS_H} className="absolute inset-0 pointer-events-none">
             <defs>
               <marker id="canvas-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">

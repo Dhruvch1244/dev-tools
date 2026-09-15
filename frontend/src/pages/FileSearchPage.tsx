@@ -73,7 +73,7 @@ export function FileSearchPage() {
               <button
                 onClick={() => setMode('upload')}
                 className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
-                  mode === 'upload' ? 'bg-white/[0.08] text-ink' : 'text-ink-faint hover:text-ink-soft'
+                  mode === 'upload' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                 }`}
               >
                 Upload
@@ -81,7 +81,7 @@ export function FileSearchPage() {
               <button
                 onClick={() => setMode('path')}
                 className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
-                  mode === 'path' ? 'bg-white/[0.08] text-ink' : 'text-ink-faint hover:text-ink-soft'
+                  mode === 'path' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                 }`}
               >
                 Local path
@@ -209,7 +209,7 @@ export function FileSearchPage() {
                 <div key={tr.term} className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-baseline gap-2">
-                      <span className="rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-xs text-cyan">{tr.term}</span>
+                      <span className="rounded-md bg-glass-strong px-2 py-0.5 font-mono text-xs text-cyan">{tr.term}</span>
                       <span className="text-xs text-ink-faint">
                         {tr.matchCount} match{tr.matchCount === 1 ? '' : 'es'}
                         {tr.truncated && ' (truncated)'}
@@ -226,7 +226,7 @@ export function FileSearchPage() {
                       tr.matches.map((m, i) => (
                         <div
                           key={i}
-                          className="group flex items-start gap-3 border-b border-rule-soft px-4 py-1.5 last:border-b-0 hover:bg-white/[0.03]"
+                          className="group flex items-start gap-3 border-b border-rule-soft px-4 py-1.5 last:border-b-0 hover:bg-glass"
                         >
                           <span className="w-12 shrink-0 select-none text-right text-ink-faint">{m.lineNumber}</span>
                           <span className="flex-1 whitespace-pre-wrap break-all text-ink">{m.line}</span>

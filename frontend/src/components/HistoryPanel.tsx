@@ -42,7 +42,7 @@ export function HistoryPanel({
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: Math.min(i * 0.03, 0.3), type: 'spring', stiffness: 380, damping: 30 }}
-              className="group flex items-center justify-between gap-2 rounded-xl border border-rule-soft bg-white/[0.02] px-2.5 py-2 text-xs transition-colors hover:border-rule hover:bg-white/[0.04]"
+              className="group flex items-center justify-between gap-2 rounded-xl border border-rule-soft bg-glass px-2.5 py-2 text-xs transition-colors hover:border-rule hover:bg-glass"
             >
               <button
                 className="flex-1 truncate text-left text-ink-soft transition-colors hover:text-ink"

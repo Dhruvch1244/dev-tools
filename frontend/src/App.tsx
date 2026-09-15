@@ -7,7 +7,6 @@ import {
   Database,
   Fingerprint,
   FileCode,
-  FileText,
   FileZip,
   GitDiff,
   Globe,
@@ -16,16 +15,17 @@ import {
   ListNumbers,
   CircleDashed,
   House,
+  LockKey,
   SidebarSimple,
   MagnifyingGlass,
   CaretDown,
   TreeStructure,
+  GitBranch,
   GitCommit,
   SquaresFour,
   Shapes,
   Clock,
   MagicWand,
-  NotePencil,
   Gauge,
   Notebook,
   GitMerge,
@@ -38,7 +38,6 @@ import {
   Terminal,
   TextAa,
   Warning,
-  Waveform,
   Wrench,
   X,
 } from '@phosphor-icons/react'
@@ -52,13 +51,14 @@ import { TimeToolkitPage } from './pages/TimeToolkitPage'
 import { RegexLabPage } from './pages/RegexLabPage'
 import { TextToolkitPage } from './pages/TextToolkitPage'
 import { DataGeneratorPage } from './pages/DataGeneratorPage'
-import { ScratchpadPage } from './pages/ScratchpadPage'
+import { VaultPage } from './pages/VaultPage'
+import { GitRepoPage } from './pages/GitRepoPage'
+import { CommandTemplatesPage } from './pages/CommandTemplatesPage'
+import { PlSqlAnalyzerPage } from './pages/PlSqlAnalyzerPage'
 import { StackTracePage } from './pages/StackTracePage'
 import { DependencyTreePage } from './pages/DependencyTreePage'
 import { SpringConfigPage } from './pages/SpringConfigPage'
 import { JarInspectPage } from './pages/JarInspectPage'
-import { MarblePage } from './pages/MarblePage'
-import { HarAnalyzerPage } from './pages/HarAnalyzerPage'
 import { BundleStatsPage } from './pages/BundleStatsPage'
 import { CorsCheckPage } from './pages/CorsCheckPage'
 import { TopAnalyzerPage } from './pages/TopAnalyzerPage'
@@ -104,15 +104,16 @@ export type Tool =
   | 'regex'
   | 'text'
   | 'data-gen'
-  | 'scratchpad'
+  | 'vault'
+  | 'git-repo'
+  | 'command-templates'
+  | 'plsql-analyzer'
   | 'stack-trace'
   | 'dep-tree'
   | 'spring-config'
   | 'jar-inspect'
   | 'top-analyzer'
   | 'reference-handbook'
-  | 'marbles'
-  | 'har'
   | 'bundle-stats'
   | 'cors-check'
   | 'aws-helpers'
@@ -126,11 +127,16 @@ export const GROUPS: ToolGroup[] = [
     tools: [{ id: 'home', label: 'Home', hint: 'favourites · recents · all tools', icon: House }],
   },
   {
+    label: 'Vault',
+    tools: [{ id: 'vault', label: 'Vault', hint: 'secrets · urls · per environment', icon: LockKey }],
+  },
+  {
     label: 'Visualizers',
     tools: [
       { id: 'diagram-studio', label: 'Diagram Studio', hint: 'mermaid code · freeform canvas', icon: Shapes },
       { id: 'spring-viz', label: 'Spring Boot Visualizer', hint: 'controllers · services · routes', icon: TreeStructure },
       { id: 'git-graph', label: 'Git Commit Graph', hint: 'branch & merge visualizer', icon: GitCommit },
+      { id: 'git-repo', label: 'Git Repo Overview', hint: 'status · branches · fetch', icon: GitBranch },
       { id: 'disk-treemap', label: 'Disk Usage Treemap', hint: 'where the space went', icon: SquaresFour },
     ],
   },
@@ -143,6 +149,7 @@ export const GROUPS: ToolGroup[] = [
       { id: 'file-search', label: 'File Search', hint: 'grep any file', icon: ListMagnifyingGlass },
       { id: 'json-xml', label: 'JSON / XML', hint: 'format · convert · → TypeScript', icon: BracketsCurly },
       { id: 'sql', label: 'SQL Workspace', hint: 'connect · query · ER diagram', icon: Database },
+      { id: 'plsql-analyzer', label: 'PL/SQL Analyzer', hint: 'call graph · table usage · risks', icon: Stack },
       { id: 'notes', label: 'Notes', hint: 'folders · links · export', icon: Notebook },
       { id: 'list-convert', label: 'List Converter', hint: "a,b,c → ('a','b','c')", icon: ListNumbers },
       { id: 'avro-schema', label: 'Avro Schema Tool', hint: 'compat check · hive ddl', icon: FileCode },
@@ -159,7 +166,7 @@ export const GROUPS: ToolGroup[] = [
       { id: 'regex', label: 'Regex Lab', hint: 'test · diagram', icon: MagicWand },
       { id: 'text', label: 'Text Toolkit', hint: 'case · sort · wrap', icon: TextAa },
       { id: 'data-gen', label: 'Data Generator', hint: 'uuid · ulid · fake data', icon: Fingerprint },
-      { id: 'scratchpad', label: 'Scratchpad', hint: 'persistent notes', icon: NotePencil },
+      { id: 'command-templates', label: 'Command Templates', hint: 'fill-in-the-blank commands · history', icon: Terminal },
     ],
   },
   {
@@ -171,8 +178,6 @@ export const GROUPS: ToolGroup[] = [
       { id: 'jar-inspect', label: 'JAR Inspector', hint: 'manifest · classes · dupes', icon: FileZip },
       { id: 'top-analyzer', label: 'top / ps Analyzer', hint: 'sort · diff snapshots', icon: Gauge },
       { id: 'reference-handbook', label: 'Reference Handbook', hint: 'linux · makefile · git', icon: Terminal },
-      { id: 'marbles', label: 'RxJS Marbles', hint: 'visualize operators', icon: Waveform },
-      { id: 'har', label: 'HAR Analyzer', hint: 'waterfall · slow requests', icon: FileText },
       { id: 'bundle-stats', label: 'Bundle Stats', hint: "what's inflating it", icon: ChartBar },
       { id: 'cors-check', label: 'CORS Checker', hint: 'why the preflight failed', icon: Globe },
       { id: 'aws-helpers', label: 'AWS Helpers', hint: 'ARN · IAM · certs', icon: ShieldCheck },
@@ -219,15 +224,16 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'regex': return <RegexLabPage />
     case 'text': return <TextToolkitPage />
     case 'data-gen': return <DataGeneratorPage />
-    case 'scratchpad': return <ScratchpadPage />
+    case 'vault': return <VaultPage />
+    case 'git-repo': return <GitRepoPage />
+    case 'command-templates': return <CommandTemplatesPage />
+    case 'plsql-analyzer': return <PlSqlAnalyzerPage />
     case 'stack-trace': return <StackTracePage />
     case 'dep-tree': return <DependencyTreePage />
     case 'spring-config': return <SpringConfigPage />
     case 'jar-inspect': return <JarInspectPage />
     case 'top-analyzer': return <TopAnalyzerPage />
     case 'reference-handbook': return <ReferenceHandbookPage />
-    case 'marbles': return <MarblePage />
-    case 'har': return <HarAnalyzerPage />
     case 'bundle-stats': return <BundleStatsPage />
     case 'cors-check': return <CorsCheckPage />
     case 'aws-helpers': return <AwsHelpersPage />

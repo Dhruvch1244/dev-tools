@@ -1,79 +1,150 @@
 # Dev Tools Suite
 
-A local, offline dev tools app: a Spring Boot repo visualizer, DB/regex/cron/git/disk
-visual tools, everyday Image/PDF tools, 40GB-scale file search, SQL Workspace with
-charting/ER-diagram/plan-visualizer tabs, a Task List, Notes with nested folders and
-backlinks, and 20+ other tools — 33 total, organized into 4 sidebar groups, reachable
-via a sidebar filter or the Ctrl+K command palette. Runs entirely on your machine as a
-single Java process — no external services, no telemetry, no internet required after
-download.
+A local, offline dev tools app: a Spring Boot repo visualizer, a heuristic PL/SQL
+call-graph/table-usage mapper, a local secrets Vault, a read-only Git repo overview,
+fill-in-the-blank Command Templates, DB/regex/cron/disk visual tools, everyday
+Image/PDF tools, 40GB-scale file search, SQL Workspace, a Task List, Notes with
+nested folders/backlinks/colors/syntax highlighting, and more — **32 tools**
+across 5 sidebar groups, reachable via the sidebar, a filter box, or the Ctrl+K
+command palette. Runs entirely on your machine as a single Java process — no
+external services, no telemetry, no internet required after download.
+
+## Vault
+
+- **Vault** — local secrets/credentials/URLs, grouped by environment (DIT, SIT,
+  UAT, PROD, or any name you use), pinned at the top of the sidebar since it's
+  used constantly. Masked by default with a reveal toggle and one-click copy.
+  Stored in the same local H2 database as everything else in this app — **plaintext,
+  no encryption at rest** — appropriate for a trusted single-user local tool, not
+  a substitute for a real secrets manager.
 
 ## Visualizers
 
-- **Diagram Studio** — a draw.io-style diagram tool with two modes: a **code** mode
-  where you write Mermaid syntax (flowcharts, sequence/class/state/ER diagrams,
-  gantt charts, pie charts) and it renders live, and a **canvas** mode — a freeform
-  whiteboard where you place rectangles/ellipses/diamonds/text, drag to move,
-  drag-resize, connect shapes with arrows, recolor, and export to SVG. Canvas
-  diagrams save by name locally for later.
-- **Spring Boot Visualizer** — point it at a local Spring Boot project's source root
-  and it statically parses the `.java` files (JavaParser, no compilation) to find
+- **Diagram Studio** — a draw.io-style diagram tool with two modes: a **code**
+  mode where you write Mermaid syntax (flowcharts, sequence/class/state/ER
+  diagrams, gantt charts, pie charts) and it renders live, and a **canvas** mode —
+  a freeform whiteboard where you place rectangles/ellipses/diamonds/text, drag to
+  move, drag-resize, connect shapes with arrows, recolor, and export to SVG or PNG.
+  Canvas diagrams save by name locally for later.
+- **Spring Boot Visualizer** — point it at a local Spring Boot project's source
+  root (or a workspace of multiple sub-projects) and it statically parses the
+  `.java` files (JavaParser, no compilation) to find
   `@RestController`/`@Service`/`@Repository`/`@Component` classes, draws a
   Controller → Service → Repository dependency graph from field/constructor
-  injection, and lists every `@GetMapping`/`@PostMapping`/etc. endpoint as a real URL
-  (reading `server.port` / `server.servlet.context-path` from
-  `application.properties`/`.yml`). Remembers recently analyzed projects.
-- **DB Schema (ER Diagram)** — reuses SQL Workspace's connections; renders every
-  table as a box with its columns (PK/FK marked) and draws foreign-key relationship
-  lines between them.
-- **Cron Visualizer** — paste a 5-field cron expression, get a plain-English
-  description, a weekly hour × day-of-week heatmap of when it fires, and the next 12
-  actual run times.
-- **Regex Diagram** — breaks a pattern into groups, alternation, character classes,
-  and quantifiers and lays it out as a railroad-style flow diagram instead of a wall
-  of escape characters.
+  injection, flags circular dependencies, follows `@FeignClient` cross-service
+  calls, and lists every `@GetMapping`/`@PostMapping`/etc. endpoint as a real URL.
+  Remembers recently analyzed projects.
 - **Git Commit Graph** — paste the output of one `git log` command and see a real
   branch/merge graph with lane-colored commit lines, not just a flat list.
-- **Disk Usage Treemap** — scans a local folder and renders a proportional treemap of
-  what's taking up space, click any box to drill into that subfolder.
+- **Git Repo Overview** — register a local repo path and get branch, ahead/behind,
+  uncommitted files, branches, remotes, stash, and recent commits, plus a Fetch
+  button. Read-only by design — there is no commit or push endpoint anywhere in
+  the code, only a fixed set of read/fetch git subcommands.
+- **Disk Usage Treemap** — scans a local folder and renders a squarified treemap
+  (or a pie-chart view) of what's taking up space; common noise folders
+  (`node_modules`, `.git`, `dist`, `target`, …) are greyed out instead of
+  competing for attention. Click any box to drill into that subfolder.
 
-## Tools
+## Everyday & Data Tools
 
-- **Image Tools** — convert between PNG/JPG/BMP/GIF, or enhance (brightness,
-  contrast, sharpen, resize/upscale). Runs server-side, offline.
-- **PDF Converter** — assemble images into a PDF, or render a PDF's pages back
-  to a zip of images at a chosen DPI.
-- **Task List** — a to-do list that actually times you: records when a task
-  was created, started, and completed, with elapsed duration shown per task.
+- **Image Tools** — convert between PNG/JPG/BMP/GIF/WebP (read and write), or
+  enhance (brightness, contrast, sharpen, resize/upscale). Batch mode processes
+  multiple files into a zip. Runs server-side, offline.
+- **PDF Converter** — assemble images into a PDF, render a PDF's pages back to a
+  zip of images at a chosen DPI, merge multiple PDFs in order, or split one PDF
+  into one file per page.
+- **Task List** — a to-do list with priority, due dates, tags, and per-task
+  checklists, that actually times you: records when a task was created, started,
+  and completed, with elapsed duration shown per task.
 - **File Search** — search across files up to 40GB, plain term or regex,
   case-sensitive toggle. Streams line-by-line so large files don't get loaded
   into memory. Copy any single matched line or all matches at once.
-- **SQL Workspace** — connect, query, and save results, with an inline linter
-  (missing WHERE, SELECT *, unbounded queries), an auto-generated chart for
-  numeric results, and a visual tree/step view for EXPLAIN plans.
 - **JSON / XML formatter** — pretty-prints valid JSON into a collapsible,
   color-coded tree or raw text. Invalid JSON still gets broken onto readable
   lines with the parse error shown. Same idea for XML/SOAP (XXE-safe DOM parse).
   Also converts JSON ↔ escaped JSON string, both directions.
+- **SQL Workspace** — connect (Postgres, MySQL, SQLite, Oracle via JDBC thin
+  URL) and query, with autocomplete for table/column names, an inline linter
+  (missing WHERE, SELECT *, unbounded queries), an auto-generated chart for
+  numeric results, a visual tree/step view for EXPLAIN plans, and an ER
+  diagram tab.
+- **PL/SQL Analyzer** — point it at a folder of `.sql`/`.pks`/`.pkb`/`.prc`/`.fnc`/
+  `.trg` files and it builds a searchable inventory of every
+  package/procedure/function/trigger/view, a call graph (pick a routine, see its
+  callers and callees, including cross-package calls), a table read/write usage
+  map, and flags risky patterns (dynamic SQL, swallowed exceptions, deprecated
+  `(+)` outer joins, `SELECT *`). **This is a heuristic regex-based scanner, not
+  a real PL/SQL grammar parser** — treat results as a strong starting point for
+  exploring an unfamiliar codebase, not compiler-verified ground truth.
+- **Notes** — nested, collapsible folder tree, `[[Wiki-link]]` backlinks,
+  full-text search, markdown editor with sanitized live preview, colored/
+  highlighted text, syntax-highlighted code blocks, created/last-edited
+  timestamps, export to standalone `.md` or `.html`. Type `/` for a
+  Notion-style command menu (tables, checklists, headings, quote, code block,
+  bold/italic/strikethrough/inline-code/link, collapsible sections, divider,
+  colors, image upload, link-a-task — inserts a live-status `[[task:ID]]`
+  reference back to Task List), or just paste/drag an image straight into the
+  editor — images upload to the backend and are referenced by URL, not embedded
+  as base64, so the note body stays small and readable.
 - **List Converter** — paste one item per line, get back `('a', 'b', 'c')` and
   `(a, b, c)`.
-- **Notes** — nested folder tree, `[[Wiki-link]]` backlinks, markdown editor
-  with sanitized live preview, created/last-edited timestamps, export to
-  standalone `.md` or `.html`. Type `/` for a Notion-style command menu
-  (table, checklist, headings, quote, code block, divider, image upload,
-  link-a-task — inserts a live-status `[[task:ID]]` reference back to Task
-  List), or just paste/drag an image straight into the editor.
+- **Avro Schema Tool** — paste a writer and reader schema, get a backward-
+  compatibility check field-by-field, plus a generated Hive DDL from the writer
+  schema.
+- **Delimited File Profiler** — streams a huge CSV/TSV and profiles it (column
+  types, null rates, distinct counts) without loading it all into memory.
+- **Part-File Merger** — merges Hadoop/Spark-style `part-*` output files back
+  into one.
+
+## Text & Dev Utilities
+
+- **Diff** — line-and-word diff between two texts, with a unified-diff-style
+  summary and copy-to-clipboard.
+- **Encode / Decode** — base64, JWT decode, and common hash functions.
+- **Time Toolkit** — convert any date/time in any timezone (defaults to IST) to
+  epoch/ISO/every other configured timezone at once, plus epoch↔ISO conversion,
+  duration between two timestamps, and a cron expression explainer with a
+  weekly heatmap and next-12-runs list.
+- **Regex Lab** — test a pattern live against sample text, or see it broken down
+  as a railroad-style diagram instead of a wall of escape characters.
+- **Text Toolkit** — separate input/output panes; case conversion, line
+  sort/dedupe/trim/reverse/number, find & replace, column extraction, word-wrap,
+  and live stats (lines/words/chars).
+- **Data Generator** — UUIDs, ULIDs, and other fake test data.
+- **Command Templates** — write a command with placeholders like
+  `aws s3 cp <source=./file.txt> <dest=s3://bucket/file.txt>`; each `<name>` or
+  `<name=default>` becomes an editable field pre-filled with your mock value,
+  live-renders the final command as you edit, and keeps a history of every
+  generated command for reuse.
+
+## Backend, Web & Ops
+
+- **Stack Trace Analyzer** — collapses framework noise out of a pasted
+  stack trace so the actual failure point stands out.
+- **Dependency Tree** — visualizes a Maven/Gradle dependency tree.
+- **Spring Config** — diffs two versions of a `.properties`/`.yml` config file.
+- **JAR Inspector** — inspects a JAR's manifest, class list, and duplicate
+  classes across a classpath.
+- **top / ps Analyzer** — sorts and diffs pasted `top`/`ps` snapshots to spot
+  what changed.
 - **Reference Handbook** — Linux command builder, Makefile explainer, and Git
   handbook (categorized commands, "how do I…" recipes) in one tabbed tool.
-- **20 more tools** reachable via the sidebar filter or the Ctrl+K command
-  palette, with favourites (star to pin) and real multi-tab switching that
-  keeps each tool's state alive while you work in another.
+- **Bundle Stats** — loads a webpack/rollup/vite/Angular `stats.json` and shows
+  what's inflating the bundle, largest assets first.
+- **CORS Checker** — explains why a cross-origin request's preflight failed.
+- **AWS Helpers** — ARN parsing, IAM policy helpers, certificate inspection.
+
+## Shared app features
+
+- **Home tab** — pinned favourites, recently used tools, and a full searchable
+  tool directory.
 - **History** — every run is saved locally (embedded H2 file database) per
   tool; click any entry to reload it back into the input.
 - **Appearance** — pick a coding font with real ligatures (JetBrains Mono,
   Fira Code, Victor Mono) and a color theme, including a Light theme, on top
-  of the existing dark palettes (Void, Dracula, Nord, Tokyo Night, Gruvbox,
+  of several dark palettes (Void, Dracula, Nord, Tokyo Night, Gruvbox,
   Catppuccin, Solarized, and more). Both persist across restarts.
+- **Ctrl+K command palette** — jump to any tool without touching the sidebar.
 
 ## Running it
 
@@ -86,8 +157,8 @@ run.bat
 This starts `backend/target/devtools-suite.jar` and opens your browser to
 `http://localhost:8383`. Close the "Dev Tools Suite" console window to stop it.
 
-Notes/Tasks/SQL connections & saved queries/history live in an H2 database at
-`%USERPROFILE%\.devtools-suite\` — not next to the jar — so downloading a new
+Notes/Tasks/Vault/SQL connections & saved queries/history live in an H2 database
+at `%USERPROFILE%\.devtools-suite\` — not next to the jar — so downloading a new
 release (a new extracted folder) never loses your data. If you have an older
 release with `devtools-history.mv.db` sitting next to `run.bat`, the first run
 of a new version copies it into the new location automatically.
@@ -106,7 +177,20 @@ static resources, and packages everything into one runnable jar at
 
 ## Stack
 
-- Backend: Java 17, Spring Boot 3, embedded H2 (file-based) for history.
+- Backend: Java 17, Spring Boot 3, embedded H2 (file-based) for history/notes/
+  tasks/vault, JavaParser for Spring Boot static analysis, PDFBox for PDF work,
+  a `webp-imageio` plugin for WebP support, and a fixed-command git wrapper for
+  Git Repo Overview (shells out to the system `git`, no arbitrary-command
+  endpoint exists).
 - Frontend: React + TypeScript + Vite, Tailwind CSS, Framer Motion, Phosphor
-  Icons. Fonts and icons are self-hosted (no CDN), so the packaged jar works
-  fully offline.
+  Icons, `marked` + DOMPurify + `highlight.js` for Notes. Fonts and icons are
+  self-hosted (no CDN), so the packaged jar works fully offline.
+
+## Known limitations
+
+- **PL/SQL Analyzer** is a regex-based heuristic scanner, not a real grammar
+  parser — good for exploration, not a source of truth.
+- **Vault** stores secrets in plaintext locally — not encrypted at rest.
+- **Command Templates**, **Vault**, and **Git Repo Overview** are new this cycle
+  and have been smoke-tested (CRUD round-trips, live scans against real repos)
+  but not used in anger over time yet.

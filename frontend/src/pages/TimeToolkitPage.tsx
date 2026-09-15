@@ -18,6 +18,110 @@ const TIMEZONES = [
   'Europe/Berlin', 'Asia/Kolkata', 'Asia/Singapore', 'Asia/Tokyo', 'Australia/Sydney',
 ]
 
+function offsetMinutesAt(utcMs: number, timeZone: string): number {
+  const dtf = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  })
+  const parts = dtf.formatToParts(new Date(utcMs))
+  const map: Record<string, string> = {}
+  for (const p of parts) map[p.type] = p.value
+  const asUtc = Date.UTC(+map.year, +map.month - 1, +map.day, +map.hour === 24 ? 0 : +map.hour, +map.minute, +map.second)
+  return (asUtc - utcMs) / 60000
+}
+
+/** Converts a wall-clock date/time as observed in `timeZone` into the real UTC instant it represents. */
+function zonedWallTimeToUtc(y: number, mo: number, d: number, h: number, mi: number, timeZone: string): Date {
+  let guess = Date.UTC(y, mo - 1, d, h, mi, 0)
+  for (let i = 0; i < 2; i++) {
+    const offset = offsetMinutesAt(guess, timeZone)
+    guess = Date.UTC(y, mo - 1, d, h, mi, 0) - offset * 60000
+  }
+  return new Date(guess)
+}
+
+function AnyTimeConverter() {
+  const now = new Date()
+  const [sourceTz, setSourceTz] = useState('Asia/Kolkata')
+  const [dateStr, setDateStr] = useState(now.toISOString().slice(0, 10))
+  const [timeStr, setTimeStr] = useState(now.toTimeString().slice(0, 5))
+
+  const instant = useMemo(() => {
+    const [y, mo, d] = dateStr.split('-').map(Number)
+    const [h, mi] = timeStr.split(':').map(Number)
+    if (!y || !mo || !d || Number.isNaN(h) || Number.isNaN(mi)) return null
+    try {
+      return zonedWallTimeToUtc(y, mo, d, h, mi, sourceTz)
+    } catch {
+      return null
+    }
+  }, [dateStr, timeStr, sourceTz])
+
+  const relative = useMemo(() => {
+    if (!instant) return ''
+    const diffMs = instant.getTime() - Date.now()
+    const abs = Math.abs(diffMs)
+    const mins = Math.round(abs / 60000)
+    const label =
+      mins < 60 ? `${mins}m` : mins < 1440 ? `${Math.round(mins / 60)}h` : `${Math.round(mins / 1440)}d`
+    return diffMs >= 0 ? `in ${label}` : `${label} ago`
+  }, [instant])
+
+  return (
+    <Panel className="col-span-2">
+      <div className="flex flex-col gap-3 p-4">
+        <SectionLabel>Convert any date & time (any timezone) → everything</SectionLabel>
+        <div className="flex flex-wrap items-center gap-2">
+          <input type="date" className="devtools-input w-auto" value={dateStr} onChange={(e) => setDateStr(e.target.value)} />
+          <input type="time" className="devtools-input w-auto" value={timeStr} onChange={(e) => setTimeStr(e.target.value)} />
+          <span className="text-xs text-ink-faint">in</span>
+          <select className="devtools-input w-auto" value={sourceTz} onChange={(e) => setSourceTz(e.target.value)}>
+            {TIMEZONES.map((z) => <option key={z} value={z}>{z}</option>)}
+          </select>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              const n = new Date()
+              setDateStr(n.toISOString().slice(0, 10))
+              setTimeStr(n.toTimeString().slice(0, 5))
+              setSourceTz('Asia/Kolkata')
+            }}
+          >
+            Now (IST)
+          </Button>
+        </div>
+
+        {!instant ? (
+          <ErrorBanner message="Enter a valid date and time." />
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-rule-soft bg-glass p-3 text-xs text-ink-soft">
+              <span className="font-mono text-ink">{instant.toISOString()}</span>
+              <span>· epoch {Math.floor(instant.getTime() / 1000)}s</span>
+              <span>· {instant.getTime()}ms</span>
+              <span>· {relative}</span>
+              <CopyButton text={String(Math.floor(instant.getTime() / 1000))} label="Copy epoch" />
+              <CopyButton text={instant.toISOString()} label="Copy ISO" />
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
+              {TIMEZONES.map((z) => (
+                <div key={z} className="flex flex-col rounded-lg bg-glass px-2.5 py-1.5">
+                  <span className="text-[10px] uppercase tracking-wide text-ink-faint">{z}</span>
+                  <span className="font-mono text-[12px] text-ink">
+                    {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: z }).format(instant)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </Panel>
+  )
+}
+
 export function TimeToolkitPage() {
   const [epoch, setEpoch] = useState(String(Math.floor(Date.now() / 1000)))
   const [iso, setIso] = useState(new Date().toISOString())
@@ -78,6 +182,8 @@ export function TimeToolkitPage() {
 
   return (
     <div className="grid h-full grid-cols-2 gap-4 overflow-auto">
+      <AnyTimeConverter />
+
       <Panel>
         <div className="flex flex-col gap-3 p-4">
           <SectionLabel>Epoch ↔ ISO</SectionLabel>
@@ -108,7 +214,7 @@ export function TimeToolkitPage() {
               </option>
             ))}
           </select>
-          <div className="rounded-xl border border-rule-soft bg-white/[0.02] p-3 text-sm text-ink">
+          <div className="rounded-xl border border-rule-soft bg-glass p-3 text-sm text-ink">
             {zoned ?? 'Enter a valid epoch or ISO value above'}
           </div>
         </div>
@@ -119,7 +225,7 @@ export function TimeToolkitPage() {
           <SectionLabel>Duration between two timestamps</SectionLabel>
           <input className="devtools-input font-mono" value={durFrom} onChange={(e) => setDurFrom(e.target.value)} />
           <input className="devtools-input font-mono" value={durTo} onChange={(e) => setDurTo(e.target.value)} />
-          <div className="rounded-xl border border-rule-soft bg-white/[0.02] p-3 text-sm text-ink">
+          <div className="rounded-xl border border-rule-soft bg-glass p-3 text-sm text-ink">
             {durationMs == null ? 'Invalid timestamps' : formatDuration(durationMs)}
           </div>
         </div>

@@ -118,7 +118,7 @@ export function CommandPalette<T extends string>({
       >
         <MagnifyingGlass size={13} weight="light" />
         <span className="flex-1 text-left">Search tools…</span>
-        <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px]">Ctrl K</kbd>
+        <kbd className="rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[10px]">Ctrl K</kbd>
       </button>
 
       {createPortal(
@@ -149,7 +149,7 @@ export function CommandPalette<T extends string>({
                   placeholder="Jump to a tool…"
                   className="flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-faint"
                 />
-                <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">Esc</kbd>
+                <kbd className="rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">Esc</kbd>
               </div>
 
               <div className="flex-1 overflow-y-auto p-2">
@@ -165,7 +165,7 @@ export function CommandPalette<T extends string>({
                         onMouseEnter={() => setActiveIndex(i)}
                         onClick={() => select(item)}
                         className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
-                          active ? 'bg-white/[0.08]' : 'hover:bg-white/[0.04]'
+                          active ? 'bg-glass-strong' : 'hover:bg-glass'
                         }`}
                       >
                         <Icon size={16} weight="light" className={active ? 'text-cyan' : 'text-ink-faint'} />

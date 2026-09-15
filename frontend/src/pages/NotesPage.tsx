@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { DownloadSimple, FileCode as FileCodeIcon, Note as NoteIcon, Plus, Star, Trash } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, DownloadSimple, FileCode as FileCodeIcon, Note as NoteIcon, Plus, Star, Trash } from '@phosphor-icons/react'
 import {
   createFolder,
   createNote,
@@ -11,6 +11,7 @@ import {
   searchNotes,
   setNoteFavourite,
   updateNote,
+  uploadNoteImage,
   type Folder,
   type Note,
 } from '../lib/notesApi'
@@ -47,6 +48,15 @@ export function NotesPage() {
   const [tasks, setTasks] = useState<TaskItem[]>([])
   const [noteQuery, setNoteQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Note[] | null>(null)
+  const [foldersCollapsed, setFoldersCollapsed] = useState(() => localStorage.getItem('devtools.notes-folders-collapsed') === '1')
+
+  function toggleFoldersCollapsed() {
+    setFoldersCollapsed((prev) => {
+      const next = !prev
+      localStorage.setItem('devtools.notes-folders-collapsed', next ? '1' : '0')
+      return next
+    })
+  }
 
   const tasksById = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks])
   const displayedNotes = searchResults ?? notes
@@ -242,20 +252,27 @@ export function NotesPage() {
     }
   }
 
-  function readImageAsDataUrl(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
-
   async function insertImageFile(file: File, at: number | null) {
-    const dataUrl = await readImageAsDataUrl(file)
-    const md = imageMarkdown(file.name.replace(/\.[^.]+$/, ''), dataUrl)
-    if (at != null) insertAtCursor(md, at, at)
-    else insertAtCursor(md)
+    // Uploaded and referenced by URL rather than embedded as a base64 data-URI — keeps the raw
+    // markdown body small and readable no matter how many/large the images are.
+    const placeholder = `![Uploading ${file.name}…]()`
+    if (at != null) insertAtCursor(placeholder, at, at)
+    else insertAtCursor(placeholder)
+    try {
+      const { url } = await uploadNoteImage(file)
+      const md = imageMarkdown(file.name.replace(/\.[^.]+$/, ''), url)
+      setDraftBody((current) => {
+        const next = current.replace(placeholder, md)
+        scheduleSave(draftTitle, next, draftTags)
+        return next
+      })
+    } catch {
+      setDraftBody((current) => {
+        const next = current.replace(placeholder, `![upload failed: ${file.name}]()`)
+        scheduleSave(draftTitle, next, draftTags)
+        return next
+      })
+    }
   }
 
   function handleImageInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -291,25 +308,38 @@ export function NotesPage() {
 
   return (
     <div className="flex h-full gap-4">
-      <ResizablePanel storageKey="notes-folders" defaultWidth={256} className="flex flex-col gap-3">
-        <Panel>
-          <div className="flex flex-col gap-2 p-3">
-            <div className="flex items-center justify-between px-1">
-              <SectionLabel>Folders</SectionLabel>
-              <button onClick={() => addSubfolder(null)} className="text-ink-faint hover:text-cyan" title="New root folder">
-                <Plus size={12} weight="bold" />
-              </button>
-            </div>
-            <button
-              onClick={() => setSelectedFolderId(null)}
-              className={`rounded-lg px-2 py-1 text-left text-xs ${selectedFolderId === null ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'}`}
-            >
-              All notes
-            </button>
-            <FolderTree nodes={tree} selectedId={selectedFolderId} onSelect={setSelectedFolderId} onAddChild={addSubfolder} onDelete={removeFolder} />
-          </div>
+      {foldersCollapsed ? (
+        <Panel className="flex w-9 shrink-0 flex-col items-center py-3">
+          <button onClick={toggleFoldersCollapsed} className="text-ink-faint hover:text-cyan" title="Show folders">
+            <CaretRight size={13} weight="bold" />
+          </button>
         </Panel>
-      </ResizablePanel>
+      ) : (
+        <ResizablePanel storageKey="notes-folders" defaultWidth={256} className="flex flex-col gap-3">
+          <Panel>
+            <div className="flex flex-col gap-2 p-3">
+              <div className="flex items-center justify-between px-1">
+                <SectionLabel>Folders</SectionLabel>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => addSubfolder(null)} className="text-ink-faint hover:text-cyan" title="New root folder">
+                    <Plus size={12} weight="bold" />
+                  </button>
+                  <button onClick={toggleFoldersCollapsed} className="text-ink-faint hover:text-ink-soft" title="Hide folders">
+                    <CaretLeft size={12} weight="bold" />
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedFolderId(null)}
+                className={`rounded-lg px-2 py-1 text-left text-xs ${selectedFolderId === null ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'}`}
+              >
+                All notes
+              </button>
+              <FolderTree nodes={tree} selectedId={selectedFolderId} onSelect={setSelectedFolderId} onAddChild={addSubfolder} onDelete={removeFolder} />
+            </div>
+          </Panel>
+        </ResizablePanel>
+      )}
 
       <ResizablePanel storageKey="notes-list" defaultWidth={288}><Panel className="flex h-full flex-col overflow-hidden">
         <div className="flex flex-1 flex-col p-3">

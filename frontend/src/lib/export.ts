@@ -1,9 +1,55 @@
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import hljs from 'highlight.js/lib/core'
+import javascript from 'highlight.js/lib/languages/javascript'
+import typescript from 'highlight.js/lib/languages/typescript'
+import xml from 'highlight.js/lib/languages/xml'
+import css from 'highlight.js/lib/languages/css'
+import json from 'highlight.js/lib/languages/json'
+import java from 'highlight.js/lib/languages/java'
+import python from 'highlight.js/lib/languages/python'
+import bash from 'highlight.js/lib/languages/bash'
+import sql from 'highlight.js/lib/languages/sql'
+import yaml from 'highlight.js/lib/languages/yaml'
+
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('typescript', typescript)
+hljs.registerLanguage('xml', xml)
+hljs.registerLanguage('html', xml)
+hljs.registerLanguage('css', css)
+hljs.registerLanguage('json', json)
+hljs.registerLanguage('java', java)
+hljs.registerLanguage('python', python)
+hljs.registerLanguage('bash', bash)
+hljs.registerLanguage('shell', bash)
+hljs.registerLanguage('sql', sql)
+hljs.registerLanguage('yaml', yaml)
+
+const renderer = new marked.Renderer()
+renderer.code = ({ text, lang }) => {
+  const language = lang && hljs.getLanguage(lang) ? lang : null
+  const result = language ? hljs.highlight(text, { language }).value : hljs.highlightAuto(text).value
+  return `<pre class="hljs-block"><code class="hljs${language ? ` language-${language}` : ''}">${result}</code></pre>`
+}
+marked.use({ renderer })
+
+/**
+ * {color:NAME}text{/color} and {highlight}text{/highlight} are a lightweight, markdown-safe
+ * inline-color syntax (curly braces don't collide with anything marked/commonmark parses) —
+ * substituted to raw <span>/<mark> HTML before marked runs, same technique NotesPage already
+ * uses for [[wiki links]]. Marked passes untouched inline HTML straight through its tokenizer.
+ */
+function applyInlineColorSyntax(md: string): string {
+  return md
+    .replace(/\{color:([a-zA-Z0-9#]+)\}([\s\S]*?)\{\/color\}/g, (_m, color, inner) => `<span style="color:${color}">${inner}</span>`)
+    .replace(/\{highlight(?::([a-zA-Z0-9#]+))?\}([\s\S]*?)\{\/highlight\}/g, (_m, color, inner) =>
+      `<mark${color ? ` style="background:${color}"` : ''}>${inner}</mark>`
+    )
+}
 
 export function markdownToSafeHtml(md: string): string {
-  const raw = marked.parse(md, { async: false, breaks: true }) as string
-  return DOMPurify.sanitize(raw)
+  const raw = marked.parse(applyInlineColorSyntax(md), { async: false, breaks: true }) as string
+  return DOMPurify.sanitize(raw, { ADD_ATTR: ['style', 'class'] })
 }
 
 function slugify(title: string): string {

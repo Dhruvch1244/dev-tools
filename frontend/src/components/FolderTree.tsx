@@ -49,7 +49,7 @@ function FolderRow({
     <div>
       <div
         className={`group flex items-center gap-1 rounded-lg px-1.5 py-1 text-xs transition-colors ${
-          active ? 'bg-white/[0.08] text-ink' : 'text-ink-soft hover:bg-white/[0.04]'
+          active ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'
         }`}
         style={{ paddingLeft: 6 + depth * 14 }}
       >

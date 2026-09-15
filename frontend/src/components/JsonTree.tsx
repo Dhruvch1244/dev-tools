@@ -40,7 +40,7 @@ function Node({ label, value, depth }: { label: string | null; value: unknown; d
   return (
     <div>
       <div
-        className="flex cursor-pointer select-none items-center gap-1.5 rounded-lg py-1 hover:bg-white/[0.04]"
+        className="flex cursor-pointer select-none items-center gap-1.5 rounded-lg py-1 hover:bg-glass"
         style={{ paddingLeft: depth * 18 }}
         onClick={() => setOpen((o) => !o)}
       >

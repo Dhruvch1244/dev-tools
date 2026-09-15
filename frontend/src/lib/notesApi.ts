@@ -38,3 +38,11 @@ export const createNote = (req: NoteRequest) => jsonFetch<Note>('/api/notes', 'P
 export const updateNote = (id: number, req: NoteRequest) => jsonFetch<Note>(`/api/notes/${id}`, 'PUT', req)
 export const deleteNote = (id: number) => jsonFetch<void>(`/api/notes/${id}`, 'DELETE')
 export const setNoteFavourite = (id: number, favourite: boolean) => jsonFetch<Note>(`/api/notes/${id}/favourite`, 'POST', { favourite })
+
+export async function uploadNoteImage(file: File): Promise<{ id: number; url: string }> {
+  const fd = new FormData()
+  fd.set('file', file)
+  const res = await fetch('/api/notes/attachments', { method: 'POST', body: fd })
+  if (!res.ok) throw new Error((await res.json().catch(() => ({ error: res.statusText }))).error ?? 'Upload failed')
+  return res.json()
+}
