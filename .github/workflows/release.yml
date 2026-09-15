@@ -1,0 +1,77 @@
+name: Release
+
+# Runs whenever a feature branch lands on main — builds the app, bumps the
+# patch version off the latest existing tag, and cuts a GitHub release with
+# the same run.bat/build.bat + jar zip layout used for manual releases.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Copy frontend into backend static resources
+        shell: pwsh
+        run: |
+          if (Test-Path backend\src\main\resources\static) { Remove-Item -Recurse -Force backend\src\main\resources\static }
+          New-Item -ItemType Directory -Force -Path backend\src\main\resources\static | Out-Null
+          Copy-Item -Recurse -Force frontend\dist\* backend\src\main\resources\static\
+
+      - name: Build backend jar
+        working-directory: backend
+        run: mvn -B -q clean package -DskipTests
+
+      - name: Compute next version
+        id: version
+        shell: pwsh
+        run: |
+          $latest = (git tag --list "v*" --sort=-v:refname | Select-Object -First 1)
+          if (-not $latest) { $latest = "v0.0.0" }
+          $parts = $latest.TrimStart("v").Split(".")
+          $next = "v$($parts[0]).$($parts[1]).$([int]$parts[2] + 1)"
+          echo "version=$next" >> $env:GITHUB_OUTPUT
+          echo "Releasing $next (previous: $latest)"
+
+      - name: Package release zip
+        shell: pwsh
+        run: |
+          $stage = "stage\devtools-suite"
+          New-Item -ItemType Directory -Force -Path "$stage\backend\target" | Out-Null
+          Copy-Item build.bat, run.bat, README.md -Destination $stage
+          Copy-Item backend\target\devtools-suite.jar -Destination "$stage\backend\target\devtools-suite.jar"
+          Compress-Archive -Path $stage -DestinationPath "devtools-suite-${{ steps.version.outputs.version }}.zip"
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag ${{ steps.version.outputs.version }}
+          git push origin ${{ steps.version.outputs.version }}
+          gh release create ${{ steps.version.outputs.version }} `
+            "devtools-suite-${{ steps.version.outputs.version }}.zip" `
+            --title "Dev Tools Suite ${{ steps.version.outputs.version }}" `
+            --generate-notes
