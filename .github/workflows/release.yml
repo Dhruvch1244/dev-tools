@@ -1,8 +1,9 @@
 name: Release
 
-# Runs whenever a feature branch lands on main — builds the app, bumps the
-# patch version off the latest existing tag, and cuts a GitHub release with
-# the same run.bat/build.bat + jar zip layout used for manual releases.
+# Fires on every push to main (i.e. every merge from a feature branch). Builds the frontend,
+# packages it into the Spring Boot jar the same way build.bat does locally, bumps the patch
+# version automatically from the latest vX.Y.Z tag, and publishes a GitHub release with the
+# same run.bat/build.bat/README.md + jar zip layout as the manual releases.
 on:
   push:
     branches: [main]
@@ -10,68 +11,74 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
           cache: maven
+          cache-dependency-path: backend/pom.xml
 
-      - name: Build frontend
-        working-directory: frontend
-        run: |
-          npm install
-          npm run build
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Copy frontend into backend static resources
-        shell: pwsh
-        run: |
-          if (Test-Path backend\src\main\resources\static) { Remove-Item -Recurse -Force backend\src\main\resources\static }
-          New-Item -ItemType Directory -Force -Path backend\src\main\resources\static | Out-Null
-          Copy-Item -Recurse -Force frontend\dist\* backend\src\main\resources\static\
-
-      - name: Build backend jar
-        working-directory: backend
-        run: mvn -B -q clean package -DskipTests
+      - name: Build (frontend -> backend static -> jar)
+        shell: cmd
+        run: build.bat
 
       - name: Compute next version
         id: version
-        shell: pwsh
+        shell: bash
         run: |
-          $latest = (git tag --list "v*" --sort=-v:refname | Select-Object -First 1)
-          if (-not $latest) { $latest = "v0.0.0" }
-          $parts = $latest.TrimStart("v").Split(".")
-          $next = "v$($parts[0]).$($parts[1]).$([int]$parts[2] + 1)"
-          echo "version=$next" >> $env:GITHUB_OUTPUT
-          echo "Releasing $next (previous: $latest)"
+          git fetch --tags --quiet
+          latest=$(git tag -l 'v*.*.*' | sort -t. -k1.2,1n -k2,2n -k3,3n | tail -1)
+          if [ -z "$latest" ]; then latest="v0.0.0"; fi
+          version=${latest#v}
+          IFS='.' read -r major minor patch <<< "$version"
+          next="v${major}.${minor}.$((patch + 1))"
+          echo "tag=$next" >> "$GITHUB_OUTPUT"
+          echo "Next release: $next (previous: $latest)"
 
       - name: Package release zip
-        shell: pwsh
+        shell: bash
         run: |
-          $stage = "stage\devtools-suite"
-          New-Item -ItemType Directory -Force -Path "$stage\backend\target" | Out-Null
-          Copy-Item build.bat, run.bat, README.md -Destination $stage
-          Copy-Item backend\target\devtools-suite.jar -Destination "$stage\backend\target\devtools-suite.jar"
-          Compress-Archive -Path $stage -DestinationPath "devtools-suite-${{ steps.version.outputs.version }}.zip"
+          stage="stage/devtools-suite"
+          mkdir -p "$stage/backend/target"
+          cp build.bat run.bat README.md "$stage/"
+          cp backend/target/devtools-suite.jar "$stage/backend/target/devtools-suite.jar"
+          (cd stage && 7z a -tzip "../devtools-suite-${{ steps.version.outputs.tag }}.zip" devtools-suite)
 
-      - name: Tag and release
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Tag
+        shell: bash
         run: |
-          git tag ${{ steps.version.outputs.version }}
-          git push origin ${{ steps.version.outputs.version }}
-          gh release create ${{ steps.version.outputs.version }} `
-            "devtools-suite-${{ steps.version.outputs.version }}.zip" `
-            --title "Dev Tools Suite ${{ steps.version.outputs.version }}" `
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Dev Tools Suite ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            "devtools-suite-${{ steps.version.outputs.tag }}.zip" \
+            --title "Dev Tools Suite ${{ steps.version.outputs.tag }}" \
             --generate-notes
