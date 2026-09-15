@@ -42,4 +42,23 @@ public class PdfController {
                 .header("X-Page-Count", String.valueOf(result.pageCount()))
                 .body(result.zipBytes());
     }
+
+    @PostMapping(value = "/merge", consumes = "multipart/form-data")
+    public ResponseEntity<byte[]> merge(@RequestParam("files") List<MultipartFile> files) throws IOException {
+        byte[] pdf = service.mergePdfs(files);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename("merged.pdf").build().toString())
+                .body(pdf);
+    }
+
+    @PostMapping(value = "/split", consumes = "multipart/form-data")
+    public ResponseEntity<byte[]> split(@RequestParam("file") MultipartFile file) throws IOException {
+        var result = service.splitPdf(file);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/zip"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("pdf-split.zip").build().toString())
+                .header("X-Page-Count", String.valueOf(result.pageCount()))
+                .body(result.zipBytes());
+    }
 }

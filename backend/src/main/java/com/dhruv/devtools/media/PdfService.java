@@ -1,6 +1,9 @@
 package com.dhruv.devtools.media;
 
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -75,6 +78,47 @@ public class PdfService {
                 }
             }
             return new RenderedPages(zipBuffer.toByteArray(), pageCount);
+        }
+    }
+
+    /** Concatenates PDFs in upload order into one document. */
+    public byte[] mergePdfs(List<MultipartFile> files) throws IOException {
+        if (files.size() < 2) throw new IllegalArgumentException("Upload at least two PDFs to merge.");
+
+        PDFMergerUtility merger = new PDFMergerUtility();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        merger.setDestinationStream(out);
+        for (MultipartFile file : files) {
+            merger.addSource(new RandomAccessReadBuffer(file.getInputStream()));
+        }
+        merger.mergeDocuments(null);
+        return out.toByteArray();
+    }
+
+    public record SplitResult(byte[] zipBytes, int pageCount) {}
+
+    /** One PDF file per page, zipped. */
+    public SplitResult splitPdf(MultipartFile file) throws IOException {
+        try (PDDocument doc = Loader.loadPDF(file.getBytes())) {
+            int pageCount = doc.getNumberOfPages();
+            if (pageCount < 2) throw new IllegalArgumentException("PDF has only one page — nothing to split.");
+
+            Splitter splitter = new Splitter();
+            List<PDDocument> pages = splitter.split(doc);
+
+            ByteArrayOutputStream zipBuffer = new ByteArrayOutputStream();
+            try (ZipOutputStream zip = new ZipOutputStream(zipBuffer)) {
+                for (int i = 0; i < pages.size(); i++) {
+                    try (PDDocument page = pages.get(i)) {
+                        ByteArrayOutputStream pageBuffer = new ByteArrayOutputStream();
+                        page.save(pageBuffer);
+                        zip.putNextEntry(new ZipEntry(String.format("page-%03d.pdf", i + 1)));
+                        zip.write(pageBuffer.toByteArray());
+                        zip.closeEntry();
+                    }
+                }
+            }
+            return new SplitResult(zipBuffer.toByteArray(), pageCount);
         }
     }
 

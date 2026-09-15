@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { UploadSimple, DownloadSimple, Image as ImageIcon } from '@phosphor-icons/react'
-import { convertImage, enhanceImage, type ImageFormat } from '../lib/mediaApi'
+import { convertImage, convertImageBatch, enhanceImage, enhanceImageBatch, type ImageFormat } from '../lib/mediaApi'
 import { Button, Panel, SectionLabel, ErrorBanner } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
 
@@ -8,7 +8,7 @@ type Tab = 'convert' | 'enhance'
 
 export function ImageToolsPage() {
   const [tab, setTab] = useState<Tab>('convert')
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [sourceUrl, setSourceUrl] = useState<string | null>(null)
   const [resultUrl, setResultUrl] = useState<string | null>(null)
   const [resultName, setResultName] = useState('')
@@ -21,20 +21,29 @@ export function ImageToolsPage() {
   const [sharpen, setSharpen] = useState(false)
   const [scale, setScale] = useState(1)
 
-  function pickFile(f: File | null) {
-    setFile(f)
+  const isBatch = files.length > 1
+  const singleFile = files.length === 1 ? files[0] : null
+
+  function pickFiles(list: File[]) {
+    setFiles(list)
     setResultUrl(null)
     setError(null)
     if (sourceUrl) URL.revokeObjectURL(sourceUrl)
-    setSourceUrl(f ? URL.createObjectURL(f) : null)
+    setSourceUrl(list.length === 1 ? URL.createObjectURL(list[0]) : null)
   }
 
   async function run() {
-    if (!file) return
+    if (files.length === 0) return
     setLoading(true)
     setError(null)
     try {
-      const { blob, fileName } = tab === 'convert' ? await convertImage(file, format) : await enhanceImage(file, { brightness, contrast, sharpen, scale })
+      const { blob, fileName } = isBatch
+        ? tab === 'convert'
+          ? await convertImageBatch(files, format)
+          : await enhanceImageBatch(files, { brightness, contrast, sharpen, scale })
+        : tab === 'convert'
+          ? await convertImage(files[0], format)
+          : await enhanceImage(files[0], { brightness, contrast, sharpen, scale })
       if (resultUrl) URL.revokeObjectURL(resultUrl)
       setResultUrl(URL.createObjectURL(blob))
       setResultName(fileName)
@@ -64,17 +73,23 @@ export function ImageToolsPage() {
               ))}
             </div>
 
-            <SectionLabel>Image</SectionLabel>
+            <SectionLabel>Image{isBatch ? 's' : ''}</SectionLabel>
             <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-rule px-3 py-2.5 text-xs text-ink-soft transition-colors hover:border-cyan/40 hover:text-ink">
               <UploadSimple size={14} weight="light" />
-              <span className="truncate">{file ? file.name : 'Choose an image…'}</span>
+              <span className="truncate">
+                {files.length === 0 ? 'Choose one or more images…' : files.length === 1 ? files[0].name : `${files.length} images selected`}
+              </span>
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+                multiple
+                onChange={(e) => pickFiles(Array.from(e.target.files ?? []))}
                 className="hidden"
               />
             </label>
+            {isBatch && (
+              <div className="text-[11px] text-ink-faint">Multiple images selected — result downloads as a zip instead of a side-by-side preview.</div>
+            )}
 
             {tab === 'convert' ? (
               <>
@@ -105,8 +120,8 @@ export function ImageToolsPage() {
               </>
             )}
 
-            <Button variant="primary" onClick={run} disabled={!file || loading}>
-              {loading ? 'Processing…' : tab === 'convert' ? 'Convert' : 'Enhance'}
+            <Button variant="primary" onClick={run} disabled={files.length === 0 || loading}>
+              {loading ? 'Processing…' : isBatch ? `${tab === 'convert' ? 'Convert' : 'Enhance'} ${files.length} images` : tab === 'convert' ? 'Convert' : 'Enhance'}
             </Button>
           </div>
         </Panel>
@@ -116,16 +131,33 @@ export function ImageToolsPage() {
         <div className="flex-1 overflow-auto p-4">
           {error && <ErrorBanner message={error} />}
 
-          {!file && !error && (
+          {files.length === 0 && !error && (
             <div className="flex h-full items-center justify-center text-sm text-ink-faint">
               <div className="flex flex-col items-center gap-2">
                 <ImageIcon size={28} weight="light" />
-                Pick an image on the left to get started.
+                Pick one or more images on the left to get started.
               </div>
             </div>
           )}
 
-          {file && (
+          {isBatch && (
+            <div className="flex h-full flex-col items-center justify-center gap-4">
+              <div className="flex max-h-40 w-72 flex-col gap-1 overflow-auto rounded-2xl border border-rule bg-panel p-3">
+                {files.map((f, i) => (
+                  <div key={i} className="truncate text-[11px] text-ink-soft">{f.name}</div>
+                ))}
+              </div>
+              {resultUrl ? (
+                <Button variant="default" onClick={() => downloadResult(resultUrl, resultName)}>
+                  <DownloadSimple size={14} weight="light" /> Download {resultName}
+                </Button>
+              ) : (
+                <span className="text-xs text-ink-faint">Run {tab} to process all {files.length} images into a zip.</span>
+              )}
+            </div>
+          )}
+
+          {singleFile && (
             <div className="grid h-full grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <SectionLabel>Original</SectionLabel>

@@ -32,6 +32,23 @@ export function enhanceImage(file: File, opts: EnhanceOptions) {
   return downloadFetch('/api/media/image/enhance', fd)
 }
 
+export function convertImageBatch(files: File[], format: ImageFormat) {
+  const fd = new FormData()
+  for (const f of files) fd.append('files', f)
+  fd.set('format', format)
+  return downloadFetch('/api/media/image/convert-batch', fd)
+}
+
+export function enhanceImageBatch(files: File[], opts: EnhanceOptions) {
+  const fd = new FormData()
+  for (const f of files) fd.append('files', f)
+  fd.set('brightness', String(opts.brightness))
+  fd.set('contrast', String(opts.contrast))
+  fd.set('sharpen', String(opts.sharpen))
+  fd.set('scale', String(opts.scale))
+  return downloadFetch('/api/media/image/enhance-batch', fd)
+}
+
 export function imagesToPdf(files: File[]) {
   const fd = new FormData()
   for (const f of files) fd.append('files', f)
@@ -44,6 +61,18 @@ export function pdfToImages(file: File, format: 'png' | 'jpg', dpi: number) {
   fd.set('format', format)
   fd.set('dpi', String(dpi))
   return downloadFetch('/api/media/pdf/to-images', fd)
+}
+
+export function mergePdfs(files: File[]) {
+  const fd = new FormData()
+  for (const f of files) fd.append('files', f)
+  return downloadFetch('/api/media/pdf/merge', fd)
+}
+
+export function splitPdf(file: File) {
+  const fd = new FormData()
+  fd.set('file', file)
+  return downloadFetch('/api/media/pdf/split', fd)
 }
 
 export function triggerDownload(blob: Blob, fileName: string) {
