@@ -48,8 +48,12 @@ jobs:
         shell: bash
         run: |
           git fetch --tags --quiet
-          latest=$(git tag -l 'v*.*.*' | sort -t. -k1.2,1n -k2,2n -k3,3n | tail -1)
-          if [ -z "$latest" ]; then latest="v0.0.0"; fi
+          tags=$(git tag -l 'v*.*.*')
+          if [ -z "$tags" ]; then
+            latest="v0.0.0"
+          else
+            latest="v$(echo "$tags" | sed 's/^v//' | sort -V | tail -1)"
+          fi
           version=${latest#v}
           IFS='.' read -r major minor patch <<< "$version"
           next="v${major}.${minor}.$((patch + 1))"
@@ -57,13 +61,14 @@ jobs:
           echo "Next release: $next (previous: $latest)"
 
       - name: Package release zip
-        shell: bash
+        shell: pwsh
         run: |
-          stage="stage/devtools-suite"
-          mkdir -p "$stage/backend/target"
-          cp build.bat run.bat README.md "$stage/"
-          cp backend/target/devtools-suite.jar "$stage/backend/target/devtools-suite.jar"
-          (cd stage && 7z a -tzip "../devtools-suite-${{ steps.version.outputs.tag }}.zip" devtools-suite)
+          $tag = "${{ steps.version.outputs.tag }}"
+          $stage = "stage/devtools-suite"
+          New-Item -ItemType Directory -Force -Path "$stage/backend/target" | Out-Null
+          Copy-Item build.bat,run.bat,README.md -Destination $stage
+          Copy-Item backend/target/devtools-suite.jar -Destination "$stage/backend/target/devtools-suite.jar"
+          Compress-Archive -Path $stage -DestinationPath "devtools-suite-$tag.zip"
 
       - name: Tag
         shell: bash
