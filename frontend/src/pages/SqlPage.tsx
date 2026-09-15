@@ -78,23 +78,7 @@ export function SqlPage() {
   const [sampleView, setSampleView] = useState<{ label: string; columns: string[]; rows: unknown[][] } | null>(null)
   const [resultView, setResultView] = useState<'table' | 'chart'>('table')
 
-  const sqlRef = useRef<HTMLTextAreaElement>(null)
-  const [ac, setAc] = useState<{ start: number; end: number; pos: { top: number; left: number } } | null>(null)
-  const [acIndex, setAcIndex] = useState(0)
-
   const activeConnection = useMemo(() => connections.find((c) => c.id === connectionId) ?? null, [connections, connectionId])
-
-  const acSuggestions = useMemo(() => {
-    type Item = { label: string; detail: string }
-    const items: Item[] = []
-    for (const s of schema) {
-      for (const t of s.tables) {
-        items.push({ label: t.name, detail: 'table' })
-        for (const c of t.columns) items.push({ label: c.name, detail: t.name })
-      }
-    }
-    return items
-  }, [schema])
 
   const lintIssues: LintIssue[] = useMemo(
     () => lintSql(sql, { readOnlyConnection: activeConnection?.readOnly }),
@@ -167,6 +151,13 @@ export function SqlPage() {
       .slice(0, 12)
   }, [suggest, allSuggestions])
 
+  /** Odd number of unescaped quotes before the caret on this line = we're inside a string literal. */
+  function insideStringLiteral(linePrefix: string): boolean {
+    const singles = (linePrefix.match(/(?<!\\)'/g) ?? []).length
+    const doubles = (linePrefix.match(/(?<!\\)"/g) ?? []).length
+    return singles % 2 === 1 || doubles % 2 === 1
+  }
+
   function updateSuggestState() {
     const el = sqlRef.current
     if (!el || allSuggestions.length === 0) {
@@ -175,6 +166,11 @@ export function SqlPage() {
     }
     const caret = el.selectionStart
     const upToCaret = el.value.slice(0, caret)
+    const lineStart = upToCaret.lastIndexOf('\n') + 1
+    if (insideStringLiteral(upToCaret.slice(lineStart))) {
+      setSuggest(null)
+      return
+    }
     const match = upToCaret.match(/[A-Za-z_][A-Za-z0-9_]*$/)
     if (!match || match[0].length < 2) {
       setSuggest(null)
