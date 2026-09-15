@@ -1,12 +1,12 @@
 package com.dhruv.devtools.springviz;
 
 import com.dhruv.devtools.springviz.dto.SpringVizResult;
+import com.dhruv.devtools.springviz.dto.SpringVizResult.Cycle;
 import com.dhruv.devtools.springviz.dto.SpringVizResult.Edge;
 import com.dhruv.devtools.springviz.dto.SpringVizResult.Endpoint;
 import com.dhruv.devtools.springviz.dto.SpringVizResult.Node;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
 import org.springframework.stereotype.Service;
@@ -19,16 +19,23 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * Static-analysis repo visualizer: walks a local Spring Boot project's .java sources with
- * JavaParser (AST only, no compilation/classpath needed) to find @RestController/@Service/
- * @Repository/@Component classes, the HTTP endpoints controllers expose, and "depends on"
- * edges inferred from field/constructor injection where the injected type is itself a
- * discovered bean. Also does a light line-scan of application.properties/yml for
- * server.port and server.servlet.context-path so endpoint paths can be shown as real URLs.
+ * Static-analysis repo visualizer: walks local Spring Boot source with JavaParser (AST only,
+ * no compilation/classpath needed) to find @RestController/@Service/@Repository/@Component
+ * classes, the HTTP endpoints controllers expose, "depends on" edges inferred from field/
+ * constructor injection, @FeignClient-based cross-service calls, and circular dependencies.
+ *
+ * Two scan modes, auto-detected from the folder you point it at:
+ *  - Single project: the root itself is (or contains, Maven-multi-module-style) one build.
+ *    Every class gets tagged with its `module` (nearest ancestor dir with a pom.xml/build.gradle).
+ *  - Workspace: the root has no build file of its own but >= 2 immediate subdirectories that
+ *    each do — i.e. a folder of several independent services. Every class additionally gets
+ *    tagged with its `project` (which immediate subdirectory it came from), so the frontend can
+ *    group/filter by service. @FeignClient interfaces become edges to a synthetic external-
+ *    service node, resolved to a real scanned project when the Feign client name matches one.
  *
  * This is deliberately a heuristic, not a full Spring context resolution — no classpath
  * scanning, no interface-to-impl resolution, no conditional beans. Good enough to see the
- * shape of a codebase at a glance, same spirit as SqlGuard's "confident heuristic" approach.
+ * shape of a codebase (or a workspace of them) at a glance.
  */
 @Service
 public class SpringVizService {
@@ -49,11 +56,14 @@ public class SpringVizService {
             throw new IllegalArgumentException("'" + rootPath + "' is not a directory.");
         }
 
+        boolean workspace = isWorkspace(root);
+        List<Path> projectRoots = workspace ? immediateBuildRoots(root) : List.of(root);
+
         List<Path> javaFiles;
         try (Stream<Path> walk = Files.walk(root)) {
             javaFiles = walk
                     .filter(p -> p.toString().endsWith(".java"))
-                    .filter(p -> !p.toString().contains(targetDirMarker()))
+                    .filter(p -> !p.toString().contains(targetDirMarker()) && !p.toString().contains(buildDirMarker()))
                     .toList();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -62,9 +72,10 @@ public class SpringVizService {
             throw new IllegalArgumentException("No .java files found under '" + rootPath + "'.");
         }
 
-        // Pass 1: find every stereotyped class, keyed by simple class name.
+        // Pass 1: every stereotyped class, keyed by simple class name; every @FeignClient interface separately.
         Map<String, Node> nodesByName = new LinkedHashMap<>();
         Map<String, ClassOrInterfaceDeclaration> declByName = new HashMap<>();
+        Map<String, String> feignTargetByInterface = new HashMap<>();
         int scanned = 0;
 
         for (Path file : javaFiles) {
@@ -73,22 +84,32 @@ public class SpringVizService {
                 cu = StaticJavaParser.parse(file);
                 scanned++;
             } catch (Exception e) {
-                continue; // unparsable file (syntax error, unsupported language level) — skip, don't fail the whole scan
+                continue; // unparsable file — skip, don't fail the whole scan
             }
             String pkg = cu.getPackageDeclaration().map(pd -> pd.getNameAsString()).orElse("");
+            String module = nearestModuleName(file, root);
+            String project = workspace ? topLevelDirName(file, root) : "";
 
             for (ClassOrInterfaceDeclaration decl : cu.findAll(ClassOrInterfaceDeclaration.class)) {
-                if (decl.isInterface()) continue;
+                String name = decl.getNameAsString();
+
+                if (decl.isInterface()) {
+                    feignClientTarget(decl).ifPresent(target -> {
+                        feignTargetByInterface.put(name, target);
+                        declByName.put(name, decl);
+                        nodesByName.put(name, new Node(name, name, pkg, "RemoteClient", 0, module, project));
+                    });
+                    continue;
+                }
+
                 String kind = stereotypeOf(decl);
                 if (kind == null) continue;
-
-                String name = decl.getNameAsString();
                 declByName.put(name, decl);
-                nodesByName.put(name, new Node(name, name, pkg, kind, 0));
+                nodesByName.put(name, new Node(name, name, pkg, kind, 0, module, project));
             }
         }
 
-        // Pass 2: endpoints (controllers only) + dependency edges (any bean -> any other known bean).
+        // Pass 2: endpoints (controllers only) + dependency edges (any bean -> any other known bean/Feign client).
         List<Endpoint> endpoints = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         Map<String, Integer> endpointCounts = new HashMap<>();
@@ -96,7 +117,8 @@ public class SpringVizService {
         for (var entry : declByName.entrySet()) {
             String name = entry.getKey();
             ClassOrInterfaceDeclaration decl = entry.getValue();
-            String kind = nodesByName.get(name).kind();
+            Node node = nodesByName.get(name);
+            String kind = node.kind();
 
             if (kind.equals("RestController") || kind.equals("Controller")) {
                 String basePath = classRequestMappingPath(decl);
@@ -109,29 +131,135 @@ public class SpringVizService {
 
                         String methodPath = firstStringValue(ann, "value", "path").orElse("");
                         String fullPath = joinPaths(basePath, methodPath);
-                        endpoints.add(new Endpoint(httpMethod, fullPath, name, m.getNameAsString()));
+                        endpoints.add(new Endpoint(httpMethod, fullPath, name, m.getNameAsString(), node.project()));
                         endpointCounts.merge(name, 1, Integer::sum);
                     }
                 }
             }
 
-            for (String depType : injectedTypeNames(decl)) {
-                if (declByName.containsKey(depType) && !depType.equals(name)) {
-                    edges.add(new Edge(name, depType));
+            if (!kind.equals("RemoteClient")) {
+                for (String depType : injectedTypeNames(decl)) {
+                    if (declByName.containsKey(depType) && !depType.equals(name)) {
+                        edges.add(new Edge(name, depType));
+                    }
                 }
             }
         }
 
+        // Feign clients -> a synthetic external-service node per distinct target, resolved to a
+        // real scanned project's name when the workspace has one that matches (case-insensitive,
+        // ignoring separators — "order-service" vs "OrderService" vs "order_service" all match).
+        Set<String> knownProjects = projectRoots.stream().map(p -> p.getFileName().toString()).collect(java.util.stream.Collectors.toSet());
+        for (var e : feignTargetByInterface.entrySet()) {
+            String interfaceName = e.getKey();
+            String target = e.getValue();
+            String resolved = resolveToKnownProject(target, knownProjects).orElse(target);
+            String externalId = "service:" + resolved;
+            nodesByName.putIfAbsent(externalId, new Node(externalId, resolved, "", "ExternalService", 0, "", resolved));
+            edges.add(new Edge(interfaceName, externalId));
+        }
+
         List<Node> nodes = nodesByName.values().stream()
-                .map(n -> new Node(n.id(), n.simpleName(), n.packageName(), n.kind(), endpointCounts.getOrDefault(n.id(), 0)))
+                .map(n -> new Node(n.id(), n.simpleName(), n.packageName(), n.kind(), endpointCounts.getOrDefault(n.id(), 0), n.module(), n.project()))
                 .sorted(Comparator.comparing(Node::kind).thenComparing(Node::simpleName))
                 .toList();
 
         List<Edge> dedupedEdges = edges.stream().distinct().toList();
+        List<Cycle> cycles = findCycles(nodes, dedupedEdges);
 
         AppConfig config = readAppConfig(root);
+        List<String> projectNames = workspace ? new ArrayList<>(knownProjects) : List.of();
+        Collections.sort(projectNames);
 
-        return new SpringVizResult.Response(nodes, dedupedEdges, endpoints, config.contextPath, config.port, scanned);
+        return new SpringVizResult.Response(nodes, dedupedEdges, endpoints, config.contextPath, config.port, scanned, workspace, projectNames, cycles);
+    }
+
+    /** A workspace: the root has no build file itself, but >=2 immediate children do. */
+    private boolean isWorkspace(Path root) {
+        if (hasBuildFile(root)) return false;
+        return immediateBuildRoots(root).size() >= 2;
+    }
+
+    private List<Path> immediateBuildRoots(Path root) {
+        try (Stream<Path> children = Files.list(root)) {
+            return children.filter(Files::isDirectory).filter(this::hasBuildFile).toList();
+        } catch (IOException e) {
+            return List.of();
+        }
+    }
+
+    private boolean hasBuildFile(Path dir) {
+        return Files.exists(dir.resolve("pom.xml")) || Files.exists(dir.resolve("build.gradle")) || Files.exists(dir.resolve("build.gradle.kts"));
+    }
+
+    /** Nearest ancestor directory (relative to root, inclusive) that has a build file — the Maven/Gradle module a file belongs to. */
+    private String nearestModuleName(Path file, Path root) {
+        Path dir = file.getParent();
+        while (dir != null && !dir.equals(root.getParent())) {
+            if (hasBuildFile(dir)) return dir.getFileName() == null ? "" : dir.getFileName().toString();
+            if (dir.equals(root)) break;
+            dir = dir.getParent();
+        }
+        return "";
+    }
+
+    private String topLevelDirName(Path file, Path root) {
+        Path rel = root.relativize(file);
+        return rel.getNameCount() > 0 ? rel.getName(0).toString() : "";
+    }
+
+    private Optional<String> resolveToKnownProject(String target, Set<String> knownProjects) {
+        String normalizedTarget = normalize(target);
+        for (String p : knownProjects) {
+            if (normalize(p).equals(normalizedTarget)) return Optional.of(p);
+        }
+        return Optional.empty();
+    }
+
+    private String normalize(String s) {
+        return s.toLowerCase().replaceAll("[-_]", "");
+    }
+
+    /** @FeignClient(name="x") / (value="x") / (url="x") — any of the three name the remote service. */
+    private Optional<String> feignClientTarget(ClassOrInterfaceDeclaration decl) {
+        for (AnnotationExpr ann : decl.getAnnotations()) {
+            if (!ann.getNameAsString().equals("FeignClient")) continue;
+            return firstStringValue(ann, "name", "value", "url");
+        }
+        return Optional.empty();
+    }
+
+    /** DFS cycle detection over the bean-dependency graph, reported once per distinct cycle (by node set). */
+    private List<Cycle> findCycles(List<Node> nodes, List<Edge> edges) {
+        Map<String, List<String>> adjacency = new HashMap<>();
+        for (Edge e : edges) adjacency.computeIfAbsent(e.from(), k -> new ArrayList<>()).add(e.to());
+
+        List<Cycle> cycles = new ArrayList<>();
+        Set<Set<String>> seen = new HashSet<>();
+        Set<String> visiting = new LinkedHashSet<>();
+        Set<String> done = new HashSet<>();
+
+        for (Node n : nodes) {
+            if (!done.contains(n.id())) dfs(n.id(), adjacency, visiting, done, cycles, seen);
+        }
+        return cycles;
+    }
+
+    private void dfs(String node, Map<String, List<String>> adjacency, Set<String> visiting, Set<String> done, List<Cycle> cycles, Set<Set<String>> seen) {
+        visiting.add(node);
+        for (String next : adjacency.getOrDefault(node, List.of())) {
+            if (visiting.contains(next)) {
+                List<String> path = new ArrayList<>(visiting);
+                int startIdx = path.indexOf(next);
+                List<String> cyclePath = new ArrayList<>(path.subList(startIdx, path.size()));
+                cyclePath.add(next);
+                if (seen.add(new HashSet<>(cyclePath))) cycles.add(new Cycle(cyclePath));
+            } else if (!done.contains(next)) {
+                dfs(next, adjacency, visiting, done, cycles, seen);
+            }
+        }
+        visiting.remove(node);
+        done.add(node);
     }
 
     private String stereotypeOf(ClassOrInterfaceDeclaration decl) {
@@ -318,5 +446,9 @@ public class SpringVizService {
 
     private String targetDirMarker() {
         return java.io.File.separator + "target" + java.io.File.separator;
+    }
+
+    private String buildDirMarker() {
+        return java.io.File.separator + "build" + java.io.File.separator;
     }
 }

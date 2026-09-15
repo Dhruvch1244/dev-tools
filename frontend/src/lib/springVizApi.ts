@@ -9,11 +9,12 @@ async function jsonFetch<T>(url: string, method: string, body?: unknown): Promis
   return text ? JSON.parse(text) : (undefined as T)
 }
 
-export type BeanKind = 'RestController' | 'Controller' | 'Service' | 'Repository' | 'Component' | 'Configuration'
+export type BeanKind = 'RestController' | 'Controller' | 'Service' | 'Repository' | 'Component' | 'Configuration' | 'RemoteClient' | 'ExternalService'
 
-export type SpringVizNode = { id: string; simpleName: string; packageName: string; kind: BeanKind; endpointCount: number }
+export type SpringVizNode = { id: string; simpleName: string; packageName: string; kind: BeanKind; endpointCount: number; module: string; project: string }
 export type SpringVizEdge = { from: string; to: string }
-export type SpringVizEndpoint = { httpMethod: string; path: string; controllerClass: string; methodName: string }
+export type SpringVizEndpoint = { httpMethod: string; path: string; controllerClass: string; methodName: string; project: string }
+export type SpringVizCycle = { path: string[] }
 
 export type SpringVizResponse = {
   nodes: SpringVizNode[]
@@ -22,6 +23,9 @@ export type SpringVizResponse = {
   contextPath: string | null
   port: number | null
   javaFilesScanned: number
+  workspace: boolean
+  projects: string[]
+  cycles: SpringVizCycle[]
 }
 
 export const analyzeSpringRepo = (path: string) =>

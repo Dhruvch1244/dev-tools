@@ -1,8 +1,13 @@
 import { useMemo, useState } from 'react'
-import type { BeanKind, SpringVizEdge, SpringVizNode } from '../lib/springVizApi'
+import type { BeanKind, SpringVizCycle, SpringVizEdge, SpringVizNode } from '../lib/springVizApi'
 
-const LAYER_ORDER: BeanKind[] = ['RestController', 'Controller', 'Configuration', 'Service', 'Component', 'Repository']
-const LAYER_INDEX: Record<BeanKind, number> = { RestController: 0, Controller: 0, Configuration: 0, Service: 1, Component: 1, Repository: 2 }
+const LAYER_ORDER: BeanKind[] = ['RestController', 'Controller', 'Configuration', 'Service', 'Component', 'RemoteClient', 'Repository', 'ExternalService']
+const LAYER_INDEX: Record<BeanKind, number> = {
+  RestController: 0, Controller: 0, Configuration: 0,
+  Service: 1, Component: 1, RemoteClient: 1,
+  Repository: 2,
+  ExternalService: 3,
+}
 const KIND_COLOR: Record<BeanKind, string> = {
   RestController: 'var(--cyan)',
   Controller: 'var(--cyan)',
@@ -10,6 +15,8 @@ const KIND_COLOR: Record<BeanKind, string> = {
   Component: 'var(--warm)',
   Repository: 'var(--emerald)',
   Configuration: 'var(--rose)',
+  RemoteClient: 'var(--warm)',
+  ExternalService: 'var(--ink-faint)',
 }
 
 const BOX_W = 168
@@ -17,8 +24,17 @@ const BOX_H = 56
 const GAP_X = 28
 const GAP_Y = 72
 
-export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges: SpringVizEdge[] }) {
+export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringVizNode[]; edges: SpringVizEdge[]; cycles?: SpringVizCycle[] }) {
   const [selected, setSelected] = useState<string | null>(null)
+  const showProjects = nodes.some((n) => n.project)
+
+  const cycleEdgeKeys = useMemo(() => {
+    const keys = new Set<string>()
+    for (const c of cycles) {
+      for (let i = 0; i < c.path.length - 1; i++) keys.add(`${c.path[i]}|${c.path[i + 1]}`)
+    }
+    return keys
+  }, [cycles])
 
   const { positions, width, height } = useMemo(() => {
     const byLayer = new Map<number, SpringVizNode[]>()
@@ -77,6 +93,7 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
             const from = positions.get(e.from)
             const to = positions.get(e.to)
             if (!from || !to) return null
+            const inCycle = cycleEdgeKeys.has(`${e.from}|${e.to}`)
             const dimmed = connectedIds && !(connectedIds.has(e.from) && connectedIds.has(e.to))
             const x1 = from.x + BOX_W / 2 + 20
             const y1 = from.y + BOX_H + 20
@@ -88,15 +105,18 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
                 key={i}
                 d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
                 fill="none"
-                stroke={dimmed ? 'var(--rule)' : 'var(--ink-faint)'}
-                strokeWidth={1.5}
-                markerEnd="url(#arrow)"
+                stroke={inCycle ? 'var(--rose)' : dimmed ? 'var(--rule)' : 'var(--ink-faint)'}
+                strokeWidth={inCycle ? 2.25 : 1.5}
+                markerEnd={inCycle ? 'url(#arrow-warn)' : 'url(#arrow)'}
               />
             )
           })}
           <defs>
             <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
               <path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--ink-faint)" strokeWidth={1.2} />
+            </marker>
+            <marker id="arrow-warn" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6" fill="none" stroke="var(--rose)" strokeWidth={1.4} />
             </marker>
           </defs>
         </svg>
@@ -105,6 +125,7 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
           const p = positions.get(n.id)
           if (!p) return null
           const dimmed = connectedIds && !connectedIds.has(n.id)
+          const external = n.kind === 'ExternalService'
           return (
             <div
               key={n.id}
@@ -112,7 +133,7 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
                 e.stopPropagation()
                 setSelected(selected === n.id ? null : n.id)
               }}
-              className="absolute cursor-pointer rounded-xl border bg-panel px-3 py-2 transition-opacity"
+              className={`absolute cursor-pointer rounded-xl border bg-panel px-3 py-2 transition-opacity ${external ? 'border-dashed' : ''}`}
               style={{
                 left: p.x + 20,
                 top: p.y + 20,
@@ -123,12 +144,15 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
               }}
             >
               <div className="truncate text-xs font-semibold text-ink">{n.simpleName}</div>
-              <div className="truncate text-[10px] text-ink-faint">{n.packageName}</div>
+              <div className="truncate text-[10px] text-ink-faint">{external ? 'external service' : n.packageName}</div>
               <div className="mt-0.5 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: KIND_COLOR[n.kind] }} />
                 <span className="text-[9.5px] uppercase tracking-wide text-ink-faint">{n.kind}</span>
                 {n.endpointCount > 0 && <span className="text-[9.5px] text-cyan">· {n.endpointCount} routes</span>}
               </div>
+              {showProjects && n.project && !external && (
+                <div className="absolute -top-1.5 left-2 rounded-full bg-void px-1.5 text-[8.5px] text-ink-faint ring-1 ring-rule">{n.project}</div>
+              )}
             </div>
           )
         })}
@@ -140,10 +164,10 @@ export function SpringVizGraph({ nodes, edges }: { nodes: SpringVizNode[]; edges
 export function GraphLegend() {
   return (
     <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-soft">
-      {(['RestController', 'Service', 'Repository', 'Component', 'Configuration'] as BeanKind[]).map((k) => (
+      {(['RestController', 'Service', 'Repository', 'Component', 'RemoteClient', 'ExternalService', 'Configuration'] as BeanKind[]).map((k) => (
         <div key={k} className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ background: KIND_COLOR[k] }} />
-          {k}
+          {k === 'RemoteClient' ? 'Feign Client' : k === 'ExternalService' ? 'External Service' : k}
         </div>
       ))}
     </div>
