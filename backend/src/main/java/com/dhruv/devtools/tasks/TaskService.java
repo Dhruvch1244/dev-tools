@@ -23,21 +23,43 @@ public class TaskService {
         return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such task: " + id));
     }
 
-    public record Request(String title, String notes) {}
+    public record ChecklistItemRequest(String text, boolean done) {}
+
+    public record Request(
+            String title,
+            String notes,
+            TaskItem.Priority priority,
+            String tags,
+            Instant dueDate,
+            List<ChecklistItemRequest> checklist
+    ) {}
 
     public TaskItem create(Request req) {
         if (req.title() == null || req.title().isBlank()) throw new IllegalArgumentException("Task title can't be empty.");
         TaskItem task = new TaskItem();
         task.setTitle(req.title().trim());
-        task.setNotes(req.notes());
+        apply(task, req);
         return repository.save(task);
     }
 
     public TaskItem update(Long id, Request req) {
         TaskItem task = get(id);
         if (req.title() != null && !req.title().isBlank()) task.setTitle(req.title().trim());
-        task.setNotes(req.notes());
+        apply(task, req);
         return repository.save(task);
+    }
+
+    private void apply(TaskItem task, Request req) {
+        task.setNotes(req.notes());
+        task.setPriority(req.priority() != null ? req.priority() : TaskItem.Priority.MEDIUM);
+        task.setTags(req.tags());
+        task.setDueDate(req.dueDate());
+        if (req.checklist() != null) {
+            task.getChecklist().clear();
+            for (ChecklistItemRequest item : req.checklist()) {
+                task.getChecklist().add(new TaskItem.ChecklistItem(item.text(), item.done()));
+            }
+        }
     }
 
     /** First transition into IN_PROGRESS records startedAt; re-starting a done task doesn't reset it. */

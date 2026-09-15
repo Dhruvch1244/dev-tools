@@ -15,6 +15,7 @@ import {
   ListMagnifyingGlass,
   ListNumbers,
   CircleDashed,
+  House,
   SidebarSimple,
   MagnifyingGlass,
   CaretDown,
@@ -74,12 +75,14 @@ import { SpringVizPage } from './pages/SpringVizPage'
 import { GitGraphPage } from './pages/GitGraphPage'
 import { DiskTreemapPage } from './pages/DiskTreemapPage'
 import { DiagramStudioPage } from './pages/DiagramStudioPage'
+import { HomePage } from './pages/HomePage'
 import { SettingsPopover } from './components/SettingsPopover'
 import { CommandPalette, type PaletteItem } from './components/CommandPalette'
 import { applyTheme, getStoredTheme } from './lib/themes'
 import { applyFont, getStoredFont } from './lib/fonts'
 
-type Tool =
+export type Tool =
+  | 'home'
   | 'diagram-studio'
   | 'spring-viz'
   | 'git-graph'
@@ -114,9 +117,14 @@ type Tool =
   | 'cors-check'
   | 'aws-helpers'
 
-type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
+export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
+export type ToolGroup = { label: string; tools: ToolDef[] }
 
-const GROUPS: { label: string; tools: ToolDef[] }[] = [
+export const GROUPS: ToolGroup[] = [
+  {
+    label: 'Home',
+    tools: [{ id: 'home', label: 'Home', hint: 'favourites · recents · all tools', icon: House }],
+  },
   {
     label: 'Visualizers',
     tools: [
@@ -187,8 +195,9 @@ function loadFavourites(): Tool[] {
   return []
 }
 
-function renderPage(tool: Tool) {
+function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]; onOpenTool: (id: Tool) => void }) {
   switch (tool) {
+    case 'home': return <HomePage favourites={homeProps.favourites} recents={homeProps.recents} onOpenTool={homeProps.onOpenTool} />
     case 'diagram-studio': return <DiagramStudioPage />
     case 'spring-viz': return <SpringVizPage />
     case 'git-graph': return <GitGraphPage />
@@ -240,7 +249,7 @@ function loadSession(): { openTabs: Tool[]; activeTab: Tool } {
   } catch {
     /* corrupt storage — start fresh */
   }
-  return { openTabs: ['file-search'], activeTab: 'file-search' }
+  return { openTabs: ['home'], activeTab: 'home' }
 }
 
 function loadRecents(): Tool[] {
@@ -297,7 +306,7 @@ function App() {
     setOpenTabs((tabs) => {
       const idx = tabs.indexOf(id)
       const next = tabs.filter((t) => t !== id)
-      if (next.length === 0) return ['file-search']
+      if (next.length === 0) return ['home']
       if (id === activeTab) {
         setActiveTab(next[Math.min(idx, next.length - 1)])
       }
@@ -522,7 +531,7 @@ function App() {
         <div className="relative flex-1 overflow-hidden">
           {openTabs.map((id) => (
             <div key={id} className="absolute inset-0" style={{ display: id === activeTab ? 'block' : 'none' }}>
-              {renderPage(id)}
+              {renderPage(id, { favourites, recents, onOpenTool: openTool })}
             </div>
           ))}
         </div>

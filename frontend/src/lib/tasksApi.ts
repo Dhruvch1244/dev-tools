@@ -11,18 +11,31 @@ async function jsonFetch<T>(url: string, method: string, body?: unknown): Promis
 }
 
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE'
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
+export type ChecklistItem = { text: string; done: boolean }
 
 export type TaskItem = {
   id: number
   title: string
   notes: string | null
   status: TaskStatus
+  priority: TaskPriority
+  tags: string | null
+  dueDate: string | null
+  checklist: ChecklistItem[]
   createdAt: string
   startedAt: string | null
   completedAt: string | null
 }
 
-export type TaskRequest = { title: string; notes: string | null }
+export type TaskRequest = {
+  title: string
+  notes: string | null
+  priority: TaskPriority
+  tags: string | null
+  dueDate: string | null
+  checklist: ChecklistItem[]
+}
 
 export const listTasks = () => jsonFetch<TaskItem[]>('/api/tasks', 'GET')
 export const createTask = (req: TaskRequest) => jsonFetch<TaskItem>('/api/tasks', 'POST', req)

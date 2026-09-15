@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Code, FloppyDisk, Plus, Trash } from '@phosphor-icons/react'
+import { Code, DownloadSimple, FloppyDisk, Plus, Trash } from '@phosphor-icons/react'
 import { Panel, SectionLabel, Button, CopyButton } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { MermaidView } from '../components/MermaidView'
@@ -44,6 +44,7 @@ const EMPTY_CANVAS: DiagramData = { shapes: [], connectors: [] }
 export function DiagramStudioPage() {
   const [mode, setMode] = useState<Mode>('code')
   const [code, setCode] = useState(EXAMPLES[0].code)
+  const [mermaidSvg, setMermaidSvg] = useState<string | null>(null)
 
   const [canvasData, setCanvasData] = useState<DiagramData>(EMPTY_CANVAS)
   const [savedCanvases, setSavedCanvases] = useState(() => listSavedDiagrams())
@@ -166,8 +167,13 @@ export function DiagramStudioPage() {
           </Panel></ResizablePanel>
 
           <Panel className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex shrink-0 items-center justify-end border-b border-rule-soft p-2">
+              <Button variant="ghost" onClick={() => mermaidSvg && downloadMermaidPng(mermaidSvg)} disabled={!mermaidSvg}>
+                <DownloadSimple size={14} weight="light" /> Export PNG
+              </Button>
+            </div>
             <div className="flex-1 overflow-auto p-6">
-              <MermaidView code={code} />
+              <MermaidView code={code} onSvgReady={setMermaidSvg} />
             </div>
           </Panel>
         </>
@@ -178,4 +184,37 @@ export function DiagramStudioPage() {
       )}
     </div>
   )
+}
+
+function downloadMermaidPng(svgString: string) {
+  const doc = new DOMParser().parseFromString(svgString, 'image/svg+xml')
+  const svgEl = doc.documentElement
+  const viewBox = svgEl.getAttribute('viewBox')?.split(/\s+/).map(Number)
+  const w = Number(svgEl.getAttribute('width')) || viewBox?.[2] || 800
+  const h = Number(svgEl.getAttribute('height')) || viewBox?.[3] || 600
+
+  const scale = 2
+  const svgUrl = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }))
+  const img = new Image()
+  img.onload = () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = w * scale
+    canvas.height = h * scale
+    const ctx = canvas.getContext('2d')!
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.scale(scale, scale)
+    ctx.drawImage(img, 0, 0, w, h)
+    URL.revokeObjectURL(svgUrl)
+    canvas.toBlob((blob) => {
+      if (!blob) return
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'diagram.png'
+      a.click()
+      URL.revokeObjectURL(url)
+    }, 'image/png')
+  }
+  img.src = svgUrl
 }

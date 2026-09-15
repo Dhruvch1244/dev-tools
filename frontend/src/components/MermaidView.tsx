@@ -3,7 +3,7 @@ import { renderMermaid } from '../lib/mermaidRender'
 import { getCurrentScheme } from '../lib/themes'
 import { ErrorBanner } from './ui'
 
-export function MermaidView({ code }: { code: string }) {
+export function MermaidView({ code, onSvgReady }: { code: string; onSvgReady?: (svg: string | null) => void }) {
   const [svg, setSvg] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -11,6 +11,7 @@ export function MermaidView({ code }: { code: string }) {
     let cancelled = false
     if (!code.trim()) {
       setSvg(null)
+      onSvgReady?.(null)
       setError(null)
       return
     }
@@ -19,6 +20,7 @@ export function MermaidView({ code }: { code: string }) {
         .then((s) => {
           if (!cancelled) {
             setSvg(s)
+            onSvgReady?.(s)
             setError(null)
           }
         })
@@ -26,6 +28,7 @@ export function MermaidView({ code }: { code: string }) {
           if (!cancelled) {
             setError(e instanceof Error ? e.message : 'Could not render this diagram')
             setSvg(null)
+            onSvgReady?.(null)
           }
         })
     }, 250)

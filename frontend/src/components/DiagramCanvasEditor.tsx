@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   Trash,
   DownloadSimple,
+  Image as ImageIcon,
 } from '@phosphor-icons/react'
 import { boundaryPoint, defaultShape, newId, SHAPE_COLORS, type Connector, type DiagramData, type Shape, type ShapeType } from '../lib/diagramCanvas'
 
@@ -140,7 +141,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
     setShapes(shapes.map((s) => (s.id === selected.id ? { ...s, color } : s)))
   }
 
-  function exportSvg() {
+  function buildSvgString(): { svg: string; w: number; h: number } {
     const bounds = shapes.reduce(
       (b, s) => ({ minX: Math.min(b.minX, s.x), minY: Math.min(b.minY, s.y), maxX: Math.max(b.maxX, s.x + s.w), maxY: Math.max(b.maxY, s.y + s.h) }),
       { minX: 0, minY: 0, maxX: 800, maxY: 500 }
@@ -184,13 +185,41 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
       ${edgesSvg}${shapesSvg}
     </svg>`
 
-    const blob = new Blob([svg], { type: 'image/svg+xml' })
+    return { svg, w, h }
+  }
+
+  function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'diagram.svg'
+    a.download = filename
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  function exportSvg() {
+    const { svg } = buildSvgString()
+    downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), 'diagram.svg')
+  }
+
+  function exportPng() {
+    const { svg, w, h } = buildSvgString()
+    const scale = 2 // export at 2x for crisp pasting into docs/slides
+    const svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = w * scale
+      canvas.height = h * scale
+      const ctx = canvas.getContext('2d')!
+      ctx.scale(scale, scale)
+      ctx.drawImage(img, 0, 0)
+      URL.revokeObjectURL(svgUrl)
+      canvas.toBlob((blob) => {
+        if (blob) downloadBlob(blob, 'diagram.png')
+      }, 'image/png')
+    }
+    img.src = svgUrl
   }
 
   return (
@@ -219,7 +248,10 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
           <Trash size={15} weight="light" />
         </button>
 
-        <button onClick={exportSvg} className="ml-auto rounded-lg p-1.5 text-ink-faint hover:bg-glass hover:text-ink" title="Export as SVG">
+        <button onClick={exportPng} className="ml-auto rounded-lg p-1.5 text-ink-faint hover:bg-glass hover:text-ink" title="Export as PNG">
+          <ImageIcon size={15} weight="light" />
+        </button>
+        <button onClick={exportSvg} className="rounded-lg p-1.5 text-ink-faint hover:bg-glass hover:text-ink" title="Export as SVG">
           <DownloadSimple size={15} weight="light" />
         </button>
 

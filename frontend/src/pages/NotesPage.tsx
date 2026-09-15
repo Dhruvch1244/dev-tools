@@ -8,6 +8,7 @@ import {
   getBacklinks,
   listFolders,
   listNotes,
+  searchNotes,
   setNoteFavourite,
   updateNote,
   type Folder,
@@ -44,8 +45,23 @@ export function NotesPage() {
   const [pendingInsertAt, setPendingInsertAt] = useState<number | null>(null)
   const [taskPickerOpen, setTaskPickerOpen] = useState(false)
   const [tasks, setTasks] = useState<TaskItem[]>([])
+  const [noteQuery, setNoteQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Note[] | null>(null)
 
   const tasksById = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks])
+  const displayedNotes = searchResults ?? notes
+
+  useEffect(() => {
+    const q = noteQuery.trim()
+    if (!q) {
+      setSearchResults(null)
+      return
+    }
+    const t = setTimeout(() => {
+      searchNotes(q).then(setSearchResults)
+    }, 250)
+    return () => clearTimeout(t)
+  }, [noteQuery])
   const filteredSlashCommands = useMemo(() => {
     if (!slash) return []
     const q = slash.query.toLowerCase()
@@ -103,16 +119,21 @@ export function NotesPage() {
     setActiveNoteId(note.id)
   }
 
+  function refreshCurrentView() {
+    refreshNotes()
+    if (noteQuery.trim()) searchNotes(noteQuery.trim()).then(setSearchResults)
+  }
+
   async function removeNote(id: number, title: string) {
     if (!window.confirm(`Delete note "${title || 'Untitled'}"? This can't be undone.`)) return
     await deleteNote(id)
     if (activeNoteId === id) setActiveNoteId(null)
-    refreshNotes()
+    refreshCurrentView()
   }
 
   async function toggleFavourite(note: Note) {
     await setNoteFavourite(note.id, !note.favourite)
-    refreshNotes()
+    refreshCurrentView()
   }
 
   async function addSubfolder(parentId: number | null) {
@@ -298,11 +319,17 @@ export function NotesPage() {
               <Plus size={12} weight="bold" /> New
             </Button>
           </div>
+          <input
+            value={noteQuery}
+            onChange={(e) => setNoteQuery(e.target.value)}
+            placeholder="Search all notes…"
+            className="devtools-input mb-2"
+          />
           <div className="flex-1 overflow-auto">
-            {notes.length === 0 ? (
-              <div className="p-2 text-xs text-ink-faint">No notes here yet.</div>
+            {displayedNotes.length === 0 ? (
+              <div className="p-2 text-xs text-ink-faint">{searchResults ? `No notes match "${noteQuery.trim()}".` : 'No notes here yet.'}</div>
             ) : (
-              notes.map((n) => (
+              displayedNotes.map((n) => (
                 <div
                   key={n.id}
                   className={`group flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs ${
