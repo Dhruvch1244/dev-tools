@@ -70,15 +70,12 @@ jobs:
           Copy-Item backend/target/devtools-suite.jar -Destination "$stage/backend/target/devtools-suite.jar"
           Compress-Archive -Path $stage -DestinationPath "devtools-suite-$tag.zip"
 
-      - name: Tag
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.version.outputs.tag }}" -m "Dev Tools Suite ${{ steps.version.outputs.tag }}"
-          git push origin "${{ steps.version.outputs.tag }}"
-
       - name: Create release
+        # Deliberately NOT `git tag` + `git push` — the default GITHUB_TOKEN can't push any ref
+        # (branch or tag) on a commit whose tree touches .github/workflows/**, even just to
+        # retag an already-pushed commit ("refusing to allow a GitHub App to create or update
+        # workflow ... without workflows permission"). `gh release create` creates the tag via
+        # the REST API instead of a git push, which isn't subject to that restriction.
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -86,4 +83,5 @@ jobs:
           gh release create "${{ steps.version.outputs.tag }}" \
             "devtools-suite-${{ steps.version.outputs.tag }}.zip" \
             --title "Dev Tools Suite ${{ steps.version.outputs.tag }}" \
+            --target "${{ github.sha }}" \
             --generate-notes
