@@ -19,6 +19,10 @@ public class CommandHistoryEntry {
     @Column(nullable = false)
     private String renderedCommand;
 
+    /** JSON object of {placeholderName: value} used to generate this entry — lets "re-run" restore the exact fields, not just the flattened text. */
+    @Lob
+    private String valuesJson;
+
     @Column(nullable = false)
     private Instant createdAt;
 
@@ -33,6 +37,8 @@ public class CommandHistoryEntry {
     public void setTemplateName(String templateName) { this.templateName = templateName; }
     public String getRenderedCommand() { return renderedCommand; }
     public void setRenderedCommand(String renderedCommand) { this.renderedCommand = renderedCommand; }
+    public String getValuesJson() { return valuesJson; }
+    public void setValuesJson(String valuesJson) { this.valuesJson = valuesJson; }
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

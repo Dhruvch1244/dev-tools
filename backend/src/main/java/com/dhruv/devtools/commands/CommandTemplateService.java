@@ -18,7 +18,7 @@ public class CommandTemplateService {
     }
 
     public record TemplateRequest(String name, String template) {}
-    public record HistoryRequest(String templateName, String renderedCommand) {}
+    public record HistoryRequest(String templateName, String renderedCommand, String valuesJson) {}
 
     public List<CommandTemplate> listTemplates() {
         return templateRepository.findAllByOrderByNameAsc();
@@ -55,6 +55,7 @@ public class CommandTemplateService {
         CommandHistoryEntry entry = new CommandHistoryEntry();
         entry.setTemplateName(req.templateName() == null || req.templateName().isBlank() ? "(ad hoc)" : req.templateName().trim());
         entry.setRenderedCommand(req.renderedCommand());
+        entry.setValuesJson(req.valuesJson());
         CommandHistoryEntry saved = historyRepository.save(entry);
         trimHistory();
         return saved;

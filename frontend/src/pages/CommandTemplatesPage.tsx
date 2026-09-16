@@ -39,19 +39,25 @@ export function CommandTemplatesPage() {
   const selected = templates.find((t) => t.id === selectedId) ?? null
   const placeholders = useMemo(() => (selected ? parsePlaceholders(selected.template) : []), [selected])
 
-  useEffect(() => {
-    if (!selected) return
-    const next: Record<string, string> = {}
-    for (const p of parsePlaceholders(selected.template)) next[p.name] = p.defaultValue
-    setValues(next)
-  }, [selected?.id, selected?.template])
-
   const rendered = selected ? renderTemplate(selected.template, values) : ''
+
+  function defaultValuesFor(t: CommandTemplate): Record<string, string> {
+    const next: Record<string, string> = {}
+    for (const p of parsePlaceholders(t.template)) next[p.name] = p.defaultValue
+    return next
+  }
+
+  function selectTemplate(t: CommandTemplate) {
+    setSelectedId(t.id)
+    setEditing(false)
+    setValues(defaultValuesFor(t))
+  }
 
   function startNew() {
     setEditName('')
     setEditTemplate(SAMPLE_TEMPLATE)
     setSelectedId(null)
+    setValues({})
     setEditing(true)
   }
 
@@ -72,6 +78,13 @@ export function CommandTemplatesPage() {
       setEditing(false)
       await refresh()
       setSelectedId(saved.id)
+      // keep any values that still match a placeholder name, fill in the rest with defaults
+      setValues((prev) => {
+        const defaults = defaultValuesFor(saved)
+        const merged: Record<string, string> = {}
+        for (const key of Object.keys(defaults)) merged[key] = prev[key] ?? defaults[key]
+        return merged
+      })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Save failed')
     }
@@ -86,8 +99,22 @@ export function CommandTemplatesPage() {
 
   async function generate() {
     if (!selected || !rendered.trim()) return
-    await addCommandHistory(selected.name, rendered)
+    await addCommandHistory(selected.name, rendered, JSON.stringify(values))
     refresh()
+  }
+
+  function rerunHistoryEntry(h: CommandHistoryEntry) {
+    const template = templates.find((t) => t.name === h.templateName)
+    if (!template) return
+    setSelectedId(template.id)
+    setEditing(false)
+    if (h.valuesJson) {
+      try {
+        setValues(JSON.parse(h.valuesJson))
+      } catch {
+        /* older history entry without saved values — leave defaults */
+      }
+    }
   }
 
   async function removeHistoryEntry(id: number) {
@@ -118,7 +145,7 @@ export function CommandTemplatesPage() {
             {templates.map((t) => (
               <button
                 key={t.id}
-                onClick={() => { setSelectedId(t.id); setEditing(false) }}
+                onClick={() => selectTemplate(t)}
                 className={`group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs ${
                   selectedId === t.id && !editing ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'
                 }`}
@@ -220,18 +247,28 @@ export function CommandTemplatesPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-1">
-                {history.map((h) => (
-                  <div key={h.id} className="group flex items-center gap-2 rounded-lg bg-glass px-2.5 py-1.5">
-                    <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-ink-faint">{h.templateName}</span>
-                    <span className="flex-1 truncate font-mono text-[11.5px] text-ink-soft">{h.renderedCommand}</span>
-                    <span className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-                      <CopyButton text={h.renderedCommand} label="" />
-                    </span>
-                    <button onClick={() => removeHistoryEntry(h.id)} className="shrink-0 text-ink-faint opacity-0 transition-opacity hover:text-rose group-hover:opacity-100">
-                      <Trash size={12} weight="light" />
-                    </button>
-                  </div>
-                ))}
+                {history.map((h) => {
+                  const canRerun = h.valuesJson != null && templates.some((t) => t.name === h.templateName)
+                  return (
+                    <div key={h.id} className="group flex items-center gap-2 rounded-lg bg-glass px-2.5 py-1.5">
+                      <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-ink-faint">{h.templateName}</span>
+                      <button
+                        onClick={() => canRerun && rerunHistoryEntry(h)}
+                        disabled={!canRerun}
+                        title={canRerun ? 'Reopen this template with these exact field values' : 'Template no longer exists or predates re-run support'}
+                        className={`flex-1 truncate text-left font-mono text-[11.5px] ${canRerun ? 'text-ink-soft hover:text-cyan' : 'cursor-default text-ink-soft'}`}
+                      >
+                        {h.renderedCommand}
+                      </button>
+                      <span className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
+                        <CopyButton text={h.renderedCommand} label="" />
+                      </span>
+                      <button onClick={() => removeHistoryEntry(h.id)} className="shrink-0 text-ink-faint opacity-0 transition-opacity hover:text-rose group-hover:opacity-100">
+                        <Trash size={12} weight="light" />
+                      </button>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>

@@ -11,7 +11,7 @@ async function jsonFetch<T>(url: string, method: string, body?: unknown): Promis
 }
 
 export type CommandTemplate = { id: number; name: string; template: string; createdAt: string }
-export type CommandHistoryEntry = { id: number; templateName: string; renderedCommand: string; createdAt: string }
+export type CommandHistoryEntry = { id: number; templateName: string; renderedCommand: string; valuesJson: string | null; createdAt: string }
 
 export const listCommandTemplates = () => jsonFetch<CommandTemplate[]>('/api/command-templates', 'GET')
 export const createCommandTemplate = (name: string, template: string) =>
@@ -21,7 +21,7 @@ export const updateCommandTemplate = (id: number, name: string, template: string
 export const deleteCommandTemplate = (id: number) => jsonFetch<void>(`/api/command-templates/${id}`, 'DELETE')
 
 export const listCommandHistory = () => jsonFetch<CommandHistoryEntry[]>('/api/command-templates/history', 'GET')
-export const addCommandHistory = (templateName: string, renderedCommand: string) =>
-  jsonFetch<CommandHistoryEntry>('/api/command-templates/history', 'POST', { templateName, renderedCommand })
+export const addCommandHistory = (templateName: string, renderedCommand: string, valuesJson: string) =>
+  jsonFetch<CommandHistoryEntry>('/api/command-templates/history', 'POST', { templateName, renderedCommand, valuesJson })
 export const deleteCommandHistory = (id: number) => jsonFetch<void>(`/api/command-templates/history/${id}`, 'DELETE')
 export const clearCommandHistory = () => jsonFetch<void>('/api/command-templates/history', 'DELETE')
