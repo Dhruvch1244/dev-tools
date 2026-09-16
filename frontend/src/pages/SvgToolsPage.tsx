@@ -369,8 +369,8 @@ function TraceTab() {
           </label>
 
           <div className="text-[10.5px] text-ink-faint">
-            Mosaic-style vectorization (flat color regions as merged rectangles), not smooth curve tracing — works best on flat-color
-            logos/icons, not photos. Higher detail = more shapes = larger file.
+            Traces smooth curved outlines (contour tracing + Bezier fitting) around each flat color region, holes included —
+            works best on flat-color logos/icons, not photos. Higher detail = more anchor points = larger file.
           </div>
 
           <Button variant="primary" onClick={run} disabled={!file || loading}>
