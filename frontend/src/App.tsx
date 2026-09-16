@@ -80,6 +80,7 @@ import { GitGraphPage } from './pages/GitGraphPage'
 import { DiskTreemapPage } from './pages/DiskTreemapPage'
 import { DiagramStudioPage } from './pages/DiagramStudioPage'
 import { HomePage } from './pages/HomePage'
+import { SystemPage } from './pages/SystemPage'
 import { SettingsPopover } from './components/SettingsPopover'
 import { CommandPalette, type PaletteItem } from './components/CommandPalette'
 import { applyTheme, getStoredTheme } from './lib/themes'
@@ -123,6 +124,7 @@ export type Tool =
   | 'bundle-stats'
   | 'cors-check'
   | 'aws-helpers'
+  | 'system'
 
 export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
 export type ToolGroup = { label: string; tools: ToolDef[] }
@@ -130,7 +132,10 @@ export type ToolGroup = { label: string; tools: ToolDef[] }
 export const GROUPS: ToolGroup[] = [
   {
     label: 'Home',
-    tools: [{ id: 'home', label: 'Home', hint: 'favourites · recents · all tools', icon: House }],
+    tools: [
+      { id: 'home', label: 'Home', hint: 'favourites · recents · all tools', icon: House },
+      { id: 'system', label: 'System', hint: 'health · backup & restore', icon: Gauge },
+    ],
   },
   {
     label: 'Vault',
@@ -211,6 +216,7 @@ function loadFavourites(): Tool[] {
 function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]; onOpenTool: (id: Tool) => void }) {
   switch (tool) {
     case 'home': return <HomePage favourites={homeProps.favourites} recents={homeProps.recents} onOpenTool={homeProps.onOpenTool} />
+    case 'system': return <SystemPage />
     case 'diagram-studio': return <DiagramStudioPage />
     case 'spring-viz': return <SpringVizPage />
     case 'git-graph': return <GitGraphPage />
