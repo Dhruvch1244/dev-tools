@@ -22,10 +22,22 @@ export function VaultPage() {
     return Array.from(set).sort()
   }, [entries])
 
-  const visible = useMemo(
-    () => (envFilter ? entries.filter((e) => e.environment === envFilter) : entries),
-    [entries, envFilter]
-  )
+  // Grouped by name (case-insensitive) so "Order API" in DIT/UAT/PROD shows as one card with
+  // every environment side by side, instead of forcing you to flip the env filter to compare.
+  const groups = useMemo(() => {
+    const byName = new Map<string, VaultEntry[]>()
+    for (const e of entries) {
+      const key = e.name.trim().toLowerCase()
+      const list = byName.get(key) ?? []
+      list.push(e)
+      byName.set(key, list)
+    }
+    const envOrder = (env: string) => environments.indexOf(env)
+    const all = Array.from(byName.values()).map((list) => [...list].sort((a, b) => envOrder(a.environment) - envOrder(b.environment)))
+    all.sort((a, b) => a[0].name.localeCompare(b[0].name))
+    if (!envFilter) return all
+    return all.filter((group) => group.some((e) => e.environment === envFilter))
+  }, [entries, envFilter, environments])
 
   function toggleReveal(id: number) {
     setRevealed((prev) => {
@@ -153,48 +165,57 @@ export function VaultPage() {
             </div>
           )}
 
-          {visible.length === 0 && editingId === null && (
+          {groups.length === 0 && editingId === null && (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 text-sm text-ink-faint">
               <LockKey size={28} weight="light" />
               No entries yet — add credentials, URLs, and secrets per environment.
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
-            {visible.map((e) => (
-              <div key={e.id} className="group flex flex-col gap-1.5 rounded-xl border border-rule-soft bg-glass px-3.5 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan">
-                    {e.environment}
-                  </span>
-                  <span className="text-sm font-medium text-ink">{e.name}</span>
-                  <div className="ml-auto flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                    <button onClick={() => startEdit(e)} className="rounded-md px-2 py-1 text-[10.5px] text-ink-faint hover:bg-glass-strong hover:text-ink">
-                      Edit
-                    </button>
-                    <button onClick={() => remove(e.id, e.name)} className="rounded-md p-1 text-ink-faint hover:text-rose">
-                      <Trash size={13} weight="light" />
-                    </button>
-                  </div>
+          <div className="flex flex-col gap-3">
+            {groups.map((group) => (
+              <div key={group[0].name.trim().toLowerCase()} className="rounded-xl border border-rule-soft bg-glass px-3.5 py-3">
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-sm font-medium text-ink">{group[0].name}</span>
+                  {group.length > 1 && <span className="text-[10.5px] text-ink-faint">{group.length} environments</span>}
                 </div>
-                {e.url && (
-                  <a href={e.url} target="_blank" rel="noreferrer" className="truncate text-[11.5px] text-cyan hover:underline">
-                    {e.url}
-                  </a>
-                )}
-                {e.username && <div className="text-[11.5px] text-ink-soft">user: <span className="font-mono">{e.username}</span></div>}
-                <div className="flex items-center gap-1.5">
-                  <span className="flex-1 truncate rounded-lg bg-panel px-2.5 py-1.5 font-mono text-[12px] text-ink">
-                    {revealed.has(e.id) ? e.secret : '•'.repeat(Math.min(24, Math.max(8, e.secret.length)))}
-                  </span>
-                  <button onClick={() => toggleReveal(e.id)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title={revealed.has(e.id) ? 'Hide' : 'Reveal'}>
-                    {revealed.has(e.id) ? <EyeSlash size={14} weight="light" /> : <Eye size={14} weight="light" />}
-                  </button>
-                  <button onClick={() => copySecret(e.secret)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title="Copy secret">
-                    <Copy size={14} weight="light" />
-                  </button>
+                <div className="flex flex-col gap-2">
+                  {group.map((e) => (
+                    <div key={e.id} className="group flex flex-col gap-1.5 rounded-lg border border-rule-soft bg-panel px-3 py-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan">
+                          {e.environment}
+                        </span>
+                        {e.url && (
+                          <a href={e.url} target="_blank" rel="noreferrer" className="truncate text-[11.5px] text-cyan hover:underline">
+                            {e.url}
+                          </a>
+                        )}
+                        <div className="ml-auto flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                          <button onClick={() => startEdit(e)} className="rounded-md px-2 py-1 text-[10.5px] text-ink-faint hover:bg-glass-strong hover:text-ink">
+                            Edit
+                          </button>
+                          <button onClick={() => remove(e.id, e.name)} className="rounded-md p-1 text-ink-faint hover:text-rose">
+                            <Trash size={13} weight="light" />
+                          </button>
+                        </div>
+                      </div>
+                      {e.username && <div className="text-[11.5px] text-ink-soft">user: <span className="font-mono">{e.username}</span></div>}
+                      <div className="flex items-center gap-1.5">
+                        <span className="flex-1 truncate rounded-lg bg-glass px-2.5 py-1.5 font-mono text-[12px] text-ink">
+                          {revealed.has(e.id) ? e.secret : '•'.repeat(Math.min(24, Math.max(8, e.secret.length)))}
+                        </span>
+                        <button onClick={() => toggleReveal(e.id)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title={revealed.has(e.id) ? 'Hide' : 'Reveal'}>
+                          {revealed.has(e.id) ? <EyeSlash size={14} weight="light" /> : <Eye size={14} weight="light" />}
+                        </button>
+                        <button onClick={() => copySecret(e.secret)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title="Copy secret">
+                          <Copy size={14} weight="light" />
+                        </button>
+                      </div>
+                      {e.notes && <div className="text-[11px] text-ink-faint">{e.notes}</div>}
+                    </div>
+                  ))}
                 </div>
-                {e.notes && <div className="text-[11px] text-ink-faint">{e.notes}</div>}
               </div>
             ))}
           </div>

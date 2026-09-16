@@ -14,12 +14,16 @@ external services, no telemetry, no internet required after download.
 
 ## Vault
 
-- **Vault** — local secrets/credentials/URLs, grouped by environment (DIT, SIT,
-  UAT, PROD, or any name you use), pinned at the top of the sidebar since it's
-  used constantly. Masked by default with a reveal toggle and one-click copy.
-  Stored in the same local H2 database as everything else in this app — **plaintext,
-  no encryption at rest** — appropriate for a trusted single-user local tool, not
-  a substitute for a real secrets manager.
+- **Vault** — local secrets/credentials/URLs, pinned at the top of the sidebar
+  since it's used constantly. Entries sharing the same name across different
+  environments (e.g. "Order API" in DIT/UAT/PROD) are clubbed into one card
+  so every environment sits side by side instead of forcing you to flip an
+  environment filter to compare them; the sidebar filter narrows which cards
+  show without breaking a card's own grouping apart. Masked by default with a
+  reveal toggle and one-click copy. Stored in the same local H2 database as
+  everything else in this app — **plaintext, no encryption at rest** —
+  appropriate for a trusted single-user local tool, not a substitute for a
+  real secrets manager.
 
 ![Vault — secrets grouped by environment, masked by default](docs/screenshots/02-vault.png)
 
