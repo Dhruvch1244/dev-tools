@@ -12,7 +12,7 @@ async function jsonFetch<T>(url: string, method: string, body?: unknown): Promis
 
 export type SavedGitRepo = { id: number; path: string; label: string; createdAt: string }
 
-export type CommitEntry = { hash: string; author: string; date: string; subject: string }
+export type CommitEntry = { hash: string; parents: string[]; author: string; date: string; subject: string }
 export type BranchEntry = { name: string; current: boolean }
 export type RemoteEntry = { name: string; url: string }
 export type StashEntry = { ref: string; message: string }

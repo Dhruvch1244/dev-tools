@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { ArrowClockwise, ArrowsDownUp, GitBranch, Plus, Trash } from '@phosphor-icons/react'
+import { useEffect, useMemo, useState } from 'react'
+import { ArrowClockwise, ArrowsDownUp, GitBranch, ListBullets, Plus, ShareNetwork, Star, Trash } from '@phosphor-icons/react'
 import {
   addGitRepo,
   fetchGitRepo,
@@ -9,8 +9,32 @@ import {
   type GitOverview,
   type SavedGitRepo,
 } from '../lib/gitRepoApi'
+import { layoutCommits, type PositionedCommit } from '../lib/gitGraph'
 import { Button, Panel, SectionLabel, ErrorBanner, CopyButton } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
+
+const LANE_COLORS = ['var(--cyan)', 'var(--violet)', 'var(--emerald)', 'var(--warm)', 'var(--rose)']
+const ROW_H = 26
+const LANE_W = 16
+const DOT_R = 4
+
+const FAV_BRANCHES_KEY = 'devtools.git-repo-fav-branches'
+
+function loadFavBranches(): Record<string, string[]> {
+  try {
+    const raw = localStorage.getItem(FAV_BRANCHES_KEY)
+    return raw ? JSON.parse(raw) : {}
+  } catch {
+    return {}
+  }
+}
+function saveFavBranches(all: Record<string, string[]>) {
+  try {
+    localStorage.setItem(FAV_BRANCHES_KEY, JSON.stringify(all))
+  } catch {
+    /* storage full or unavailable */
+  }
+}
 
 export function GitRepoPage() {
   const [repos, setRepos] = useState<SavedGitRepo[]>([])
@@ -20,6 +44,10 @@ export function GitRepoPage() {
   const [loading, setLoading] = useState(false)
   const [addPath, setAddPath] = useState('')
   const [addLabel, setAddLabel] = useState('')
+  const [showAllBranches, setShowAllBranches] = useState(false)
+  const [branchFilter, setBranchFilter] = useState('')
+  const [favBranchesByRepo, setFavBranchesByRepo] = useState<Record<string, string[]>>(() => loadFavBranches())
+  const [commitView, setCommitView] = useState<'list' | 'graph'>('list')
 
   const refreshRepos = () => listGitRepos().then((r) => {
     setRepos(r)
@@ -57,6 +85,35 @@ export function GitRepoPage() {
     if (selectedId === id) setSelectedId(null)
     refreshRepos()
   }
+
+  const favBranches = overview ? new Set(favBranchesByRepo[overview.path] ?? []) : new Set<string>()
+
+  function toggleFavBranch(name: string) {
+    if (!overview) return
+    const current = new Set(favBranchesByRepo[overview.path] ?? [])
+    current.has(name) ? current.delete(name) : current.add(name)
+    const next = { ...favBranchesByRepo, [overview.path]: Array.from(current) }
+    setFavBranchesByRepo(next)
+    saveFavBranches(next)
+  }
+
+  const visibleBranches = useMemo(() => {
+    if (!overview) return []
+    if (branchFilter.trim()) {
+      const q = branchFilter.trim().toLowerCase()
+      return overview.branches.filter((b) => b.name.toLowerCase().includes(q))
+    }
+    if (showAllBranches) return overview.branches
+    const isMain = (n: string) => n === 'main' || n === 'master' || n.endsWith('/main') || n.endsWith('/master')
+    return overview.branches.filter((b) => b.current || isMain(b.name) || favBranches.has(b.name))
+  }, [overview, branchFilter, showAllBranches, favBranches])
+
+  const commitGraph = useMemo(() => {
+    if (!overview) return null
+    const commits: PositionedCommit[] = layoutCommits(overview.recentCommits).positioned
+    const laneCount = Math.max(1, ...commits.map((c) => c.lane + 1))
+    return { commits, laneCount }
+  }, [overview])
 
   async function doFetch() {
     if (selectedId == null) return
@@ -157,15 +214,29 @@ export function GitRepoPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <Panel className="flex flex-col overflow-hidden">
-                  <div className="flex max-h-64 flex-col gap-1 overflow-auto p-3">
+                  <div className="flex flex-col gap-1 p-3">
                     <SectionLabel>Uncommitted changes ({overview.changedFiles.length})</SectionLabel>
-                    {overview.changedFiles.length === 0 ? (
-                      <div className="text-xs text-ink-faint">Clean working tree.</div>
-                    ) : (
-                      overview.changedFiles.map((f, i) => (
-                        <div key={i} className="truncate rounded bg-glass px-2 py-1 font-mono text-[11px] text-ink-soft">{f}</div>
-                      ))
-                    )}
+                    <div className="flex max-h-64 flex-col gap-0.5 overflow-y-auto overflow-x-hidden pr-1">
+                      {overview.changedFiles.length === 0 ? (
+                        <div className="text-xs text-ink-faint">Clean working tree.</div>
+                      ) : (
+                        overview.changedFiles.map((f, i) => {
+                          const status = f.slice(0, 2).trim() || '?'
+                          const path = f.slice(2).trim()
+                          const color =
+                            status.includes('?') ? 'text-ink-faint' :
+                            status.includes('D') ? 'text-rose' :
+                            status.includes('A') ? 'text-emerald' :
+                            'text-warm'
+                          return (
+                            <div key={i} title={f} className="flex items-center gap-2 rounded bg-glass px-2 py-1 text-[11px]">
+                              <span className={`w-6 shrink-0 font-mono font-semibold ${color}`}>{status}</span>
+                              <span className="min-w-0 flex-1 truncate font-mono text-ink-soft">{path}</span>
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
                   </div>
                 </Panel>
 
@@ -197,17 +268,43 @@ export function GitRepoPage() {
               </div>
 
               <Panel className="flex flex-col overflow-hidden">
-                <div className="flex max-h-48 flex-col gap-1 overflow-auto p-3">
-                  <SectionLabel>Branches ({overview.branches.length})</SectionLabel>
-                  <div className="flex flex-wrap gap-1.5">
-                    {overview.branches.map((b, i) => (
+                <div className="flex flex-col gap-1.5 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <SectionLabel>
+                      Branches ({overview.branches.length}){!showAllBranches && !branchFilter.trim() ? ' — main + favourites' : ''}
+                    </SectionLabel>
+                    <div className="flex items-center gap-2">
+                      {overview.branches.length > 8 && (
+                        <input
+                          className="devtools-input h-6 w-32 py-0 text-[10.5px]"
+                          placeholder="Filter branches…"
+                          value={branchFilter}
+                          onChange={(e) => setBranchFilter(e.target.value)}
+                        />
+                      )}
+                      {overview.branches.length > 8 && !branchFilter.trim() && (
+                        <button onClick={() => setShowAllBranches((v) => !v)} className="text-[10.5px] text-cyan hover:underline">
+                          {showAllBranches ? 'Show less' : `Show all ${overview.branches.length}`}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex max-h-48 flex-wrap gap-1.5 overflow-auto">
+                    {visibleBranches.map((b, i) => (
                       <span
                         key={i}
-                        className={`rounded-full px-2.5 py-1 text-[11px] ${b.current ? 'bg-glass-strong text-cyan' : 'bg-glass text-ink-soft'}`}
+                        className={`group flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] ${b.current ? 'bg-glass-strong text-cyan' : 'bg-glass text-ink-soft'}`}
                       >
                         {b.name}
+                        <Star
+                          size={10}
+                          weight={favBranches.has(b.name) ? 'fill' : 'light'}
+                          onClick={() => toggleFavBranch(b.name)}
+                          className={`cursor-pointer ${favBranches.has(b.name) ? 'text-warm' : 'text-ink-faint opacity-0 group-hover:opacity-100'}`}
+                        />
                       </span>
                     ))}
+                    {visibleBranches.length === 0 && <div className="text-xs text-ink-faint">No branches match.</div>}
                   </div>
                 </div>
               </Panel>
@@ -216,16 +313,81 @@ export function GitRepoPage() {
                 <div className="flex flex-1 flex-col gap-1 overflow-auto p-3">
                   <div className="mb-1 flex items-center justify-between">
                     <SectionLabel>Recent commits</SectionLabel>
-                    <CopyButton text={overview.recentCommits.map((c) => `${c.hash.slice(0, 7)} ${c.subject}`).join('\n')} />
-                  </div>
-                  {overview.recentCommits.map((c) => (
-                    <div key={c.hash} className="flex items-center gap-3 border-l-2 border-rule-soft py-1 pl-3 text-xs">
-                      <span className="font-mono text-[10.5px] text-ink-faint">{c.hash.slice(0, 7)}</span>
-                      <span className="flex-1 truncate text-ink">{c.subject}</span>
-                      <span className="shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
-                      <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5 rounded-lg border border-rule bg-panel p-0.5">
+                        <button
+                          onClick={() => setCommitView('list')}
+                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium ${commitView === 'list' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                        >
+                          <ListBullets size={12} weight="light" /> List
+                        </button>
+                        <button
+                          onClick={() => setCommitView('graph')}
+                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium ${commitView === 'graph' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                        >
+                          <ShareNetwork size={12} weight="light" /> Graph
+                        </button>
+                      </div>
+                      <CopyButton text={overview.recentCommits.map((c) => `${c.hash.slice(0, 7)} ${c.subject}`).join('\n')} />
                     </div>
-                  ))}
+                  </div>
+
+                  {commitView === 'list' ? (
+                    overview.recentCommits.map((c) => (
+                      <div key={c.hash} className="flex items-center gap-3 border-l-2 border-rule-soft py-1 pl-3 text-xs">
+                        <span className="font-mono text-[10.5px] text-ink-faint">{c.hash.slice(0, 7)}</span>
+                        <span className="flex-1 truncate text-ink">{c.subject}</span>
+                        <span className="shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
+                        <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                      </div>
+                    ))
+                  ) : commitGraph && commitGraph.commits.length > 0 ? (
+                    <div className="flex overflow-auto">
+                      <svg
+                        width={commitGraph.laneCount * LANE_W + 20}
+                        height={commitGraph.commits.length * ROW_H + 20}
+                        className="shrink-0"
+                      >
+                        {commitGraph.commits.map((c) =>
+                          c.parents.map((parentHash) => {
+                            const parent = commitGraph.commits.find((p) => p.hash === parentHash)
+                            if (!parent) return null
+                            const x1 = c.lane * LANE_W + 12
+                            const y1 = c.row * ROW_H + 13
+                            const x2 = parent.lane * LANE_W + 12
+                            const y2 = parent.row * ROW_H + 13
+                            const color = LANE_COLORS[c.lane % LANE_COLORS.length]
+                            if (x1 === x2) return <line key={`${c.hash}-${parentHash}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={2} />
+                            const midY = (y1 + y2) / 2
+                            return (
+                              <path
+                                key={`${c.hash}-${parentHash}`}
+                                d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
+                                fill="none"
+                                stroke={color}
+                                strokeWidth={2}
+                              />
+                            )
+                          })
+                        )}
+                        {commitGraph.commits.map((c) => (
+                          <circle key={c.hash} cx={c.lane * LANE_W + 12} cy={c.row * ROW_H + 13} r={DOT_R} fill={LANE_COLORS[c.lane % LANE_COLORS.length]} />
+                        ))}
+                      </svg>
+                      <div className="flex-1">
+                        {commitGraph.commits.map((c) => (
+                          <div key={c.hash} className="flex items-center gap-3 pr-2 text-xs" style={{ height: ROW_H }}>
+                            <span className="font-mono text-[10.5px] text-ink-faint">{c.hash.slice(0, 7)}</span>
+                            <span className="flex-1 truncate text-ink">{c.subject}</span>
+                            <span className="shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
+                            <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-ink-faint">No commits to graph.</div>
+                  )}
                 </div>
               </Panel>
             </>

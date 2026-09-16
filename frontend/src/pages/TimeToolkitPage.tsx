@@ -1,6 +1,95 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { describeCron, nextRuns, parseCron } from '../lib/cron'
+import { CITY_TIMEZONES, CONTINENT_BLOBS, isDaytimeAtLongitude, project } from '../lib/worldMap'
 import { Panel, SectionLabel, Button, ErrorBanner, CopyButton } from '../components/ui'
+
+const MAP_W = 720
+const MAP_H = 340
+
+function WorldClock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  const rows = useMemo(
+    () =>
+      CITY_TIMEZONES.map((c) => {
+        const day = isDaytimeAtLongitude(now, c.lon)
+        const time = new Intl.DateTimeFormat('en-US', { timeStyle: 'medium', timeZone: c.tz }).format(now)
+        const date = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: c.tz }).format(now)
+        const offsetParts = new Intl.DateTimeFormat('en-US', { timeZone: c.tz, timeZoneName: 'shortOffset' }).formatToParts(now)
+        const offset = offsetParts.find((p) => p.type === 'timeZoneName')?.value ?? ''
+        return { ...c, day, time, date, offset }
+      }),
+    [now]
+  )
+
+  return (
+    <Panel className="col-span-2">
+      <div className="flex flex-col gap-3 p-4">
+        <div className="flex items-center justify-between">
+          <SectionLabel>World clock</SectionLabel>
+          <span className="text-[10.5px] text-ink-faint">updates live</span>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-rule bg-panel">
+          <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="h-auto w-full">
+            {/* night-side shading, one thin vertical strip per few degrees of longitude */}
+            {Array.from({ length: 72 }, (_, i) => {
+              const lon = -180 + i * 5
+              const day = isDaytimeAtLongitude(now, lon)
+              const x = project(lon, 0, MAP_W, MAP_H).x
+              const stripW = MAP_W / 72
+              return day ? null : <rect key={i} x={x} y={0} width={stripW + 0.5} height={MAP_H} fill="var(--void)" opacity={0.35} />
+            })}
+            {CONTINENT_BLOBS.map((b) => {
+              const { x, y } = project(b.lon, b.lat, MAP_W, MAP_H)
+              return <ellipse key={b.name} cx={x} cy={y} rx={b.rx * (MAP_W / 360)} ry={b.ry * (MAP_H / 180)} fill="var(--emerald)" opacity={0.22} />
+            })}
+            {rows.map((c) => {
+              const { x, y } = project(c.lon, c.lat, MAP_W, MAP_H)
+              return (
+                <g key={c.tz}>
+                  <circle cx={x} cy={y} r={4} fill={c.day ? 'var(--warm)' : 'var(--cyan)'} stroke="var(--surface)" strokeWidth={1.5} />
+                  <text x={x + 7} y={y + 3} fontSize={9} fill="var(--ink-faint)" className="select-none">{c.city}</text>
+                </g>
+              )
+            })}
+          </svg>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-rule">
+          <table className="w-full text-left text-[12px]">
+            <thead>
+              <tr className="border-b border-rule-soft text-[10px] uppercase tracking-wide text-ink-faint">
+                <th className="px-3 py-2 font-medium">City</th>
+                <th className="px-3 py-2 font-medium">Timezone</th>
+                <th className="px-3 py-2 font-medium">Local time</th>
+                <th className="px-3 py-2 font-medium">Date</th>
+                <th className="px-3 py-2 font-medium">UTC offset</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((c) => (
+                <tr key={c.tz} className="border-b border-rule-soft last:border-0">
+                  <td className="px-3 py-1.5 text-ink">{c.city}</td>
+                  <td className="px-3 py-1.5 font-mono text-ink-faint">{c.tz}</td>
+                  <td className="px-3 py-1.5 font-mono text-ink">
+                    <span className="mr-1.5">{c.day ? '☀️' : '🌙'}</span>{c.time}
+                  </td>
+                  <td className="px-3 py-1.5 text-ink-soft">{c.date}</td>
+                  <td className="px-3 py-1.5 font-mono text-ink-faint">{c.offset}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Panel>
+  )
+}
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const CRON_PRESETS = [
@@ -183,6 +272,7 @@ export function TimeToolkitPage() {
   return (
     <div className="grid h-full grid-cols-2 gap-4 overflow-auto">
       <AnyTimeConverter />
+      <WorldClock />
 
       <Panel>
         <div className="flex flex-col gap-3 p-4">

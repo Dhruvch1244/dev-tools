@@ -27,7 +27,7 @@ public class GitRepoService {
         this.repository = repository;
     }
 
-    public record CommitEntry(String hash, String author, String date, String subject) {}
+    public record CommitEntry(String hash, List<String> parents, String author, String date, String subject) {}
     public record BranchEntry(String name, boolean current) {}
     public record RemoteEntry(String name, String url) {}
     public record StashEntry(String ref, String message) {}
@@ -100,11 +100,14 @@ public class GitRepoService {
         }
 
         List<CommitEntry> commits = new ArrayList<>();
-        String log = tryRun(dir, "log", "-30", "--date=short", "--format=%H%x1f%an%x1f%ad%x1f%s");
+        String log = tryRun(dir, "log", "-60", "--date=short", "--format=%H%x1f%P%x1f%an%x1f%ad%x1f%s");
         for (String line : log.split("\n")) {
             if (line.isBlank()) continue;
-            String[] f = line.split("", 4);
-            if (f.length == 4) commits.add(new CommitEntry(f[0], f[1], f[2], f[3]));
+            String[] f = line.split("", 5);
+            if (f.length == 5) {
+                List<String> parents = f[1].isBlank() ? List.of() : List.of(f[1].trim().split("\\s+"));
+                commits.add(new CommitEntry(f[0], parents, f[2], f[3], f[4]));
+            }
         }
 
         List<BranchEntry> branches = new ArrayList<>();

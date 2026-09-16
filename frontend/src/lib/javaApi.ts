@@ -1,9 +1,18 @@
+export type LargestEntry = { name: string; size: number }
+export type PackageCount = { packageName: string; classCount: number }
+
 export type JarSummary = {
   fileName: string
   entryCount: number
+  classCount: number
   totalUncompressedSize: number
   manifestMainAttributes: Record<string, string>
   classMajorVersions: Record<string, number>
+  resourcesByExtension: Record<string, number>
+  largestEntries: LargestEntry[]
+  topPackages: PackageCount[]
+  signed: boolean
+  multiRelease: boolean
 }
 export type DuplicateClass = { className: string; foundInJars: string[] }
 export type JarInspectResponse = { jars: JarSummary[]; duplicateClasses: DuplicateClass[] }

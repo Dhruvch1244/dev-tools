@@ -4,6 +4,12 @@ import { inspectJars, type JarInspectResponse } from '../lib/javaApi'
 import { Panel, SectionLabel, Button, ErrorBanner } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
 
+function formatBytes(n: number): string {
+  if (n > 1024 * 1024) return `${(n / 1024 / 1024).toFixed(2)} MB`
+  if (n > 1024) return `${(n / 1024).toFixed(1)} KB`
+  return `${n} B`
+}
+
 export function JarInspectPage() {
   const [files, setFiles] = useState<File[]>([])
   const [result, setResult] = useState<JarInspectResponse | null>(null)
@@ -80,12 +86,18 @@ export function JarInspectPage() {
 
               {result.jars.map((jar) => (
                 <div key={jar.fileName} className="rounded-2xl border border-rule bg-panel p-4">
-                  <div className="mb-2 flex items-center justify-between">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
                     <div className="font-mono text-sm text-ink">{jar.fileName}</div>
-                    <div className="text-xs text-ink-faint">{jar.entryCount} entries · {(jar.totalUncompressedSize / 1024).toFixed(1)} KB</div>
+                    <div className="ml-auto flex items-center gap-1.5">
+                      {jar.signed && <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-emerald">signed</span>}
+                      {jar.multiRelease && <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-violet">multi-release</span>}
+                    </div>
+                  </div>
+                  <div className="mb-3 text-xs text-ink-faint">
+                    {jar.entryCount} entries · {jar.classCount} classes · {formatBytes(jar.totalUncompressedSize)}
                   </div>
 
-                  <div className="mb-2">
+                  <div className="mb-3">
                     <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">Class file versions</div>
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(jar.classMajorVersions).map(([label, count]) => (
@@ -97,12 +109,55 @@ export function JarInspectPage() {
                   </div>
 
                   {Object.keys(jar.manifestMainAttributes).length > 0 && (
-                    <div>
+                    <div className="mb-3">
                       <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">Manifest</div>
                       <div className="flex flex-col gap-0.5 font-mono text-[11.5px] text-ink-soft">
                         {Object.entries(jar.manifestMainAttributes).map(([k, v]) => (
                           <div key={k}>
                             {k}: <span className="text-ink-faint">{v}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {Object.keys(jar.resourcesByExtension).length > 0 && (
+                    <div className="mb-3">
+                      <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">Resource files by type</div>
+                      <div className="flex flex-wrap gap-2">
+                        {Object.entries(jar.resourcesByExtension)
+                          .sort((a, b) => b[1] - a[1])
+                          .map(([ext, count]) => (
+                            <span key={ext} className="rounded-md bg-glass px-2 py-0.5 text-[11px] text-ink-soft">
+                              .{ext} × {count}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {jar.topPackages.length > 0 && (
+                    <div className="mb-3">
+                      <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">Top packages by class count</div>
+                      <div className="flex flex-col gap-0.5 font-mono text-[11.5px] text-ink-soft">
+                        {jar.topPackages.map((p) => (
+                          <div key={p.packageName} className="flex items-center gap-2">
+                            <span className="flex-1 truncate">{p.packageName}</span>
+                            <span className="shrink-0 text-ink-faint">{p.classCount}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {jar.largestEntries.length > 0 && (
+                    <div>
+                      <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">Largest entries</div>
+                      <div className="flex flex-col gap-0.5 font-mono text-[11.5px] text-ink-soft">
+                        {jar.largestEntries.map((e) => (
+                          <div key={e.name} className="flex items-center gap-2">
+                            <span className="flex-1 truncate">{e.name}</span>
+                            <span className="shrink-0 text-ink-faint">{formatBytes(e.size)}</span>
                           </div>
                         ))}
                       </div>

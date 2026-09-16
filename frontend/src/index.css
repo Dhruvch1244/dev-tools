@@ -145,6 +145,11 @@ textarea, pre, code, .font-mono {
 }
 .prose-note table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
 .prose-note th, .prose-note td { border: 1px solid var(--rule); padding: 0.4em 0.6em; text-align: left; }
+/* Diff tool: live word/line highlight drawn on a transparent-text overlay positioned behind the
+   actual (transparent-background) textarea, so this bleeds through under the real typed text. */
+.diff-overlay { border: 1px solid transparent; }
+.diff-hl { background: color-mix(in srgb, var(--warm) 45%, transparent); border-radius: 0.15em; color: transparent; }
+
 .wiki-link {
   color: var(--cyan);
   background: rgba(47, 230, 242, 0.12);

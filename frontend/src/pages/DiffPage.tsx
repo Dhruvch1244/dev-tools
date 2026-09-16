@@ -1,15 +1,64 @@
-import { useMemo, useState } from 'react'
-import { diffLines, diffWords, groupDiffRows } from '../lib/diff'
+import { useMemo, useRef, useState } from 'react'
+import { diffLines, diffWords, groupDiffRows, type DiffRow } from '../lib/diff'
 import { Panel, SectionLabel, CopyButton } from '../components/ui'
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string))
+}
+
+/**
+ * Reconstructs one side's exact original text as HTML, wrapping only the differing words/lines
+ * in a <mark> span — used as a same-text overlay drawn behind the (transparent-background)
+ * textarea so live diff highlighting shows through underneath what you're typing.
+ */
+function buildHighlightHtml(rows: DiffRow[], side: 'before' | 'after'): string {
+  const lines: string[] = []
+  for (const row of rows) {
+    if (row.kind === 'equal') {
+      lines.push(escapeHtml(row.line))
+      continue
+    }
+    if (row.kind === 'remove') {
+      if (side === 'before') lines.push(`<mark class="diff-hl">${escapeHtml(row.line)}</mark>`)
+      continue
+    }
+    if (row.kind === 'add') {
+      if (side === 'after') lines.push(`<mark class="diff-hl">${escapeHtml(row.line)}</mark>`)
+      continue
+    }
+    // kind === 'change': word-level highlight for just the differing tokens
+    const changeRow = row as Extract<DiffRow, { kind: 'change' }>
+    const wordOps = diffWords(changeRow.before, changeRow.after)
+    const keep = side === 'before' ? 'remove' : 'add'
+    const skip = side === 'before' ? 'add' : 'remove'
+    const html = wordOps
+      .filter((w) => w.type !== skip)
+      .map((w) => (w.type === keep ? `<mark class="diff-hl">${escapeHtml(w.text)}</mark>` : escapeHtml(w.text)))
+      .join('')
+    lines.push(html)
+  }
+  return lines.join('\n')
+}
 
 export function DiffPage() {
   const [before, setBefore] = useState('')
   const [after, setAfter] = useState('')
+  const beforeOverlayRef = useRef<HTMLDivElement>(null)
+  const afterOverlayRef = useRef<HTMLDivElement>(null)
 
   const ops = useMemo(() => diffLines(before, after), [before, after])
   const rows = useMemo(() => groupDiffRows(ops), [ops])
   const added = ops.filter((o) => o.type === 'add').length
   const removed = ops.filter((o) => o.type === 'remove').length
+
+  const beforeHtml = useMemo(() => buildHighlightHtml(rows, 'before'), [rows])
+  const afterHtml = useMemo(() => buildHighlightHtml(rows, 'after'), [rows])
+
+  function syncScroll(source: HTMLTextAreaElement, overlay: HTMLDivElement | null) {
+    if (!overlay) return
+    overlay.scrollTop = source.scrollTop
+    overlay.scrollLeft = source.scrollLeft
+  }
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -17,25 +66,43 @@ export function DiffPage() {
         <Panel className="flex flex-col overflow-hidden">
           <div className="flex flex-1 flex-col p-4">
             <SectionLabel>Before</SectionLabel>
-            <textarea
-              value={before}
-              onChange={(e) => setBefore(e.target.value)}
-              spellCheck={false}
-              placeholder="Paste the original text…"
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
-            />
+            <div className="relative flex-1">
+              <div
+                ref={beforeOverlayRef}
+                aria-hidden
+                dangerouslySetInnerHTML={{ __html: beforeHtml }}
+                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[13px] leading-relaxed text-transparent"
+              />
+              <textarea
+                value={before}
+                onChange={(e) => setBefore(e.target.value)}
+                onScroll={(e) => syncScroll(e.currentTarget, beforeOverlayRef.current)}
+                spellCheck={false}
+                placeholder="Paste the original text…"
+                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              />
+            </div>
           </div>
         </Panel>
         <Panel className="flex flex-col overflow-hidden">
           <div className="flex flex-1 flex-col p-4">
             <SectionLabel>After</SectionLabel>
-            <textarea
-              value={after}
-              onChange={(e) => setAfter(e.target.value)}
-              spellCheck={false}
-              placeholder="Paste the changed text…"
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
-            />
+            <div className="relative flex-1">
+              <div
+                ref={afterOverlayRef}
+                aria-hidden
+                dangerouslySetInnerHTML={{ __html: afterHtml }}
+                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[13px] leading-relaxed text-transparent"
+              />
+              <textarea
+                value={after}
+                onChange={(e) => setAfter(e.target.value)}
+                onScroll={(e) => syncScroll(e.currentTarget, afterOverlayRef.current)}
+                spellCheck={false}
+                placeholder="Paste the changed text…"
+                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              />
+            </div>
           </div>
         </Panel>
       </div>
@@ -50,7 +117,7 @@ export function DiffPage() {
           </div>
           <div className="max-h-72 overflow-auto rounded-2xl border border-rule bg-panel font-mono text-[12.5px]">
             {before === '' && after === '' ? (
-              <div className="p-3 text-ink-faint">Paste text in both panes to see the diff.</div>
+              <div className="p-3 text-ink-faint">Paste text in both panes to see the diff — differences highlight live in yellow as you type.</div>
             ) : (
               rows.map((row, i) => {
                 if (row.kind === 'change') {

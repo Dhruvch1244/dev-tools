@@ -9,6 +9,8 @@ across 5 sidebar groups, reachable via the sidebar, a filter box, or the Ctrl+K
 command palette. Runs entirely on your machine as a single Java process — no
 external services, no telemetry, no internet required after download.
 
+![Home — the full tool directory](docs/screenshots/01-home.png)
+
 ## Vault
 
 - **Vault** — local secrets/credentials/URLs, grouped by environment (DIT, SIT,
@@ -18,6 +20,8 @@ external services, no telemetry, no internet required after download.
   no encryption at rest** — appropriate for a trusted single-user local tool, not
   a substitute for a real secrets manager.
 
+![Vault — secrets grouped by environment, masked by default](docs/screenshots/02-vault.png)
+
 ## Visualizers
 
 - **Diagram Studio** — a draw.io-style diagram tool with two modes: a **code**
@@ -26,6 +30,9 @@ external services, no telemetry, no internet required after download.
   a freeform whiteboard where you place rectangles/ellipses/diamonds/text, drag to
   move, drag-resize, connect shapes with arrows, recolor, and export to SVG or PNG.
   Canvas diagrams save by name locally for later.
+
+![Diagram Studio — Mermaid code with a live preview](docs/screenshots/07-diagram-studio.png)
+
 - **Spring Boot Visualizer** — point it at a local Spring Boot project's source
   root (or a workspace of multiple sub-projects) and it statically parses the
   `.java` files (JavaParser, no compilation) to find
@@ -39,11 +46,20 @@ external services, no telemetry, no internet required after download.
 - **Git Repo Overview** — register a local repo path and get branch, ahead/behind,
   uncommitted files, branches, remotes, stash, and recent commits, plus a Fetch
   button. Read-only by design — there is no commit or push endpoint anywhere in
-  the code, only a fixed set of read/fetch git subcommands.
+  the code, only a fixed set of read/fetch git subcommands. A repo with hundreds
+  of branches doesn't get dumped in your face — by default only `main`/`master`,
+  the current branch, and anything you've starred as a favourite are shown, with
+  a filter box and "show all" toggle for the rest. Recent commits can switch
+  between a flat list and a real lane-colored commit/merge graph.
+
+![Git Repo Overview — status, favourited branches, and a commit graph](docs/screenshots/03-git-repo-overview.png)
+
 - **Disk Usage Treemap** — scans a local folder and renders a squarified treemap
   (or a pie-chart view) of what's taking up space; common noise folders
   (`node_modules`, `.git`, `dist`, `target`, …) are greyed out instead of
   competing for attention. Click any box to drill into that subfolder.
+
+![Disk Usage Treemap — squarified layout with a pie view toggle](docs/screenshots/06-disk-treemap.png)
 
 ## Everyday & Data Tools
 
@@ -56,6 +72,8 @@ external services, no telemetry, no internet required after download.
 - **Task List** — a to-do list with priority, due dates, tags, and per-task
   checklists, that actually times you: records when a task was created, started,
   and completed, with elapsed duration shown per task.
+
+![Task List — priority, tags, due dates, checklists](docs/screenshots/09-task-list.png)
 - **File Search** — search across files up to 40GB, plain term or regex,
   case-sensitive toggle. Streams line-by-line so large files don't get loaded
   into memory. Copy any single matched line or all matches at once.
@@ -76,6 +94,8 @@ external services, no telemetry, no internet required after download.
   `(+)` outer joins, `SELECT *`). **This is a heuristic regex-based scanner, not
   a real PL/SQL grammar parser** — treat results as a strong starting point for
   exploring an unfamiliar codebase, not compiler-verified ground truth.
+
+![PL/SQL Analyzer — real call graph resolved from scanned package bodies](docs/screenshots/04-plsql-analyzer.png)
 - **Notes** — nested, collapsible folder tree, `[[Wiki-link]]` backlinks,
   full-text search, markdown editor with sanitized live preview, colored/
   highlighted text, syntax-highlighted code blocks, created/last-edited
@@ -86,6 +106,8 @@ external services, no telemetry, no internet required after download.
   reference back to Task List), or just paste/drag an image straight into the
   editor — images upload to the backend and are referenced by URL, not embedded
   as base64, so the note body stays small and readable.
+
+![Notes — colors, highlight, tables, and code blocks with live preview](docs/screenshots/08-notes.png)
 - **List Converter** — paste one item per line, get back `('a', 'b', 'c')` and
   `(a, b, c)`.
 - **Avro Schema Tool** — paste a writer and reader schema, get a backward-
@@ -99,12 +121,15 @@ external services, no telemetry, no internet required after download.
 ## Text & Dev Utilities
 
 - **Diff** — line-and-word diff between two texts, with a unified-diff-style
-  summary and copy-to-clipboard.
+  summary and copy-to-clipboard. Differences highlight live in yellow directly
+  in the Before/After panes as you type, not just in the results panel below.
 - **Encode / Decode** — base64, JWT decode, and common hash functions.
 - **Time Toolkit** — convert any date/time in any timezone (defaults to IST) to
   epoch/ISO/every other configured timezone at once, plus epoch↔ISO conversion,
   duration between two timestamps, and a cron expression explainer with a
-  weekly heatmap and next-12-runs list.
+  weekly heatmap and next-12-runs list. A live-ticking World Clock shows a
+  stylized world map with day/night shading and a real-time table across ten
+  major timezones.
 - **Regex Lab** — test a pattern live against sample text, or see it broken down
   as a railroad-style diagram instead of a wall of escape characters.
 - **Text Toolkit** — separate input/output panes; case conversion, line
@@ -117,14 +142,18 @@ external services, no telemetry, no internet required after download.
   live-renders the final command as you edit, and keeps a history of every
   generated command for reuse.
 
+![Command Templates — fill-in-the-blank commands with history](docs/screenshots/05-command-templates.png)
+
 ## Backend, Web & Ops
 
 - **Stack Trace Analyzer** — collapses framework noise out of a pasted
   stack trace so the actual failure point stands out.
 - **Dependency Tree** — visualizes a Maven/Gradle dependency tree.
 - **Spring Config** — diffs two versions of a `.properties`/`.yml` config file.
-- **JAR Inspector** — inspects a JAR's manifest, class list, and duplicate
-  classes across a classpath.
+- **JAR Inspector** — inspects a JAR's manifest, class file versions (correctly
+  labeled across every Java version, not just 5–8), resource files by type, the
+  largest entries, top packages by class count, signed/multi-release detection,
+  and duplicate classes across multiple jars.
 - **top / ps Analyzer** — sorts and diffs pasted `top`/`ps` snapshots to spot
   what changed.
 - **Reference Handbook** — Linux command builder, Makefile explainer, and Git
@@ -141,9 +170,10 @@ external services, no telemetry, no internet required after download.
 - **History** — every run is saved locally (embedded H2 file database) per
   tool; click any entry to reload it back into the input.
 - **Appearance** — pick a coding font with real ligatures (JetBrains Mono,
-  Fira Code, Victor Mono) and a color theme, including a Light theme, on top
-  of several dark palettes (Void, Dracula, Nord, Tokyo Night, Gruvbox,
-  Catppuccin, Solarized, and more). Both persist across restarts.
+  Fira Code, Victor Mono) and a color theme: 5 light themes (Light, Solarized
+  Light, Catppuccin Latte, One Light, Nord Light) and 11 dark ones (Void,
+  Dracula, Nord, Tokyo Night, Gruvbox, Catppuccin, Solarized, Monokai Pro, One
+  Dark, Rosé Pine, Everforest). Both persist across restarts.
 - **Ctrl+K command palette** — jump to any tool without touching the sidebar.
 
 ## Running it

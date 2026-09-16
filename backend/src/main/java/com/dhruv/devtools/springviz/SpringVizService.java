@@ -174,9 +174,14 @@ public class SpringVizService {
         return new SpringVizResult.Response(nodes, dedupedEdges, endpoints, config.contextPath, config.port, scanned, workspace, projectNames, cycles);
     }
 
-    /** A workspace: the root has no build file itself, but >=2 immediate children do. */
+    /**
+     * A workspace: >=2 immediate children have their own build file. Deliberately does NOT
+     * require the root to lack a build file — a real Maven/Gradle multi-module project's root
+     * almost always HAS a parent/aggregator pom.xml alongside its module subdirectories, and that
+     * case must still be treated as a workspace (this used to require a build-file-less root,
+     * which meant it silently never activated for the single most common multi-module layout).
+     */
     private boolean isWorkspace(Path root) {
-        if (hasBuildFile(root)) return false;
         return immediateBuildRoots(root).size() >= 2;
     }
 
