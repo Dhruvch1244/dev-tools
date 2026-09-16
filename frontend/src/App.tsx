@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   BracketsCurly,
+  Bug,
   ChartBar,
   ChartPieSlice,
+  CloudArrowDown,
   Database,
   Fingerprint,
   FileCode,
@@ -21,6 +23,9 @@ import {
   SidebarSimple,
   MagnifyingGlass,
   CaretDown,
+  ArrowsClockwise,
+  Robot,
+  Table,
   TreeStructure,
   GitBranch,
   GitCommit,
@@ -81,6 +86,18 @@ import { DiskTreemapPage } from './pages/DiskTreemapPage'
 import { DiagramStudioPage } from './pages/DiagramStudioPage'
 import { HomePage } from './pages/HomePage'
 import { SystemPage } from './pages/SystemPage'
+import { LogTailerPage } from './pages/LogTailerPage'
+import { LogPatternMinerPage } from './pages/LogPatternMinerPage'
+import { ThreadDumpAnalyzerPage } from './pages/ThreadDumpAnalyzerPage'
+import { FormatConverterPage } from './pages/FormatConverterPage'
+import { SqlInsertPage } from './pages/SqlInsertPage'
+import { SchemaDiffPage } from './pages/SchemaDiffPage'
+import { RowDiffPage } from './pages/RowDiffPage'
+import { MockServerPage } from './pages/MockServerPage'
+import { PostmanImportPage } from './pages/PostmanImportPage'
+// lazy: it wildcard-imports every @phosphor-icons/react icon (1500+), which would otherwise
+// bloat the main bundle by ~5MB for every page load, not just when this tool is opened.
+const IconLibraryPage = lazy(() => import('./pages/IconLibraryPage').then((m) => ({ default: m.IconLibraryPage })))
 import { SettingsPopover } from './components/SettingsPopover'
 import { CommandPalette, type PaletteItem } from './components/CommandPalette'
 import { GlobalSearch } from './components/GlobalSearch'
@@ -126,6 +143,16 @@ export type Tool =
   | 'cors-check'
   | 'aws-helpers'
   | 'system'
+  | 'log-tailer'
+  | 'log-pattern-miner'
+  | 'thread-dump'
+  | 'format-convert'
+  | 'sql-insert'
+  | 'schema-diff'
+  | 'row-diff'
+  | 'mock-server'
+  | 'postman-import'
+  | 'icon-library'
 
 export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
 export type ToolGroup = { label: string; tools: ToolDef[] }
@@ -197,6 +224,31 @@ export const GROUPS: ToolGroup[] = [
       { id: 'aws-helpers', label: 'AWS Helpers', hint: 'ARN · IAM · certs', icon: ShieldCheck },
     ],
   },
+  {
+    label: 'Log & Debug Tools',
+    tools: [
+      { id: 'log-tailer', label: 'Log Tailer', hint: 'live tail · filter · highlight', icon: Terminal },
+      { id: 'log-pattern-miner', label: 'Log Pattern Miner', hint: 'cluster huge logs into patterns', icon: ChartBar },
+      { id: 'thread-dump', label: 'Thread Dump Analyzer', hint: 'deadlocks · thread states', icon: Bug },
+    ],
+  },
+  {
+    label: 'Data & Migration Tools',
+    tools: [
+      { id: 'format-convert', label: 'Format Converter', hint: 'YAML · JSON · TOML · .properties', icon: ArrowsClockwise },
+      { id: 'sql-insert', label: 'CSV/Excel → SQL', hint: 'generate INSERT statements', icon: Database },
+      { id: 'schema-diff', label: 'Schema/Migration Diff', hint: 'flag risky DDL changes', icon: GitDiff },
+      { id: 'row-diff', label: 'Row-level Data Diff', hint: 'CSV/JSON, cell-by-cell', icon: Table },
+    ],
+  },
+  {
+    label: 'Frontend & API Tools',
+    tools: [
+      { id: 'mock-server', label: 'Mock Server', hint: 'serve JSON endpoints locally', icon: Robot },
+      { id: 'postman-import', label: 'Postman/Insomnia Import', hint: 'into API Client collections', icon: CloudArrowDown },
+      { id: 'icon-library', label: 'Icon Library', hint: 'browse · copy SVG/JSX', icon: SquaresFour },
+    ],
+  },
 ]
 
 const ALL_TOOLS: ToolDef[] = GROUPS.flatMap((g) => g.tools)
@@ -254,6 +306,16 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'bundle-stats': return <BundleStatsPage />
     case 'cors-check': return <CorsCheckPage />
     case 'aws-helpers': return <AwsHelpersPage />
+    case 'log-tailer': return <LogTailerPage />
+    case 'log-pattern-miner': return <LogPatternMinerPage />
+    case 'thread-dump': return <ThreadDumpAnalyzerPage />
+    case 'format-convert': return <FormatConverterPage />
+    case 'sql-insert': return <SqlInsertPage />
+    case 'schema-diff': return <SchemaDiffPage />
+    case 'row-diff': return <RowDiffPage />
+    case 'mock-server': return <MockServerPage />
+    case 'postman-import': return <PostmanImportPage />
+    case 'icon-library': return <Suspense fallback={<div className="flex h-full items-center justify-center text-sm text-ink-faint">Loading icon set…</div>}><IconLibraryPage /></Suspense>
   }
 }
 
