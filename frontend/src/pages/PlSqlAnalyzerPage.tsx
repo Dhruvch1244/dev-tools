@@ -1,8 +1,71 @@
 import { useMemo, useState } from 'react'
-import { ArrowRight, Database, FileCode, MagnifyingGlass, Package, Warning } from '@phosphor-icons/react'
-import { scanPlSqlRepo, type Risk, type ScanResult } from '../lib/plsqlApi'
+import { ArrowRight, CaretDown, Database, Download, FileCode, MagnifyingGlass, Package, Warning } from '@phosphor-icons/react'
+import { scanPlSqlRepo, type Risk, type Routine, type ScanResult } from '../lib/plsqlApi'
 import { Panel, SectionLabel, Button, ErrorBanner } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
+
+type CallEdge = { from: string; to: string; toKnown: boolean }
+
+function buildCallEdges(routines: Routine[]): CallEdge[] {
+  const known = new Set(routines.map((r) => r.qualifiedName.toLowerCase()))
+  const edges: CallEdge[] = []
+  for (const r of routines) {
+    for (const c of r.calls) {
+      edges.push({ from: r.qualifiedName, to: c, toKnown: known.has(c.toLowerCase()) })
+    }
+  }
+  return edges
+}
+
+function dotEscape(s: string): string {
+  return s.replace(/"/g, '\\"')
+}
+
+function toDot(edges: CallEdge[]): string {
+  const lines = ['digraph plsql_call_graph {', '  rankdir=LR;', '  node [shape=box, fontsize=10, fontname="monospace"];']
+  for (const e of edges) {
+    const style = e.toKnown ? '' : ' [style=dashed, color=gray]'
+    lines.push(`  "${dotEscape(e.from)}" -> "${dotEscape(e.to)}"${style};`)
+  }
+  lines.push('}')
+  return lines.join('\n')
+}
+
+function toCsv(edges: CallEdge[]): string {
+  const rows = ['caller,callee,callee_resolved']
+  for (const e of edges) rows.push(`"${e.from.replace(/"/g, '""')}","${e.to.replace(/"/g, '""')}",${e.toKnown}`)
+  return rows.join('\n')
+}
+
+function mermaidId(s: string, ids: Map<string, string>): string {
+  let id = ids.get(s)
+  if (!id) {
+    id = `n${ids.size}`
+    ids.set(s, id)
+  }
+  return id
+}
+
+function toMermaid(edges: CallEdge[]): string {
+  const ids = new Map<string, string>()
+  const lines = ['graph LR']
+  for (const e of edges) {
+    const fromId = mermaidId(e.from, ids)
+    const toId = mermaidId(e.to, ids)
+    lines.push(`  ${fromId}["${e.from}"] ${e.toKnown ? '-->' : '-.->'} ${toId}["${e.to}"]`)
+  }
+  return lines.join('\n')
+}
+
+function download(content: string, fileName: string, mime: string) {
+  const blob = new Blob([content], { type: mime })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 type Tab = 'inventory' | 'graph' | 'tables' | 'risks'
 const TABS: { id: Tab; label: string }[] = [
@@ -28,6 +91,7 @@ export function PlSqlAnalyzerPage() {
   const [tab, setTab] = useState<Tab>('inventory')
   const [query, setQuery] = useState('')
   const [selectedRoutine, setSelectedRoutine] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
 
   async function scan() {
     if (!path.trim()) return
@@ -82,6 +146,15 @@ export function PlSqlAnalyzerPage() {
     }
     return Array.from(groups.entries()).sort((a, b) => b[1].length - a[1].length)
   }, [result])
+
+  const callEdges = useMemo(() => buildCallEdges(nonPackageRoutines), [nonPackageRoutines])
+
+  function exportGraph(format: 'dot' | 'csv' | 'mermaid') {
+    setExportOpen(false)
+    if (format === 'dot') download(toDot(callEdges), 'plsql-call-graph.dot', 'text/vnd.graphviz')
+    else if (format === 'csv') download(toCsv(callEdges), 'plsql-call-graph.csv', 'text/csv')
+    else download(toMermaid(callEdges), 'plsql-call-graph.mmd', 'text/plain')
+  }
 
   const selected = selectedRoutine ? byQualifiedName.get(selectedRoutine.toLowerCase()) ?? null : null
   const callers = useMemo(() => {
@@ -180,16 +253,30 @@ export function PlSqlAnalyzerPage() {
 
             {tab === 'graph' && (
               <div className="flex flex-1 flex-col gap-3">
-                <select
-                  className="devtools-input w-full font-mono text-xs"
-                  value={selectedRoutine ?? ''}
-                  onChange={(e) => setSelectedRoutine(e.target.value || null)}
-                >
-                  <option value="">Select a routine…</option>
-                  {nonPackageRoutines.map((r, i) => (
-                    <option key={i} value={r.qualifiedName}>{r.qualifiedName}</option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <select
+                    className="devtools-input flex-1 font-mono text-xs"
+                    value={selectedRoutine ?? ''}
+                    onChange={(e) => setSelectedRoutine(e.target.value || null)}
+                  >
+                    <option value="">Select a routine…</option>
+                    {nonPackageRoutines.map((r, i) => (
+                      <option key={i} value={r.qualifiedName}>{r.qualifiedName}</option>
+                    ))}
+                  </select>
+                  <div className="relative shrink-0">
+                    <Button variant="default" onClick={() => setExportOpen((o) => !o)} disabled={callEdges.length === 0} className="py-2 text-xs">
+                      <Download size={13} weight="light" /> Export graph <CaretDown size={11} weight="bold" />
+                    </Button>
+                    {exportOpen && (
+                      <div className="absolute right-0 top-full z-20 mt-1.5 w-44 rounded-xl border border-rule bg-surface p-1 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+                        <button onClick={() => exportGraph('dot')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">Graphviz (.dot)</button>
+                        <button onClick={() => exportGraph('mermaid')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">Mermaid (.mmd)</button>
+                        <button onClick={() => exportGraph('csv')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">CSV (.csv)</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                 {!selected ? (
                   <div className="flex flex-1 items-center justify-center text-sm text-ink-faint">Pick a routine to see its callers and callees.</div>
