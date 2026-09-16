@@ -58,6 +58,17 @@ public class ImageController {
         return respondZip(files, f -> service.enhance(f, opts), "enhanced-images.zip");
     }
 
+    @PostMapping(value = "/remove-color", consumes = "multipart/form-data")
+    public ResponseEntity<byte[]> removeColor(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "color", defaultValue = "#FFFFFF") String color,
+            @RequestParam(value = "tolerance", defaultValue = "20") int tolerance,
+            @RequestParam(value = "edgesOnly", defaultValue = "true") boolean edgesOnly
+    ) throws IOException {
+        var result = service.removeColor(file, new ImageProcessingService.ColorRemoveOptions(color, tolerance, edgesOnly));
+        return respond(result);
+    }
+
     private interface Op {
         ImageProcessingService.Converted apply(MultipartFile file) throws IOException;
     }

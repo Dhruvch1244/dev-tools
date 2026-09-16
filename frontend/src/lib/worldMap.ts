@@ -1,29 +1,48 @@
-/** Equirectangular projection: longitude/latitude → SVG x/y within a `width`×`height` viewBox. */
-export function project(lon: number, lat: number, width: number, height: number): { x: number; y: number } {
-  return { x: ((lon + 180) / 360) * width, y: ((90 - lat) / 180) * height }
+import { geoEquirectangular, geoPath, type GeoPath, type GeoPermissibleObjects } from 'd3-geo'
+import { feature } from 'topojson-client'
+// world-atlas ships pre-simplified real coastline data (Natural Earth, 110m resolution) as a
+// static JSON file — bundled at build time, no runtime fetch, so this stays fully offline.
+import landTopology from 'world-atlas/land-110m.json'
+
+type LooseTopology = { type: 'Topology'; objects: { land: unknown }; arcs: unknown; transform?: unknown }
+
+let cachedProjection: ReturnType<typeof geoEquirectangular> | null = null
+let cachedPathGen: GeoPath | null = null
+let cachedDims: { w: number; h: number } | null = null
+
+function getProjection(width: number, height: number) {
+  if (!cachedProjection || cachedDims?.w !== width || cachedDims?.h !== height) {
+    cachedProjection = geoEquirectangular()
+      .scale(width / (2 * Math.PI))
+      .translate([width / 2, height / 2])
+    cachedPathGen = geoPath(cachedProjection)
+    cachedDims = { w: width, h: height }
+  }
+  return { projection: cachedProjection, pathGen: cachedPathGen as GeoPath }
 }
 
-/**
- * Deliberately stylized/abstract landmass silhouettes — soft blobs over each continent's rough
- * lon/lat bounding box, not traced coastlines. Good enough to read as "a world map" at a glance
- * without claiming geographic precision this app has no business asserting from memory.
- */
-export const CONTINENT_BLOBS: { name: string; lon: number; lat: number; rx: number; ry: number }[] = [
-  { name: 'North America', lon: -100, lat: 45, rx: 34, ry: 20 },
-  { name: 'South America', lon: -60, lat: -18, rx: 14, ry: 24 },
-  { name: 'Europe', lon: 15, lat: 52, rx: 16, ry: 12 },
-  { name: 'Africa', lon: 18, lat: 2, rx: 20, ry: 26 },
-  { name: 'Asia', lon: 95, lat: 45, rx: 42, ry: 22 },
-  { name: 'Australia', lon: 134, lat: -25, rx: 14, ry: 9 },
-]
+/** Longitude/latitude → SVG x/y, using the same real equirectangular projection as the land path. */
+export function project(lon: number, lat: number, width: number, height: number): { x: number; y: number } {
+  const { projection } = getProjection(width, height)
+  const p = projection([lon, lat])
+  return p ? { x: p[0], y: p[1] } : { x: 0, y: 0 }
+}
+
+/** SVG path `d` string for the real world landmass outline (Natural Earth 110m, via world-atlas). */
+export function worldLandPath(width: number, height: number): string {
+  const { pathGen } = getProjection(width, height)
+  const topo = landTopology as unknown as LooseTopology
+  const land = feature(topo as never, topo.objects.land as never) as GeoPermissibleObjects
+  return pathGen(land) ?? ''
+}
 
 export type CityTz = { tz: string; city: string; lon: number; lat: number }
 
 export const CITY_TIMEZONES: CityTz[] = [
-  { tz: 'UTC', city: 'Greenwich', lon: 0, lat: 51.5 },
-  { tz: 'America/New_York', city: 'New York', lon: -74, lat: 40.7 },
-  { tz: 'America/Los_Angeles', city: 'Los Angeles', lon: -118.2, lat: 34 },
-  { tz: 'America/Chicago', city: 'Chicago', lon: -87.6, lat: 41.9 },
+  { tz: 'UTC', city: 'UTC (Null Island)', lon: 0, lat: 0 },
+  { tz: 'America/New_York', city: 'New York (Eastern)', lon: -74, lat: 40.7 },
+  { tz: 'America/Los_Angeles', city: 'Los Angeles (Pacific)', lon: -118.2, lat: 34 },
+  { tz: 'America/Chicago', city: 'Chicago (Central)', lon: -87.6, lat: 41.9 },
   { tz: 'Europe/London', city: 'London', lon: -0.1, lat: 51.5 },
   { tz: 'Europe/Berlin', city: 'Berlin', lon: 13.4, lat: 52.5 },
   { tz: 'Asia/Kolkata', city: 'Mumbai', lon: 72.8, lat: 19.1 },

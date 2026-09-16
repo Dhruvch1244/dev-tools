@@ -95,6 +95,13 @@
       <artifactId>webp-imageio</artifactId>
       <version>0.1.6</version>
     </dependency>
+
+    <!-- Delimited File Profiler: reads .xlsx/.xls workbooks so it isn't CSV/TSV-only. -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.3.0</version>
+    </dependency>
   </dependencies>
 
   <build>

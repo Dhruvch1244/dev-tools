@@ -1,10 +1,11 @@
 # Dev Tools Suite
 
 A local, offline dev tools app: a Spring Boot repo visualizer, a heuristic PL/SQL
-call-graph/table-usage mapper, a local secrets Vault, a read-only Git repo overview,
-fill-in-the-blank Command Templates, DB/regex/cron/disk visual tools, everyday
-Image/PDF tools, 40GB-scale file search, SQL Workspace, a Task List, Notes with
-nested folders/backlinks/colors/syntax highlighting, and more — **32 tools**
+call-graph/table-usage mapper, a local secrets Vault, a Git repo overview with branch
+switching and a commit graph, an offline API client, SVG tools, fill-in-the-blank
+Command Templates, DB/regex/cron/disk visual tools, everyday Image/PDF tools (including
+local background removal), 40GB-scale file search, SQL Workspace, a Task List, Notes with
+nested folders/backlinks/colors/syntax highlighting, and more — **34 tools**
 across 5 sidebar groups, reachable via the sidebar, a filter box, or the Ctrl+K
 command palette. Runs entirely on your machine as a single Java process — no
 external services, no telemetry, no internet required after download.
@@ -45,8 +46,10 @@ external services, no telemetry, no internet required after download.
   branch/merge graph with lane-colored commit lines, not just a flat list.
 - **Git Repo Overview** — register a local repo path and get branch, ahead/behind,
   uncommitted files, branches, remotes, stash, and recent commits, plus a Fetch
-  button. Read-only by design — there is no commit or push endpoint anywhere in
-  the code, only a fixed set of read/fetch git subcommands. A repo with hundreds
+  button, and branch switching. Never commits or pushes — there is no commit/push
+  endpoint anywhere in the code, only a fixed set of read/fetch/checkout git
+  subcommands, and checkout refuses outright if there are any uncommitted
+  changes, so it can never discard work. A repo with hundreds
   of branches doesn't get dumped in your face — by default only `main`/`master`,
   the current branch, and anything you've starred as a favourite are shown, with
   a filter box and "show all" toggle for the rest. Recent commits can switch
@@ -65,7 +68,18 @@ external services, no telemetry, no internet required after download.
 
 - **Image Tools** — convert between PNG/JPG/BMP/GIF/WebP (read and write), or
   enhance (brightness, contrast, sharpen, resize/upscale). Batch mode processes
-  multiple files into a zip. Runs server-side, offline.
+  multiple files into a zip. Also removes a background locally: pick a color
+  (with an eyedropper where the browser supports it) and a tolerance, and it
+  flood-fills the connected background region to transparent — safer than a
+  naive "remove every matching pixel," since a subject wearing the same color
+  won't get holes punched in it. Runs server-side, offline.
+- **SVG Tools** — an **Optimize** tab (strips comments/editor metadata, rounds
+  long decimals, backed by a real DOM parser not regex-on-text), a **Convert**
+  tab (SVG↔PNG/JPG, and wrapping a raster image in an SVG container), a live
+  code+preview **Editor**, and a **Trace** tab that vectorizes a flat-color
+  logo/icon locally via k-means color quantization + run-length rectangle
+  merging — deliberately a mosaic-style vectorization (always valid,
+  non-self-intersecting SVG), not smooth curve tracing.
 - **PDF Converter** — assemble images into a PDF, render a PDF's pages back to a
   zip of images at a chosen DPI, merge multiple PDFs in order, or split one PDF
   into one file per page.
@@ -86,6 +100,10 @@ external services, no telemetry, no internet required after download.
   (missing WHERE, SELECT *, unbounded queries), an auto-generated chart for
   numeric results, a visual tree/step view for EXPLAIN plans, and an ER
   diagram tab.
+- **API Client** — a basic local Bruno/Postman-style client: method, URL,
+  headers, body, response with status/timing/size, and save requests into
+  named collections. Requests execute server-side (Java's `HttpClient`), so
+  it isn't bound by browser CORS the way a purely front-end client would be.
 - **PL/SQL Analyzer** — point it at a folder of `.sql`/`.pks`/`.pkb`/`.prc`/`.fnc`/
   `.trg` files and it builds a searchable inventory of every
   package/procedure/function/trigger/view, a call graph (pick a routine, see its
@@ -114,7 +132,11 @@ external services, no telemetry, no internet required after download.
   compatibility check field-by-field, plus a generated Hive DDL from the writer
   schema.
 - **Delimited File Profiler** — streams a huge CSV/TSV and profiles it (column
-  types, null rates, distinct counts) without loading it all into memory.
+  types, null rates, distinct counts) without loading it all into memory. Also
+  reads `.xlsx`/`.xls` workbooks (sheet picker included) via Apache POI —
+  Excel's own row ceiling means that path isn't the same streaming-scale
+  guarantee as CSV, but it handles real spreadsheets correctly (dates,
+  formulas, numbers).
 - **Part-File Merger** — merges Hadoop/Spark-style `part-*` output files back
   into one.
 
@@ -122,14 +144,23 @@ external services, no telemetry, no internet required after download.
 
 - **Diff** — line-and-word diff between two texts, with a unified-diff-style
   summary and copy-to-clipboard. Differences highlight live in yellow directly
-  in the Before/After panes as you type, not just in the results panel below.
+  in the Before/After panes as you type, refined down to the character level
+  within a changed word (e.g. `hello`→`hallo` highlights just the `e`/`a`, not
+  the whole word) — not just the results panel below.
+
+![Diff — character-level highlighting live in the Before/After panes](docs/screenshots/11-diff.png)
+
 - **Encode / Decode** — base64, JWT decode, and common hash functions.
 - **Time Toolkit** — convert any date/time in any timezone (defaults to IST) to
   epoch/ISO/every other configured timezone at once, plus epoch↔ISO conversion,
   duration between two timestamps, and a cron expression explainer with a
   weekly heatmap and next-12-runs list. A live-ticking World Clock shows a
-  stylized world map with day/night shading and a real-time table across ten
-  major timezones.
+  real world map (actual coastlines via `world-atlas`/`d3-geo`, not hand-drawn
+  shapes) with day/night shading and a real-time table across ten major
+  timezones, including US Eastern/Central/Pacific labeled explicitly.
+
+![World Clock — real coastlines, day/night shading, live per-city times](docs/screenshots/10-worldclock.png)
+
 - **Regex Lab** — test a pattern live against sample text, or see it broken down
   as a railroad-style diagram instead of a wall of escape characters.
 - **Text Toolkit** — separate input/output panes; case conversion, line
@@ -208,19 +239,28 @@ static resources, and packages everything into one runnable jar at
 ## Stack
 
 - Backend: Java 17, Spring Boot 3, embedded H2 (file-based) for history/notes/
-  tasks/vault, JavaParser for Spring Boot static analysis, PDFBox for PDF work,
-  a `webp-imageio` plugin for WebP support, and a fixed-command git wrapper for
-  Git Repo Overview (shells out to the system `git`, no arbitrary-command
-  endpoint exists).
+  tasks/vault/API collections, JavaParser for Spring Boot static analysis,
+  PDFBox for PDF work, Apache POI for Excel, a `webp-imageio` plugin for WebP
+  support, Java's built-in `HttpClient` for the API Client, and a
+  fixed-command git wrapper for Git Repo Overview (shells out to the system
+  `git`, no arbitrary-command endpoint exists).
 - Frontend: React + TypeScript + Vite, Tailwind CSS, Framer Motion, Phosphor
-  Icons, `marked` + DOMPurify + `highlight.js` for Notes. Fonts and icons are
-  self-hosted (no CDN), so the packaged jar works fully offline.
+  Icons, `marked` + DOMPurify + `highlight.js` for Notes, `d3-geo` +
+  `topojson-client` + `world-atlas` (real Natural Earth coastline data) for
+  the World Clock map. Fonts, icons, and map data are all self-hosted (no
+  CDN, no runtime fetch), so the packaged jar works fully offline.
 
 ## Known limitations
 
 - **PL/SQL Analyzer** is a regex-based heuristic scanner, not a real grammar
   parser — good for exploration, not a source of truth.
 - **Vault** stores secrets in plaintext locally — not encrypted at rest.
-- **Command Templates**, **Vault**, and **Git Repo Overview** are new this cycle
-  and have been smoke-tested (CRUD round-trips, live scans against real repos)
-  but not used in anger over time yet.
+- **SVG Tools' Trace tab** produces mosaic-style (rectangle-run) vectorization,
+  not smooth curve tracing — works well on flat-color logos/icons, poorly on
+  photos.
+- **API Client** is intentionally basic (manual request/response, no
+  environment variables, no auth helpers, no auto-import from Spring
+  Analyzer yet).
+- **Delimited File Profiler's Excel path** loads the whole workbook into
+  memory (Apache POI DOM read) — fine for real spreadsheets, not the
+  streaming-scale guarantee the CSV/TSV path makes for multi-GB files.

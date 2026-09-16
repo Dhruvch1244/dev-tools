@@ -32,4 +32,20 @@ public class CsvProfileController {
         String delimiter = (req.delimiter() == null || req.delimiter().isEmpty()) ? "," : req.delimiter();
         return csvProfileService.profilePath(req.path(), delimiter, req.hasHeader());
     }
+
+    @PostMapping(value = "/excel-sheets", consumes = "multipart/form-data")
+    public java.util.List<String> listExcelSheets(@RequestParam("file") MultipartFile file) throws IOException {
+        try (var in = file.getInputStream()) {
+            return csvProfileService.listExcelSheets(in);
+        }
+    }
+
+    @PostMapping(value = "/excel", consumes = "multipart/form-data")
+    public Response profileExcel(@RequestParam("file") MultipartFile file,
+                                  @RequestParam(value = "hasHeader", defaultValue = "true") boolean hasHeader,
+                                  @RequestParam(value = "sheetIndex", required = false) Integer sheetIndex) throws IOException {
+        try (var in = file.getInputStream()) {
+            return csvProfileService.profileExcel(in, hasHeader, sheetIndex);
+        }
+    }
 }

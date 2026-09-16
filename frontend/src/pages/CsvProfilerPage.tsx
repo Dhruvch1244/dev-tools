@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 import { HardDrives, UploadSimple } from '@phosphor-icons/react'
-import { profileCsvPath, profileCsvUpload, type CsvProfileResult } from '../lib/bigdataApi'
+import { listExcelSheets, profileCsvPath, profileCsvUpload, profileExcelUpload, type CsvProfileResult } from '../lib/bigdataApi'
 import { Panel, Button, Toggle, ErrorBanner } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
+
+function isExcelFile(file: File): boolean {
+  return /\.(xlsx|xls)$/i.test(file.name)
+}
 
 type Mode = 'upload' | 'path'
 
@@ -30,6 +34,8 @@ export function CsvProfilerPage() {
   const [result, setResult] = useState<CsvProfileResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [sheets, setSheets] = useState<string[] | null>(null)
+  const [sheetIndex, setSheetIndex] = useState(0)
 
   useEffect(() => {
     const t = setTimeout(() => localStorage.setItem(SETTINGS_KEY, JSON.stringify({ mode, path, delimiter, hasHeader })), 400)
@@ -38,14 +44,36 @@ export function CsvProfilerPage() {
 
   function loadSample() {
     setMode('upload')
+    setSheets(null)
     setFile(new File([SAMPLE_CSV], 'sample.csv', { type: 'text/csv' }))
+  }
+
+  async function pickFile(f: File | null) {
+    setFile(f)
+    setResult(null)
+    setError(null)
+    setSheets(null)
+    setSheetIndex(0)
+    if (f && isExcelFile(f)) {
+      try {
+        const names = await listExcelSheets(f)
+        setSheets(names)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Could not read this workbook')
+      }
+    }
   }
 
   async function run() {
     setLoading(true)
     setError(null)
     try {
-      const res = mode === 'upload' && file ? await profileCsvUpload(file, delimiter, hasHeader) : await profileCsvPath(path, delimiter, hasHeader)
+      const res =
+        mode === 'upload' && file
+          ? isExcelFile(file)
+            ? await profileExcelUpload(file, hasHeader, sheets ? sheetIndex : null)
+            : await profileCsvUpload(file, delimiter, hasHeader)
+          : await profileCsvPath(path, delimiter, hasHeader)
       setResult(res)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Profile failed')
@@ -68,11 +96,21 @@ export function CsvProfilerPage() {
             </div>
 
             {mode === 'upload' ? (
-              <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-rule px-3 py-2.5 text-xs text-ink-soft hover:border-cyan/40 hover:text-ink">
-                <UploadSimple size={14} weight="light" />
-                <span className="truncate">{file ? file.name : 'Choose a CSV/TSV…'}</span>
-                <input type="file" accept=".csv,.tsv,.txt" className="hidden" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-              </label>
+              <>
+                <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-rule px-3 py-2.5 text-xs text-ink-soft hover:border-cyan/40 hover:text-ink">
+                  <UploadSimple size={14} weight="light" />
+                  <span className="truncate">{file ? file.name : 'Choose a CSV/TSV/Excel file…'}</span>
+                  <input type="file" accept=".csv,.tsv,.txt,.xlsx,.xls" className="hidden" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
+                </label>
+                {sheets && sheets.length > 1 && (
+                  <label className="flex flex-col gap-1.5 text-xs text-ink-soft">
+                    Sheet
+                    <select className="devtools-input" value={sheetIndex} onChange={(e) => setSheetIndex(Number(e.target.value))}>
+                      {sheets.map((s, i) => <option key={i} value={i}>{s}</option>)}
+                    </select>
+                  </label>
+                )}
+              </>
             ) : (
               <div className="flex items-center gap-2 rounded-xl border border-rule bg-panel px-3 py-2.5">
                 <HardDrives size={14} weight="light" className="shrink-0 text-ink-faint" />
@@ -80,10 +118,12 @@ export function CsvProfilerPage() {
               </div>
             )}
 
-            <label className="flex flex-col gap-1.5 text-xs text-ink-soft">
-              Delimiter
-              <input className="devtools-input" value={delimiter} onChange={(e) => setDelimiter(e.target.value)} maxLength={1} />
-            </label>
+            {!(mode === 'upload' && file && isExcelFile(file)) && (
+              <label className="flex flex-col gap-1.5 text-xs text-ink-soft">
+                Delimiter
+                <input className="devtools-input" value={delimiter} onChange={(e) => setDelimiter(e.target.value)} maxLength={1} />
+              </label>
+            )}
             <Toggle checked={hasHeader} onChange={setHasHeader} label="First row is a header" />
 
             <Button variant="primary" onClick={run} disabled={!canRun || loading}>

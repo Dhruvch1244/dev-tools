@@ -2,6 +2,12 @@ package com.dhruv.devtools.bigdata;
 
 import com.dhruv.devtools.bigdata.dto.CsvProfileResult.ColumnStat;
 import com.dhruv.devtools.bigdata.dto.CsvProfileResult.Response;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -109,6 +115,71 @@ public class CsvProfileService {
             columns.add(accumulators.get(i).toStat(headerNames.get(i)));
         }
         return new Response(totalRows, malformedRows, columns);
+    }
+
+    /**
+     * Excel support: unlike the CSV path, this loads the workbook into memory via Apache POI
+     * (WorkbookFactory) — Excel's own ~1,048,576-row-per-sheet ceiling means it's never going to
+     * be the multi-GB-file scale the streaming CSV path is built for, so a DOM read is a
+     * reasonable trade for far simpler, correct cell-type handling (dates, formulas, numbers).
+     */
+    public Response profileExcel(InputStream in, boolean hasHeader, Integer sheetIndex) throws IOException {
+        try (Workbook workbook = WorkbookFactory.create(in)) {
+            Sheet sheet = workbook.getSheetAt(sheetIndex != null ? sheetIndex : 0);
+            DataFormatter formatter = new DataFormatter();
+
+            List<String> headerNames = null;
+            List<ColumnAccumulator> accumulators = null;
+            long totalRows = 0;
+            long malformedRows = 0;
+            int expectedColumns = -1;
+            boolean firstRow = true;
+
+            for (Row row : sheet) {
+                int lastCol = row.getLastCellNum();
+                if (lastCol < 0) continue; // fully empty row
+                List<String> fields = new ArrayList<>();
+                for (int c = 0; c < lastCol; c++) {
+                    Cell cell = row.getCell(c, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    fields.add(formatter.formatCellValue(cell).trim());
+                }
+                if (fields.stream().allMatch(String::isEmpty)) continue; // skip blank rows (common at sheet end)
+
+                if (firstRow && hasHeader) {
+                    headerNames = fields;
+                    expectedColumns = fields.size();
+                    accumulators = initAccumulators(headerNames);
+                    firstRow = false;
+                    continue;
+                }
+                firstRow = false;
+
+                if (expectedColumns == -1) {
+                    expectedColumns = fields.size();
+                    headerNames = defaultNames(expectedColumns);
+                    accumulators = initAccumulators(headerNames);
+                }
+                if (fields.size() != expectedColumns) {
+                    malformedRows++;
+                } else {
+                    for (int col = 0; col < fields.size(); col++) accumulators.get(col).accept(fields.get(col));
+                    totalRows++;
+                }
+            }
+
+            if (accumulators == null) return new Response(0, 0, List.of());
+            List<ColumnStat> columns = new ArrayList<>();
+            for (int i = 0; i < accumulators.size(); i++) columns.add(accumulators.get(i).toStat(headerNames.get(i)));
+            return new Response(totalRows, malformedRows, columns);
+        }
+    }
+
+    public List<String> listExcelSheets(InputStream in) throws IOException {
+        try (Workbook workbook = WorkbookFactory.create(in)) {
+            List<String> names = new ArrayList<>();
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) names.add(workbook.getSheetName(i));
+            return names;
+        }
     }
 
     private List<String> defaultNames(int count) {

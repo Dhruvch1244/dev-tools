@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowClockwise, ArrowsDownUp, GitBranch, ListBullets, Plus, ShareNetwork, Star, Trash } from '@phosphor-icons/react'
+import { ArrowClockwise, ArrowsDownUp, ArrowsLeftRight, GitBranch, ListBullets, Plus, ShareNetwork, Star, Trash } from '@phosphor-icons/react'
 import {
   addGitRepo,
+  checkoutBranch,
   fetchGitRepo,
   getGitOverview,
   listGitRepos,
@@ -128,6 +129,20 @@ export function GitRepoPage() {
     }
   }
 
+  async function doCheckout(branch: string) {
+    if (selectedId == null) return
+    if (!window.confirm(`Switch to "${branch}"? Refuses automatically if there are uncommitted changes.`)) return
+    setLoading(true)
+    setError(null)
+    try {
+      setOverview(await checkoutBranch(selectedId, branch))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Checkout failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="flex h-full gap-4">
       <ResizablePanel storageKey="git-repo" className="flex flex-col gap-3">
@@ -150,7 +165,7 @@ export function GitRepoPage() {
             <Button variant="primary" onClick={addRepo} disabled={!addPath.trim()}>
               <Plus size={14} weight="bold" /> Add
             </Button>
-            <div className="text-[10.5px] text-ink-faint">Read-only overview + fetch only. Never commits or pushes.</div>
+            <div className="text-[10.5px] text-ink-faint">Read-only overview, fetch, and branch switching. Never commits or pushes.</div>
           </div>
         </Panel>
 
@@ -295,6 +310,15 @@ export function GitRepoPage() {
                         key={i}
                         className={`group flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] ${b.current ? 'bg-glass-strong text-cyan' : 'bg-glass text-ink-soft'}`}
                       >
+                        {!b.current && (
+                          <button
+                            onClick={() => doCheckout(b.name)}
+                            title={`Switch to ${b.name}`}
+                            className="text-ink-faint opacity-0 hover:text-cyan group-hover:opacity-100"
+                          >
+                            <ArrowsLeftRight size={10} weight="bold" />
+                          </button>
+                        )}
                         {b.name}
                         <Star
                           size={10}

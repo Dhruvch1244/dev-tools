@@ -30,3 +30,21 @@ export async function profileCsvUpload(file: File, delimiter: string, hasHeader:
   if (!res.ok) throw new Error((await res.json().catch(() => ({ error: res.statusText }))).error)
   return res.json()
 }
+
+export async function listExcelSheets(file: File): Promise<string[]> {
+  const form = new FormData()
+  form.append('file', file)
+  const res = await fetch('/api/bigdata/csv-profile/excel-sheets', { method: 'POST', body: form })
+  if (!res.ok) throw new Error((await res.json().catch(() => ({ error: res.statusText }))).error)
+  return res.json()
+}
+
+export async function profileExcelUpload(file: File, hasHeader: boolean, sheetIndex: number | null): Promise<CsvProfileResult> {
+  const form = new FormData()
+  form.append('file', file)
+  form.append('hasHeader', String(hasHeader))
+  if (sheetIndex != null) form.append('sheetIndex', String(sheetIndex))
+  const res = await fetch('/api/bigdata/csv-profile/excel', { method: 'POST', body: form })
+  if (!res.ok) throw new Error((await res.json().catch(() => ({ error: res.statusText }))).error)
+  return res.json()
+}

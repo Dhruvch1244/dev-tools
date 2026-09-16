@@ -9,6 +9,8 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -39,6 +41,8 @@ import java.util.stream.Stream;
  */
 @Service
 public class SpringVizService {
+
+    private static final Logger log = LoggerFactory.getLogger(SpringVizService.class);
 
     private static final Set<String> STEREOTYPES = Set.of(
             "RestController", "Controller", "Service", "Repository", "Component", "Configuration");
@@ -116,33 +120,39 @@ public class SpringVizService {
 
         for (var entry : declByName.entrySet()) {
             String name = entry.getKey();
-            ClassOrInterfaceDeclaration decl = entry.getValue();
-            Node node = nodesByName.get(name);
-            String kind = node.kind();
+            try {
+                ClassOrInterfaceDeclaration decl = entry.getValue();
+                Node node = nodesByName.get(name);
+                String kind = node.kind();
 
-            if (kind.equals("RestController") || kind.equals("Controller")) {
-                String basePath = classRequestMappingPath(decl);
-                for (MethodDeclaration m : decl.getMethods()) {
-                    for (AnnotationExpr ann : m.getAnnotations()) {
-                        String annName = ann.getNameAsString();
-                        String httpMethod = MAPPING_TO_METHOD.get(annName);
-                        if (httpMethod == null && !annName.equals("RequestMapping")) continue;
-                        if (httpMethod == null) httpMethod = "GET"; // bare @RequestMapping default, heuristic
+                if (kind.equals("RestController") || kind.equals("Controller")) {
+                    String basePath = classRequestMappingPath(decl);
+                    for (MethodDeclaration m : decl.getMethods()) {
+                        for (AnnotationExpr ann : m.getAnnotations()) {
+                            String annName = ann.getNameAsString();
+                            String httpMethod = MAPPING_TO_METHOD.get(annName);
+                            if (httpMethod == null && !annName.equals("RequestMapping")) continue;
+                            if (httpMethod == null) httpMethod = "GET"; // bare @RequestMapping default, heuristic
 
-                        String methodPath = firstStringValue(ann, "value", "path").orElse("");
-                        String fullPath = joinPaths(basePath, methodPath);
-                        endpoints.add(new Endpoint(httpMethod, fullPath, name, m.getNameAsString(), node.project()));
-                        endpointCounts.merge(name, 1, Integer::sum);
+                            String methodPath = firstStringValue(ann, "value", "path").orElse("");
+                            String fullPath = joinPaths(basePath, methodPath);
+                            endpoints.add(new Endpoint(httpMethod, fullPath, name, m.getNameAsString(), node.project()));
+                            endpointCounts.merge(name, 1, Integer::sum);
+                        }
                     }
                 }
-            }
 
-            if (!kind.equals("RemoteClient")) {
-                for (String depType : injectedTypeNames(decl)) {
-                    if (declByName.containsKey(depType) && !depType.equals(name)) {
-                        edges.add(new Edge(name, depType));
+                if (!kind.equals("RemoteClient")) {
+                    for (String depType : injectedTypeNames(decl)) {
+                        if (declByName.containsKey(depType) && !depType.equals(name)) {
+                            edges.add(new Edge(name, depType));
+                        }
                     }
                 }
+            } catch (Exception e) {
+                // One class with an unusual/edge-case AST shape shouldn't take down the whole scan —
+                // log and skip it, same policy as the per-file parse failures in pass 1.
+                log.warn("Skipping class '{}' during Spring Boot Visualizer analysis: {}", name, e.toString());
             }
         }
 
@@ -151,12 +161,16 @@ public class SpringVizService {
         // ignoring separators — "order-service" vs "OrderService" vs "order_service" all match).
         Set<String> knownProjects = projectRoots.stream().map(p -> p.getFileName().toString()).collect(java.util.stream.Collectors.toSet());
         for (var e : feignTargetByInterface.entrySet()) {
-            String interfaceName = e.getKey();
-            String target = e.getValue();
-            String resolved = resolveToKnownProject(target, knownProjects).orElse(target);
-            String externalId = "service:" + resolved;
-            nodesByName.putIfAbsent(externalId, new Node(externalId, resolved, "", "ExternalService", 0, "", resolved));
-            edges.add(new Edge(interfaceName, externalId));
+            try {
+                String interfaceName = e.getKey();
+                String target = e.getValue();
+                String resolved = resolveToKnownProject(target, knownProjects).orElse(target);
+                String externalId = "service:" + resolved;
+                nodesByName.putIfAbsent(externalId, new Node(externalId, resolved, "", "ExternalService", 0, "", resolved));
+                edges.add(new Edge(interfaceName, externalId));
+            } catch (Exception ex) {
+                log.warn("Skipping Feign client '{}' during Spring Boot Visualizer analysis: {}", e.getKey(), ex.toString());
+            }
         }
 
         List<Node> nodes = nodesByName.values().stream()
@@ -165,9 +179,21 @@ public class SpringVizService {
                 .toList();
 
         List<Edge> dedupedEdges = edges.stream().distinct().toList();
-        List<Cycle> cycles = findCycles(nodes, dedupedEdges);
+        List<Cycle> cycles;
+        try {
+            cycles = findCycles(nodes, dedupedEdges);
+        } catch (Exception e) {
+            log.warn("Circular-dependency detection failed, continuing without it: {}", e.toString());
+            cycles = List.of();
+        }
 
-        AppConfig config = readAppConfig(root);
+        AppConfig config;
+        try {
+            config = readAppConfig(root);
+        } catch (Exception e) {
+            log.warn("Could not read application.properties/.yml, continuing without port/context-path: {}", e.toString());
+            config = new AppConfig(null, null);
+        }
         List<String> projectNames = workspace ? new ArrayList<>(knownProjects) : List.of();
         Collections.sort(projectNames);
 

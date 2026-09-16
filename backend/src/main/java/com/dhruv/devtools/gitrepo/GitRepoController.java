@@ -40,4 +40,11 @@ public class GitRepoController {
     public GitRepoService.Overview fetch(@PathVariable Long id) {
         return service.fetch(id);
     }
+
+    public record CheckoutRequest(String branch) {}
+
+    @PostMapping("/{id}/checkout")
+    public GitRepoService.Overview checkout(@PathVariable Long id, @RequestBody CheckoutRequest req) {
+        return service.checkout(id, req.branch());
+    }
 }

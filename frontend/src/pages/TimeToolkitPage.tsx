@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { describeCron, nextRuns, parseCron } from '../lib/cron'
-import { CITY_TIMEZONES, CONTINENT_BLOBS, isDaytimeAtLongitude, project } from '../lib/worldMap'
+import { CITY_TIMEZONES, isDaytimeAtLongitude, project, worldLandPath } from '../lib/worldMap'
 import { Panel, SectionLabel, Button, ErrorBanner, CopyButton } from '../components/ui'
 
 const MAP_W = 720
-const MAP_H = 340
+const MAP_H = 360
 
 function WorldClock() {
   const [now, setNow] = useState(() => new Date())
@@ -12,6 +12,8 @@ function WorldClock() {
     const t = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(t)
   }, [])
+
+  const worldPath = useMemo(() => worldLandPath(MAP_W, MAP_H), [])
 
   const rows = useMemo(
     () =>
@@ -34,26 +36,47 @@ function WorldClock() {
           <span className="text-[10.5px] text-ink-faint">updates live</span>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-rule bg-panel">
+        <div className="overflow-hidden rounded-2xl border border-rule">
           <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} className="h-auto w-full">
+            {/* ocean base */}
+            <rect x={0} y={0} width={MAP_W} height={MAP_H} fill="color-mix(in srgb, var(--cyan) 10%, var(--panel))" />
+
+            {/* graticule: a lon/lat reference grid every 30°, like a real map projection */}
+            {Array.from({ length: 11 }, (_, i) => {
+              const x = project(-180 + i * 30, 0, MAP_W, MAP_H).x
+              return <line key={`v${i}`} x1={x} y1={0} x2={x} y2={MAP_H} stroke="var(--rule-soft)" strokeWidth={1} />
+            })}
+            {Array.from({ length: 5 }, (_, i) => {
+              const y = project(0, -60 + i * 30, MAP_W, MAP_H).y
+              return <line key={`h${i}`} x1={0} y1={y} x2={MAP_W} y2={y} stroke="var(--rule-soft)" strokeWidth={1} />
+            })}
+
+            {/* landmasses — real coastlines (Natural Earth 110m via world-atlas + d3-geo), not hand-drawn shapes */}
+            <path
+              d={worldPath}
+              fill="color-mix(in srgb, var(--emerald) 55%, var(--panel))"
+              stroke="color-mix(in srgb, var(--emerald) 80%, var(--ink))"
+              strokeWidth={0.75}
+              strokeLinejoin="round"
+            />
+
             {/* night-side shading, one thin vertical strip per few degrees of longitude */}
             {Array.from({ length: 72 }, (_, i) => {
               const lon = -180 + i * 5
               const day = isDaytimeAtLongitude(now, lon)
               const x = project(lon, 0, MAP_W, MAP_H).x
               const stripW = MAP_W / 72
-              return day ? null : <rect key={i} x={x} y={0} width={stripW + 0.5} height={MAP_H} fill="var(--void)" opacity={0.35} />
+              return day ? null : <rect key={i} x={x} y={0} width={stripW + 0.5} height={MAP_H} fill="var(--void)" opacity={0.4} />
             })}
-            {CONTINENT_BLOBS.map((b) => {
-              const { x, y } = project(b.lon, b.lat, MAP_W, MAP_H)
-              return <ellipse key={b.name} cx={x} cy={y} rx={b.rx * (MAP_W / 360)} ry={b.ry * (MAP_H / 180)} fill="var(--emerald)" opacity={0.22} />
-            })}
-            {rows.map((c) => {
+
+            {rows.map((c, i) => {
               const { x, y } = project(c.lon, c.lat, MAP_W, MAP_H)
+              const above = i % 2 === 0
+              const labelY = above ? y - 8 : y + 14
               return (
                 <g key={c.tz}>
                   <circle cx={x} cy={y} r={4} fill={c.day ? 'var(--warm)' : 'var(--cyan)'} stroke="var(--surface)" strokeWidth={1.5} />
-                  <text x={x + 7} y={y + 3} fontSize={9} fill="var(--ink-faint)" className="select-none">{c.city}</text>
+                  <text x={x} y={labelY} fontSize={9} textAnchor="middle" fill="var(--ink)" stroke="var(--surface)" strokeWidth={3} paintOrder="stroke" className="select-none">{c.city}</text>
                 </g>
               )
             })}

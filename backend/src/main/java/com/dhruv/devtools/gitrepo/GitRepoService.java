@@ -70,9 +70,29 @@ public class GitRepoService {
     }
 
     public Overview fetch(Long id) {
-        SavedGitRepo repo = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such saved repo: " + id));
+        SavedGitRepo repo = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such repo: " + id));
         Path dir = Path.of(repo.getPath());
         run(dir, "fetch", "--all", "--prune");
+        return buildOverview(repo);
+    }
+
+    /**
+     * Switches branches — the one exception to this service's otherwise strict "never changes
+     * repo state" rule, added deliberately and only after explicit user sign-off. Refuses outright
+     * if there are ANY uncommitted changes (not just ones git itself would consider conflicting)
+     * so this can never discard work — commit or stash first, same as everywhere else in git.
+     */
+    public Overview checkout(Long id, String branchName) {
+        if (branchName == null || branchName.isBlank()) throw new IllegalArgumentException("Branch name can't be empty.");
+        SavedGitRepo repo = repository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such repo: " + id));
+        Path dir = Path.of(repo.getPath());
+
+        String status = tryRun(dir, "status", "--porcelain=v1");
+        if (!status.isBlank()) {
+            throw new IllegalArgumentException("Refusing to switch branches: there are uncommitted changes. Commit or stash them first.");
+        }
+
+        run(dir, "checkout", branchName.trim());
         return buildOverview(repo);
     }
 

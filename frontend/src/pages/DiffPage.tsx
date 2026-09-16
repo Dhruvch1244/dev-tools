@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
-import { diffLines, diffWords, groupDiffRows, type DiffRow } from '../lib/diff'
+import { diffLines, groupDiffRows, refineDiff, type DiffRow } from '../lib/diff'
 import { Panel, SectionLabel, CopyButton } from '../components/ui'
 
 function escapeHtml(s: string): string {
@@ -26,15 +26,11 @@ function buildHighlightHtml(rows: DiffRow[], side: 'before' | 'after'): string {
       if (side === 'after') lines.push(`<mark class="diff-hl">${escapeHtml(row.line)}</mark>`)
       continue
     }
-    // kind === 'change': word-level highlight for just the differing tokens
+    // kind === 'change': char-level highlight within substituted words, not the whole word
     const changeRow = row as Extract<DiffRow, { kind: 'change' }>
-    const wordOps = diffWords(changeRow.before, changeRow.after)
-    const keep = side === 'before' ? 'remove' : 'add'
-    const skip = side === 'before' ? 'add' : 'remove'
-    const html = wordOps
-      .filter((w) => w.type !== skip)
-      .map((w) => (w.type === keep ? `<mark class="diff-hl">${escapeHtml(w.text)}</mark>` : escapeHtml(w.text)))
-      .join('')
+    const { beforeTokens, afterTokens } = refineDiff(changeRow.before, changeRow.after)
+    const tokens = side === 'before' ? beforeTokens : afterTokens
+    const html = tokens.map((t) => (t.highlight ? `<mark class="diff-hl">${escapeHtml(t.text)}</mark>` : escapeHtml(t.text))).join('')
     lines.push(html)
   }
   return lines.join('\n')
@@ -121,28 +117,20 @@ export function DiffPage() {
             ) : (
               rows.map((row, i) => {
                 if (row.kind === 'change') {
-                  const wordOps = diffWords(row.before, row.after)
+                  const { beforeTokens, afterTokens } = refineDiff(row.before, row.after)
                   return (
                     <div key={i}>
                       <div className="whitespace-pre-wrap break-all bg-rose/[0.08] px-3 py-0.5 text-rose">
                         {'- '}
-                        {wordOps
-                          .filter((w) => w.type !== 'add')
-                          .map((w, wi) => (
-                            <span key={wi} className={w.type === 'remove' ? 'rounded bg-rose/25 text-rose' : undefined}>
-                              {w.text}
-                            </span>
-                          ))}
+                        {beforeTokens.map((t, ti) => (
+                          <span key={ti} className={t.highlight ? 'rounded bg-rose/25 text-rose' : undefined}>{t.text}</span>
+                        ))}
                       </div>
                       <div className="whitespace-pre-wrap break-all bg-emerald/[0.08] px-3 py-0.5 text-emerald">
                         {'+ '}
-                        {wordOps
-                          .filter((w) => w.type !== 'remove')
-                          .map((w, wi) => (
-                            <span key={wi} className={w.type === 'add' ? 'rounded bg-emerald/25 text-emerald' : undefined}>
-                              {w.text}
-                            </span>
-                          ))}
+                        {afterTokens.map((t, ti) => (
+                          <span key={ti} className={t.highlight ? 'rounded bg-emerald/25 text-emerald' : undefined}>{t.text}</span>
+                        ))}
                       </div>
                     </div>
                   )

@@ -49,6 +49,15 @@ export function enhanceImageBatch(files: File[], opts: EnhanceOptions) {
   return downloadFetch('/api/media/image/enhance-batch', fd)
 }
 
+export function removeColor(file: File, color: string, tolerance: number, edgesOnly: boolean) {
+  const fd = new FormData()
+  fd.set('file', file)
+  fd.set('color', color)
+  fd.set('tolerance', String(tolerance))
+  fd.set('edgesOnly', String(edgesOnly))
+  return downloadFetch('/api/media/image/remove-color', fd)
+}
+
 export function imagesToPdf(files: File[]) {
   const fd = new FormData()
   for (const f of files) fd.append('files', f)

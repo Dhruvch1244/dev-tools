@@ -35,3 +35,4 @@ export const addGitRepo = (path: string, label: string) => jsonFetch<SavedGitRep
 export const removeGitRepo = (id: number) => jsonFetch<void>(`/api/git-repos/${id}`, 'DELETE')
 export const getGitOverview = (id: number) => jsonFetch<GitOverview>(`/api/git-repos/${id}/overview`, 'GET')
 export const fetchGitRepo = (id: number) => jsonFetch<GitOverview>(`/api/git-repos/${id}/fetch`, 'POST')
+export const checkoutBranch = (id: number, branch: string) => jsonFetch<GitOverview>(`/api/git-repos/${id}/checkout`, 'POST', { branch })

@@ -14,6 +14,8 @@ import {
   ListMagnifyingGlass,
   ListNumbers,
   CircleDashed,
+  PenNib,
+  PaperPlaneTilt,
   House,
   LockKey,
   SidebarSimple,
@@ -55,6 +57,8 @@ import { VaultPage } from './pages/VaultPage'
 import { GitRepoPage } from './pages/GitRepoPage'
 import { CommandTemplatesPage } from './pages/CommandTemplatesPage'
 import { PlSqlAnalyzerPage } from './pages/PlSqlAnalyzerPage'
+import { SvgToolsPage } from './pages/SvgToolsPage'
+import { ApiClientPage } from './pages/ApiClientPage'
 import { StackTracePage } from './pages/StackTracePage'
 import { DependencyTreePage } from './pages/DependencyTreePage'
 import { SpringConfigPage } from './pages/SpringConfigPage'
@@ -108,6 +112,8 @@ export type Tool =
   | 'git-repo'
   | 'command-templates'
   | 'plsql-analyzer'
+  | 'svg-tools'
+  | 'api-client'
   | 'stack-trace'
   | 'dep-tree'
   | 'spring-config'
@@ -143,12 +149,14 @@ export const GROUPS: ToolGroup[] = [
   {
     label: 'Everyday & Data Tools',
     tools: [
-      { id: 'image-tools', label: 'Image Tools', hint: 'convert · enhance', icon: Image },
+      { id: 'image-tools', label: 'Image Tools', hint: 'convert · enhance · remove bg', icon: Image },
+      { id: 'svg-tools', label: 'SVG Tools', hint: 'optimize · convert · trace', icon: PenNib },
       { id: 'pdf-tools', label: 'PDF Converter', hint: 'images ↔ pdf', icon: FilePdf },
       { id: 'task-list', label: 'Task List', hint: 'to-dos with timings', icon: ListChecks },
       { id: 'file-search', label: 'File Search', hint: 'grep any file', icon: ListMagnifyingGlass },
       { id: 'json-xml', label: 'JSON / XML', hint: 'format · convert · → TypeScript', icon: BracketsCurly },
       { id: 'sql', label: 'SQL Workspace', hint: 'connect · query · ER diagram', icon: Database },
+      { id: 'api-client', label: 'API Client', hint: 'request · collections · response', icon: PaperPlaneTilt },
       { id: 'plsql-analyzer', label: 'PL/SQL Analyzer', hint: 'call graph · table usage · risks', icon: Stack },
       { id: 'notes', label: 'Notes', hint: 'folders · links · export', icon: Notebook },
       { id: 'list-convert', label: 'List Converter', hint: "a,b,c → ('a','b','c')", icon: ListNumbers },
@@ -228,6 +236,8 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'git-repo': return <GitRepoPage />
     case 'command-templates': return <CommandTemplatesPage />
     case 'plsql-analyzer': return <PlSqlAnalyzerPage />
+    case 'svg-tools': return <SvgToolsPage />
+    case 'api-client': return <ApiClientPage />
     case 'stack-trace': return <StackTracePage />
     case 'dep-tree': return <DependencyTreePage />
     case 'spring-config': return <SpringConfigPage />
