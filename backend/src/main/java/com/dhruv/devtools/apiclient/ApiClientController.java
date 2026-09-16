@@ -57,4 +57,24 @@ public class ApiClientController {
     public ApiExecutionService.ExecuteResponse execute(@RequestBody ApiExecutionService.ExecuteRequest req) {
         return executionService.execute(req);
     }
+
+    @GetMapping("/collections/{id}/environments")
+    public List<ApiEnvironment> listEnvironments(@PathVariable Long id) {
+        return service.listEnvironments(id);
+    }
+
+    @PostMapping("/environments")
+    public ApiEnvironment saveEnvironment(@RequestBody ApiClientService.EnvironmentSave req) {
+        return service.saveEnvironment(req);
+    }
+
+    @PutMapping("/environments/{id}")
+    public ApiEnvironment updateEnvironment(@PathVariable Long id, @RequestBody ApiClientService.EnvironmentSave req) {
+        return service.updateEnvironment(id, req);
+    }
+
+    @DeleteMapping("/environments/{id}")
+    public void deleteEnvironment(@PathVariable Long id) {
+        service.deleteEnvironment(id);
+    }
 }

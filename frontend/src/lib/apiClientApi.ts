@@ -25,6 +25,9 @@ export type ApiRequestDef = {
 export type HeaderKV = { key: string; value: string }
 export type RequestSave = { collectionId: number; name: string; method: string; url: string; headersJson: string; body: string }
 
+export type ApiEnvironment = { id: number; collectionId: number; name: string; variablesJson: string; createdAt: string }
+export type EnvironmentSave = { collectionId: number; name: string; variablesJson: string }
+
 export type ExecuteRequest = { method: string; url: string; headers: HeaderKV[]; body: string }
 export type ExecuteResponse = {
   status: number
@@ -43,3 +46,10 @@ export const saveRequest = (req: RequestSave) => jsonFetch<ApiRequestDef>('/api/
 export const updateRequest = (id: number, req: RequestSave) => jsonFetch<ApiRequestDef>(`/api/api-client/requests/${id}`, 'PUT', req)
 export const deleteRequest = (id: number) => jsonFetch<void>(`/api/api-client/requests/${id}`, 'DELETE')
 export const executeRequest = (req: ExecuteRequest) => jsonFetch<ExecuteResponse>('/api/api-client/execute', 'POST', req)
+
+export const listEnvironments = (collectionId: number) =>
+  jsonFetch<ApiEnvironment[]>(`/api/api-client/collections/${collectionId}/environments`, 'GET')
+export const saveEnvironment = (req: EnvironmentSave) => jsonFetch<ApiEnvironment>('/api/api-client/environments', 'POST', req)
+export const updateEnvironment = (id: number, req: EnvironmentSave) =>
+  jsonFetch<ApiEnvironment>(`/api/api-client/environments/${id}`, 'PUT', req)
+export const deleteEnvironment = (id: number) => jsonFetch<void>(`/api/api-client/environments/${id}`, 'DELETE')

@@ -1,15 +1,20 @@
-import { useEffect, useState } from 'react'
-import { FloppyDisk, PaperPlaneTilt, Plus, Trash } from '@phosphor-icons/react'
+import { useEffect, useMemo, useState } from 'react'
+import { CaretDown, FloppyDisk, PaperPlaneTilt, Plus, Trash } from '@phosphor-icons/react'
 import {
   createCollection,
   deleteCollection,
+  deleteEnvironment,
   deleteRequest,
   executeRequest,
   listCollections,
+  listEnvironments,
   listRequests,
+  saveEnvironment,
   saveRequest,
+  updateEnvironment,
   updateRequest,
   type ApiCollection,
+  type ApiEnvironment,
   type ApiRequestDef,
   type ExecuteResponse,
   type HeaderKV,
@@ -20,6 +25,19 @@ import { ResizablePanel } from '../components/ResizablePanel'
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 const METHOD_COLOR: Record<string, string> = {
   GET: 'var(--emerald)', POST: 'var(--cyan)', PUT: 'var(--warm)', PATCH: 'var(--warm)', DELETE: 'var(--rose)', HEAD: 'var(--violet)', OPTIONS: 'var(--violet)',
+}
+
+function parseVars(json: string | null | undefined): Record<string, string> {
+  try {
+    return json ? JSON.parse(json) : {}
+  } catch {
+    return {}
+  }
+}
+
+/** Replaces {{varName}} tokens with the active environment's values — unresolved tokens are left as-is so a typo is obvious rather than silently becoming empty. */
+function applyVars(text: string, vars: Record<string, string>): string {
+  return text.replace(/\{\{\s*([\w.-]+)\s*\}\}/g, (match, key) => (key in vars ? vars[key] : match))
 }
 
 function statusColor(status: number): string {
@@ -47,6 +65,13 @@ export function ApiClientPage() {
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
 
+  const [environments, setEnvironments] = useState<ApiEnvironment[]>([])
+  const [activeEnvId, setActiveEnvId] = useState<number | null>(null)
+  const [envEditorOpen, setEnvEditorOpen] = useState(false)
+  const [envEditing, setEnvEditing] = useState<ApiEnvironment | 'new' | null>(null)
+  const [envName, setEnvName] = useState('')
+  const [envVars, setEnvVars] = useState<HeaderKV[]>([{ key: '', value: '' }])
+
   const refreshCollections = () => listCollections().then((c) => {
     setCollections(c)
     if (selectedCollectionId == null && c.length > 0) setSelectedCollectionId(c[0].id)
@@ -54,9 +79,64 @@ export function ApiClientPage() {
   useEffect(() => { refreshCollections() }, [])
 
   useEffect(() => {
-    if (selectedCollectionId == null) { setRequests([]); return }
+    if (selectedCollectionId == null) { setRequests([]); setEnvironments([]); setActiveEnvId(null); return }
     listRequests(selectedCollectionId).then(setRequests)
+    listEnvironments(selectedCollectionId).then((envs) => {
+      setEnvironments(envs)
+      setActiveEnvId((prev) => (prev != null && envs.some((e) => e.id === prev) ? prev : envs[0]?.id ?? null))
+    })
   }, [selectedCollectionId])
+
+  const activeVars = useMemo(() => {
+    const env = environments.find((e) => e.id === activeEnvId)
+    return env ? parseVars(env.variablesJson) : {}
+  }, [environments, activeEnvId])
+
+  function refreshEnvironments(collectionId: number) {
+    listEnvironments(collectionId).then(setEnvironments)
+  }
+
+  function startNewEnv() {
+    setEnvEditing('new')
+    setEnvName('')
+    setEnvVars([{ key: '', value: '' }])
+  }
+
+  function startEditEnv(env: ApiEnvironment) {
+    setEnvEditing(env)
+    setEnvName(env.name)
+    const vars = parseVars(env.variablesJson)
+    const rows = Object.entries(vars).map(([key, value]) => ({ key, value }))
+    setEnvVars(rows.length ? [...rows, { key: '', value: '' }] : [{ key: '', value: '' }])
+  }
+
+  function updateEnvVar(i: number, patch: Partial<HeaderKV>) {
+    setEnvVars((prev) => {
+      const next = [...prev]
+      next[i] = { ...next[i], ...patch }
+      if (i === next.length - 1 && (next[i].key || next[i].value)) next.push({ key: '', value: '' })
+      return next
+    })
+  }
+
+  async function saveEnv() {
+    if (selectedCollectionId == null || !envName.trim()) return
+    const varsObj: Record<string, string> = {}
+    for (const v of envVars) if (v.key.trim()) varsObj[v.key.trim()] = v.value
+    const payload = { collectionId: selectedCollectionId, name: envName.trim(), variablesJson: JSON.stringify(varsObj) }
+    const saved = envEditing !== 'new' && envEditing ? await updateEnvironment(envEditing.id, payload) : await saveEnvironment(payload)
+    refreshEnvironments(selectedCollectionId)
+    setActiveEnvId(saved.id)
+    setEnvEditing(null)
+  }
+
+  async function removeEnv(id: number) {
+    if (!window.confirm('Delete this environment?')) return
+    await deleteEnvironment(id)
+    if (selectedCollectionId != null) refreshEnvironments(selectedCollectionId)
+    if (activeEnvId === id) setActiveEnvId(null)
+    if (envEditing !== 'new' && envEditing?.id === id) setEnvEditing(null)
+  }
 
   async function addCollection() {
     const name = window.prompt('Collection name')
@@ -119,7 +199,10 @@ export function ApiClientPage() {
     setSending(true)
     setError(null)
     try {
-      const result = await executeRequest({ method, url, headers: headers.filter((h) => h.key.trim()), body })
+      const resolvedUrl = applyVars(url, activeVars)
+      const resolvedHeaders = headers.filter((h) => h.key.trim()).map((h) => ({ key: applyVars(h.key, activeVars), value: applyVars(h.value, activeVars) }))
+      const resolvedBody = applyVars(body, activeVars)
+      const result = await executeRequest({ method, url: resolvedUrl, headers: resolvedHeaders, body: resolvedBody })
       setResponse(result)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Request failed')
@@ -211,6 +294,60 @@ export function ApiClientPage() {
               <Button variant="default" onClick={save} disabled={selectedCollectionId == null || !requestName.trim()}>
                 <FloppyDisk size={13} weight="light" /> Save
               </Button>
+              <div className="relative">
+                <button
+                  onClick={() => setEnvEditorOpen((o) => !o)}
+                  disabled={selectedCollectionId == null}
+                  className="flex items-center gap-1.5 rounded-full bg-glass px-3 py-2 text-xs text-ink-soft ring-1 ring-glass-strong hover:bg-glass-strong disabled:opacity-35"
+                >
+                  {environments.find((e) => e.id === activeEnvId)?.name ?? 'No environment'}
+                  <CaretDown size={11} weight="bold" />
+                </button>
+                {envEditorOpen && (
+                  <div className="absolute right-0 top-full z-20 mt-1.5 w-80 rounded-2xl border border-rule bg-surface p-3 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+                    <div className="mb-2 flex items-center justify-between">
+                      <SectionLabel>Environments</SectionLabel>
+                      <button onClick={startNewEnv} className="text-ink-faint hover:text-cyan"><Plus size={12} weight="bold" /></button>
+                    </div>
+                    <div className="mb-2 flex flex-col gap-1">
+                      <button
+                        onClick={() => setActiveEnvId(null)}
+                        className={`rounded-lg px-2.5 py-1.5 text-left text-xs ${activeEnvId === null ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
+                      >
+                        No environment (raw {'{{vars}}'})
+                      </button>
+                      {environments.map((env) => (
+                        <div key={env.id} className={`group flex items-center gap-1.5 rounded-lg px-1 ${activeEnvId === env.id ? 'bg-glass-strong' : 'hover:bg-glass'}`}>
+                          <button onClick={() => setActiveEnvId(env.id)} className={`flex-1 truncate px-1.5 py-1.5 text-left text-xs ${activeEnvId === env.id ? 'text-ink' : 'text-ink-faint'}`}>
+                            {env.name}
+                          </button>
+                          <button onClick={() => startEditEnv(env)} className="rounded px-1.5 py-1 text-[10px] text-ink-faint opacity-0 hover:text-cyan group-hover:opacity-100">Edit</button>
+                          <Trash size={11} weight="light" className="mr-1 shrink-0 text-ink-faint opacity-0 hover:text-rose group-hover:opacity-100" onClick={() => removeEnv(env.id)} />
+                        </div>
+                      ))}
+                      {environments.length === 0 && <div className="px-2 py-1 text-[11px] text-ink-faint">No environments yet.</div>}
+                    </div>
+
+                    {envEditing !== null && (
+                      <div className="flex flex-col gap-2 border-t border-rule-soft pt-2">
+                        <input className="devtools-input text-xs" placeholder="Environment name (e.g. Dev, Prod)" value={envName} onChange={(e) => setEnvName(e.target.value)} />
+                        <div className="flex max-h-40 flex-col gap-1.5 overflow-auto">
+                          {envVars.map((v, i) => (
+                            <div key={i} className="flex items-center gap-1.5">
+                              <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="varName" value={v.key} onChange={(e) => updateEnvVar(i, { key: e.target.value })} />
+                              <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="value" value={v.value} onChange={(e) => updateEnvVar(i, { value: e.target.value })} />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-1.5">
+                          <Button variant="primary" onClick={saveEnv} disabled={!envName.trim()} className="flex-1 justify-center py-1.5 text-xs">Save</Button>
+                          <Button variant="ghost" onClick={() => setEnvEditing(null)} className="py-1.5 text-xs">Cancel</Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Panel>

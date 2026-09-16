@@ -10,13 +10,16 @@ public class ApiClientService {
 
     private final ApiCollectionRepository collections;
     private final ApiRequestDefRepository requests;
+    private final ApiEnvironmentRepository environments;
 
-    public ApiClientService(ApiCollectionRepository collections, ApiRequestDefRepository requests) {
+    public ApiClientService(ApiCollectionRepository collections, ApiRequestDefRepository requests, ApiEnvironmentRepository environments) {
         this.collections = collections;
         this.requests = requests;
+        this.environments = environments;
     }
 
     public record RequestSave(Long collectionId, String name, String method, String url, String headersJson, String body) {}
+    public record EnvironmentSave(Long collectionId, String name, String variablesJson) {}
 
     public List<ApiCollection> listCollections() {
         return collections.findAllByOrderByNameAsc();
@@ -32,7 +35,36 @@ public class ApiClientService {
     @Transactional
     public void deleteCollection(Long id) {
         requests.deleteAllByCollectionId(id);
+        environments.deleteAllByCollectionId(id);
         collections.deleteById(id);
+    }
+
+    public List<ApiEnvironment> listEnvironments(Long collectionId) {
+        return environments.findAllByCollectionIdOrderByNameAsc(collectionId);
+    }
+
+    public ApiEnvironment saveEnvironment(EnvironmentSave req) {
+        if (req.name() == null || req.name().isBlank()) throw new IllegalArgumentException("Environment name can't be empty.");
+        if (!collections.existsById(req.collectionId())) throw new IllegalArgumentException("No such collection: " + req.collectionId());
+        ApiEnvironment e = new ApiEnvironment();
+        e.setCollectionId(req.collectionId());
+        applyEnv(e, req);
+        return environments.save(e);
+    }
+
+    public ApiEnvironment updateEnvironment(Long id, EnvironmentSave req) {
+        ApiEnvironment e = environments.findById(id).orElseThrow(() -> new IllegalArgumentException("No such environment: " + id));
+        applyEnv(e, req);
+        return environments.save(e);
+    }
+
+    public void deleteEnvironment(Long id) {
+        environments.deleteById(id);
+    }
+
+    private void applyEnv(ApiEnvironment e, EnvironmentSave req) {
+        e.setName(req.name().trim());
+        e.setVariablesJson(req.variablesJson() == null ? "{}" : req.variablesJson());
     }
 
     public List<ApiRequestDef> listRequests(Long collectionId) {
