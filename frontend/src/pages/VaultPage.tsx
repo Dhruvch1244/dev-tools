@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Copy, Eye, EyeSlash, Plus, Trash, LockKey } from '@phosphor-icons/react'
-import { createVaultEntry, deleteVaultEntry, listVaultEntries, updateVaultEntry, type VaultEntry, type VaultRequest } from '../lib/vaultApi'
+import { Copy, Eye, EyeSlash, Plus, Trash, LockKey, LockSimple, LockSimpleOpen, ShieldCheck } from '@phosphor-icons/react'
+import {
+  createVaultEntry,
+  deleteVaultEntry,
+  disableEncryption,
+  enableEncryption,
+  getEncryptionStatus,
+  listVaultEntries,
+  lockVault,
+  rotatePassphrase,
+  unlockVault,
+  updateVaultEntry,
+  type EncryptionStatus,
+  type VaultEntry,
+  type VaultRequest,
+} from '../lib/vaultApi'
 import { Button, Panel, SectionLabel, ErrorBanner } from '../components/ui'
 
 const EMPTY: VaultRequest = { environment: '', name: '', url: '', username: '', secret: '', notes: '' }
@@ -12,9 +26,96 @@ export function VaultPage() {
   const [revealed, setRevealed] = useState<Set<number>>(new Set())
   const [editingId, setEditingId] = useState<number | 'new' | null>(null)
   const [form, setForm] = useState<VaultRequest>(EMPTY)
+  const [encStatus, setEncStatus] = useState<EncryptionStatus | null>(null)
+  const [encBusy, setEncBusy] = useState(false)
 
   const refresh = () => listVaultEntries().then(setEntries).catch((e) => setError(e.message))
-  useEffect(() => { refresh() }, [])
+  const refreshEncStatus = () => getEncryptionStatus().then(setEncStatus).catch(() => {})
+  useEffect(() => { refresh(); refreshEncStatus() }, [])
+
+  const locked = encStatus?.enabled === true && encStatus.unlocked === false
+
+  async function handleEnable() {
+    const passphrase = window.prompt('Set a passphrase to encrypt all vault secrets. You will need it every time you restart the app.')
+    if (!passphrase) return
+    const confirmPass = window.prompt('Confirm the passphrase:')
+    if (confirmPass !== passphrase) { setError('Passphrases did not match.'); return }
+    setError(null)
+    setEncBusy(true)
+    try {
+      await enableEncryption(passphrase)
+      await refreshEncStatus()
+      refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to enable encryption')
+    } finally {
+      setEncBusy(false)
+    }
+  }
+
+  async function handleUnlock() {
+    const passphrase = window.prompt('Enter the vault passphrase to unlock:')
+    if (!passphrase) return
+    setError(null)
+    setEncBusy(true)
+    try {
+      await unlockVault(passphrase)
+      await refreshEncStatus()
+      refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to unlock')
+    } finally {
+      setEncBusy(false)
+    }
+  }
+
+  async function handleLock() {
+    setEncBusy(true)
+    try {
+      await lockVault()
+      await refreshEncStatus()
+      refresh()
+    } finally {
+      setEncBusy(false)
+    }
+  }
+
+  async function handleDisable() {
+    const passphrase = window.prompt('Enter the current passphrase to disable encryption (all secrets will be stored as plaintext again):')
+    if (!passphrase) return
+    if (!window.confirm('Disable encryption and store all secrets as plaintext?')) return
+    setError(null)
+    setEncBusy(true)
+    try {
+      await disableEncryption(passphrase)
+      await refreshEncStatus()
+      refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to disable encryption')
+    } finally {
+      setEncBusy(false)
+    }
+  }
+
+  async function handleRotate() {
+    const oldPass = window.prompt('Current passphrase:')
+    if (!oldPass) return
+    const newPass = window.prompt('New passphrase:')
+    if (!newPass) return
+    const confirmPass = window.prompt('Confirm new passphrase:')
+    if (confirmPass !== newPass) { setError('New passphrases did not match.'); return }
+    setError(null)
+    setEncBusy(true)
+    try {
+      await rotatePassphrase(oldPass, newPass)
+      await refreshEncStatus()
+      refresh()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to change passphrase')
+    } finally {
+      setEncBusy(false)
+    }
+  }
 
   const environments = useMemo(() => {
     const set = new Set<string>()
@@ -52,12 +153,14 @@ export function VaultPage() {
   }
 
   function startNew() {
+    if (locked) { setError('Unlock the vault before adding entries.'); return }
     setForm({ ...EMPTY, environment: envFilter ?? '' })
     setEditingId('new')
   }
 
   function startEdit(e: VaultEntry) {
-    setForm({ environment: e.environment, name: e.name, url: e.url ?? '', username: e.username ?? '', secret: e.secret, notes: e.notes ?? '' })
+    if (locked || e.locked) { setError('Unlock the vault before editing entries.'); return }
+    setForm({ environment: e.environment, name: e.name, url: e.url ?? '', username: e.username ?? '', secret: e.secret ?? '', notes: e.notes ?? '' })
     setEditingId(e.id)
   }
 
@@ -104,6 +207,44 @@ export function VaultPage() {
           <Button variant="primary" onClick={startNew} className="mt-2">
             <Plus size={14} weight="bold" /> Add entry
           </Button>
+        </div>
+
+        <div className="border-t border-rule-soft p-3">
+          <SectionLabel>Encryption</SectionLabel>
+          {!encStatus ? (
+            <div className="mt-2 text-[10.5px] text-ink-faint">Loading…</div>
+          ) : !encStatus.enabled ? (
+            <div className="mt-2 flex flex-col gap-1.5">
+              <div className="text-[10.5px] text-ink-faint">Secrets are stored as plaintext.</div>
+              <Button variant="ghost" onClick={handleEnable} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
+                <ShieldCheck size={13} weight="light" /> Enable encryption
+              </Button>
+            </div>
+          ) : encStatus.unlocked ? (
+            <div className="mt-2 flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 text-[10.5px] text-cyan">
+                <LockSimpleOpen size={12} weight="bold" /> Unlocked
+              </div>
+              <Button variant="ghost" onClick={handleLock} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
+                <LockSimple size={13} weight="light" /> Lock vault
+              </Button>
+              <Button variant="ghost" onClick={handleRotate} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
+                Change passphrase
+              </Button>
+              <Button variant="ghost" onClick={handleDisable} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs text-rose">
+                Disable encryption
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-2 flex flex-col gap-1.5">
+              <div className="flex items-center gap-1.5 text-[10.5px] text-warm">
+                <LockSimple size={12} weight="bold" /> Locked
+              </div>
+              <Button variant="primary" onClick={handleUnlock} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
+                <LockSimpleOpen size={13} weight="light" /> Unlock vault
+              </Button>
+            </div>
+          )}
         </div>
       </Panel>
 
@@ -203,12 +344,18 @@ export function VaultPage() {
                       {e.username && <div className="text-[11.5px] text-ink-soft">user: <span className="font-mono">{e.username}</span></div>}
                       <div className="flex items-center gap-1.5">
                         <span className="flex-1 truncate rounded-lg bg-glass px-2.5 py-1.5 font-mono text-[12px] text-ink">
-                          {revealed.has(e.id) ? e.secret : '•'.repeat(Math.min(24, Math.max(8, e.secret.length)))}
+                          {e.locked ? (
+                            <span className="flex items-center gap-1.5 text-ink-faint"><LockSimple size={12} weight="bold" /> Locked — unlock the vault to view</span>
+                          ) : revealed.has(e.id) ? (
+                            e.secret
+                          ) : (
+                            '•'.repeat(Math.min(24, Math.max(8, (e.secret ?? '').length)))
+                          )}
                         </span>
-                        <button onClick={() => toggleReveal(e.id)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title={revealed.has(e.id) ? 'Hide' : 'Reveal'}>
+                        <button onClick={() => toggleReveal(e.id)} disabled={e.locked} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink disabled:opacity-30" title={revealed.has(e.id) ? 'Hide' : 'Reveal'}>
                           {revealed.has(e.id) ? <EyeSlash size={14} weight="light" /> : <Eye size={14} weight="light" />}
                         </button>
-                        <button onClick={() => copySecret(e.secret)} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink" title="Copy secret">
+                        <button onClick={() => e.secret && copySecret(e.secret)} disabled={e.locked} className="rounded-md p-1.5 text-ink-faint hover:bg-glass-strong hover:text-ink disabled:opacity-30" title="Copy secret">
                           <Copy size={14} weight="light" />
                         </button>
                       </div>

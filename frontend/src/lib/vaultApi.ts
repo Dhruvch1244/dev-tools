@@ -16,11 +16,14 @@ export type VaultEntry = {
   name: string
   url: string | null
   username: string | null
-  secret: string
+  secret: string | null
   notes: string | null
   createdAt: string
   updatedAt: string
+  locked: boolean
 }
+
+export type EncryptionStatus = { enabled: boolean; unlocked: boolean }
 
 export type VaultRequest = {
   environment: string
@@ -35,3 +38,14 @@ export const listVaultEntries = () => jsonFetch<VaultEntry[]>('/api/vault', 'GET
 export const createVaultEntry = (req: VaultRequest) => jsonFetch<VaultEntry>('/api/vault', 'POST', req)
 export const updateVaultEntry = (id: number, req: VaultRequest) => jsonFetch<VaultEntry>(`/api/vault/${id}`, 'PUT', req)
 export const deleteVaultEntry = (id: number) => jsonFetch<void>(`/api/vault/${id}`, 'DELETE')
+
+export const getEncryptionStatus = () => jsonFetch<EncryptionStatus>('/api/vault/encryption/status', 'GET')
+export const enableEncryption = (passphrase: string) =>
+  jsonFetch<EncryptionStatus>('/api/vault/encryption/enable', 'POST', { passphrase })
+export const disableEncryption = (passphrase: string) =>
+  jsonFetch<EncryptionStatus>('/api/vault/encryption/disable', 'POST', { passphrase })
+export const unlockVault = (passphrase: string) =>
+  jsonFetch<{ unlocked: boolean }>('/api/vault/encryption/unlock', 'POST', { passphrase })
+export const lockVault = () => jsonFetch<EncryptionStatus>('/api/vault/encryption/lock', 'POST')
+export const rotatePassphrase = (oldPassphrase: string, newPassphrase: string) =>
+  jsonFetch<EncryptionStatus>('/api/vault/encryption/rotate', 'POST', { oldPassphrase, newPassphrase })
