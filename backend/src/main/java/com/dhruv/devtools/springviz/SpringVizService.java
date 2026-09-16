@@ -194,7 +194,7 @@ public class SpringVizService {
             log.warn("Could not read application.properties/.yml, continuing without port/context-path: {}", e.toString());
             config = new AppConfig(null, null);
         }
-        List<String> projectNames = workspace ? new ArrayList<>(knownProjects) : List.of();
+        List<String> projectNames = new ArrayList<>(workspace ? knownProjects : List.of());
         Collections.sort(projectNames);
 
         return new SpringVizResult.Response(nodes, dedupedEdges, endpoints, config.contextPath, config.port, scanned, workspace, projectNames, cycles);
