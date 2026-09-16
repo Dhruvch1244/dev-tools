@@ -83,6 +83,7 @@ import { HomePage } from './pages/HomePage'
 import { SystemPage } from './pages/SystemPage'
 import { SettingsPopover } from './components/SettingsPopover'
 import { CommandPalette, type PaletteItem } from './components/CommandPalette'
+import { GlobalSearch } from './components/GlobalSearch'
 import { applyTheme, getStoredTheme } from './lib/themes'
 import { applyFont, getStoredFont } from './lib/fonts'
 
@@ -401,7 +402,10 @@ function App() {
               <div className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">local · offline</div>
             </div>
           </div>
-          <CommandPalette items={paletteItems} onSelect={openTool} favourites={favourites} recents={recents} />
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1"><CommandPalette items={paletteItems} onSelect={openTool} favourites={favourites} recents={recents} /></div>
+            <GlobalSearch onOpenTool={(id) => openTool(id as Tool)} />
+          </div>
           <div className="relative mt-2">
             <MagnifyingGlass size={13} weight="light" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint" />
             <input
