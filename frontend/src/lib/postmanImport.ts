@@ -52,6 +52,21 @@ function parseInsomnia(doc: { resources: InsomniaResource[] }): ImportedRequest[
     }))
 }
 
+/** Postman v2.1 collection JSON, built from a flat request list — the format parseImportFile above reads back in, so it round-trips through this app's own import tool. */
+export function buildPostmanCollection(name: string, requests: { name: string; method: string; url: string }[]): string {
+  return JSON.stringify(
+    {
+      info: { name, schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json' },
+      item: requests.map((r) => ({
+        name: r.name,
+        request: { method: r.method, header: [], url: { raw: r.url } },
+      })),
+    },
+    null,
+    2
+  )
+}
+
 export function parseImportFile(text: string): { collectionName: string; requests: ImportedRequest[] } {
   const doc = JSON.parse(text)
   if (Array.isArray(doc.resources)) {

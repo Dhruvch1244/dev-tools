@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CloudArrowDown, FolderOpen, GitBranch, Trash, Warning } from '@phosphor-icons/react'
+import { Check, CloudArrowDown, Copy, DownloadSimple, FolderOpen, GitBranch, Trash, Warning } from '@phosphor-icons/react'
 import { analyzeSpringRepo, type SpringVizEndpoint, type SpringVizResponse } from '../lib/springVizApi'
 import {
   createCollection as createApiCollection,
@@ -9,6 +9,8 @@ import {
   saveRequest as saveApiRequest,
   updateEnvironment as updateApiEnvironment,
 } from '../lib/apiClientApi'
+import { buildPostmanCollection } from '../lib/postmanImport'
+import { exportTextAsFile } from '../lib/export'
 import { Button, Panel, SectionLabel, ErrorBanner } from '../components/ui'
 import { ResizablePanel } from '../components/ResizablePanel'
 import { SpringVizGraph, GraphLegend } from '../components/SpringVizGraph'
@@ -46,6 +48,8 @@ export function SpringVizPage() {
   const [selectedEndpoints, setSelectedEndpoints] = useState<Set<string>>(new Set())
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState<string | null>(null)
+  const [copiedRowKey, setCopiedRowKey] = useState<string | null>(null)
+  const [curlCopied, setCurlCopied] = useState(false)
 
   async function run(targetPath: string) {
     if (!targetPath.trim()) return
@@ -73,6 +77,39 @@ export function SpringVizPage() {
   }
 
   const baseUrl = result ? `http://localhost:${result.port ?? 8080}${result.contextPath ?? ''}` : ''
+
+  function endpointUrl(e: SpringVizEndpoint): string {
+    return (result?.workspace ? '' : baseUrl) + e.path
+  }
+
+  function curlFor(e: SpringVizEndpoint): string {
+    return `curl -X ${e.httpMethod} '${endpointUrl(e)}'`
+  }
+
+  async function copyRowUrl(e: SpringVizEndpoint) {
+    const key = endpointKey(e)
+    await navigator.clipboard.writeText(endpointUrl(e))
+    setCopiedRowKey(key)
+    setTimeout(() => setCopiedRowKey((k) => (k === key ? null : k)), 1200)
+  }
+
+  async function copySelectedAsCurl() {
+    const toCopy = filteredEndpoints.filter((e) => selectedEndpoints.has(endpointKey(e)))
+    if (toCopy.length === 0) return
+    await navigator.clipboard.writeText(toCopy.map(curlFor).join('\n'))
+    setCurlCopied(true)
+    setTimeout(() => setCurlCopied(false), 1200)
+  }
+
+  function exportSelectedAsJson() {
+    if (!result) return
+    const toExport = filteredEndpoints.filter((e) => selectedEndpoints.has(endpointKey(e)))
+    const json = buildPostmanCollection(
+      'Spring endpoints',
+      toExport.map((e) => ({ name: `${e.controllerClass}.${e.methodName}`, method: e.httpMethod, url: endpointUrl(e) }))
+    )
+    exportTextAsFile('spring-endpoints.json', json, 'json')
+  }
 
   const filteredNodes = useMemo(() => {
     if (!result || !projectFilter) return result?.nodes ?? []
@@ -287,6 +324,23 @@ export function SpringVizPage() {
                       <CloudArrowDown size={13} weight="light" />
                       {importing ? 'Importing…' : `Import ${selectedEndpoints.size || ''} to API Client`}
                     </Button>
+                    <Button
+                      variant="default"
+                      onClick={copySelectedAsCurl}
+                      disabled={selectedEndpoints.size === 0}
+                      className="py-1.5 text-xs"
+                    >
+                      {curlCopied ? <Check size={13} weight="bold" className="text-emerald" /> : <Copy size={13} weight="light" />}
+                      {curlCopied ? 'Copied' : `Copy ${selectedEndpoints.size || ''} as cURL`}
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={exportSelectedAsJson}
+                      disabled={selectedEndpoints.size === 0}
+                      className="py-1.5 text-xs"
+                    >
+                      <DownloadSimple size={13} weight="light" /> Export {selectedEndpoints.size || ''} as JSON
+                    </Button>
                     {importMsg && <span className="text-[11.5px] text-emerald">{importMsg}</span>}
                   </div>
                 )}
@@ -304,13 +358,14 @@ export function SpringVizPage() {
                           <th className="border-b border-rule px-3 py-2 font-medium text-ink-faint">Path</th>
                           <th className="border-b border-rule px-3 py-2 font-medium text-ink-faint">Controller</th>
                           {result.workspace && <th className="border-b border-rule px-3 py-2 font-medium text-ink-faint">Project</th>}
+                          <th className="border-b border-rule px-3 py-2 font-medium text-ink-faint" />
                         </tr>
                       </thead>
                       <tbody>
                         {filteredEndpoints.map((e, i) => {
                           const key = endpointKey(e)
                           return (
-                            <tr key={i} className="border-b border-rule-soft hover:bg-glass">
+                            <tr key={i} className="group border-b border-rule-soft hover:bg-glass">
                               <td className="px-3 py-1.5">
                                 <input type="checkbox" checked={selectedEndpoints.has(key)} onChange={() => toggleEndpoint(key)} />
                               </td>
@@ -325,6 +380,16 @@ export function SpringVizPage() {
                                 {e.controllerClass}.{e.methodName}()
                               </td>
                               {result.workspace && <td className="px-3 py-1.5 text-ink-faint">{e.project}</td>}
+                              <td className="px-3 py-1.5 text-right">
+                                <button
+                                  onClick={() => copyRowUrl(e)}
+                                  title="Copy URL"
+                                  className="text-ink-faint opacity-0 transition-opacity hover:text-cyan group-hover:opacity-100"
+                                  style={{ opacity: copiedRowKey === key ? 1 : undefined }}
+                                >
+                                  {copiedRowKey === key ? <Check size={12} weight="bold" className="text-emerald" /> : <Copy size={12} weight="light" />}
+                                </button>
+                              </td>
                             </tr>
                           )
                         })}

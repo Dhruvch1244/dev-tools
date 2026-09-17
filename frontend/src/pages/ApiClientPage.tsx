@@ -270,11 +270,16 @@ export function ApiClientPage() {
         <Panel>
           <div className="flex flex-col gap-2 p-3">
             <div className="flex items-center gap-2">
-              <select value={method} onChange={(e) => setMethod(e.target.value)} className="devtools-input w-auto font-mono text-xs font-semibold" style={{ color: METHOD_COLOR[method] }}>
+              <select
+                value={method}
+                onChange={(e) => setMethod(e.target.value)}
+                className="devtools-input shrink-0 font-mono text-xs font-semibold"
+                style={{ color: METHOD_COLOR[method], width: '108px' }}
+              >
                 {METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
               <input
-                className="devtools-input flex-1 font-mono text-xs"
+                className="devtools-input min-w-0 flex-1 font-mono text-xs"
                 placeholder="https://api.example.com/resource"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}

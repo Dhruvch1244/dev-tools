@@ -122,11 +122,13 @@ ${bodyHtml}
   downloadFile(`${slugify(note.title)}.html`, page, 'text/html')
 }
 
-export function exportTextAsFile(filename: string, content: string, format: 'markdown' | 'html' | 'text') {
+export function exportTextAsFile(filename: string, content: string, format: 'markdown' | 'html' | 'text' | 'json') {
   if (format === 'html') {
     downloadFile(filename.endsWith('.html') ? filename : `${filename}.html`, content, 'text/html')
   } else if (format === 'markdown') {
     downloadFile(filename.endsWith('.md') ? filename : `${filename}.md`, content, 'text/markdown')
+  } else if (format === 'json') {
+    downloadFile(filename.endsWith('.json') ? filename : `${filename}.json`, content, 'application/json')
   } else {
     downloadFile(filename, content, 'text/plain')
   }
