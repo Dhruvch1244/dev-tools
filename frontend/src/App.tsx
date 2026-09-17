@@ -26,6 +26,7 @@ import {
   ArrowsClockwise,
   Robot,
   Table,
+  Translate,
   TreeStructure,
   GitBranch,
   GitCommit,
@@ -95,6 +96,7 @@ import { SchemaDiffPage } from './pages/SchemaDiffPage'
 import { RowDiffPage } from './pages/RowDiffPage'
 import { MockServerPage } from './pages/MockServerPage'
 import { PostmanImportPage } from './pages/PostmanImportPage'
+import { HinglishConverterPage } from './pages/HinglishConverterPage'
 // lazy: it wildcard-imports every @phosphor-icons/react icon (1500+), which would otherwise
 // bloat the main bundle by ~5MB for every page load, not just when this tool is opened.
 const IconLibraryPage = lazy(() => import('./pages/IconLibraryPage').then((m) => ({ default: m.IconLibraryPage })))
@@ -126,6 +128,7 @@ export type Tool =
   | 'time'
   | 'regex'
   | 'text'
+  | 'hinglish-convert'
   | 'data-gen'
   | 'vault'
   | 'git-repo'
@@ -206,6 +209,12 @@ export const GROUPS: ToolGroup[] = [
       { id: 'time', label: 'Time Toolkit', hint: 'epoch · tz · cron', icon: Clock },
       { id: 'regex', label: 'Regex Lab', hint: 'test · diagram', icon: MagicWand },
       { id: 'text', label: 'Text Toolkit', hint: 'case · sort · wrap', icon: TextAa },
+      {
+        id: 'hinglish-convert',
+        label: 'Hinglish Converter',
+        hint: 'Tanglish/Tenglish/Hinglish → English + Hindi',
+        icon: Translate,
+      },
       { id: 'data-gen', label: 'Data Generator', hint: 'uuid · ulid · fake data', icon: Fingerprint },
       { id: 'command-templates', label: 'Command Templates', hint: 'fill-in-the-blank commands · history', icon: Terminal },
     ],
@@ -290,6 +299,7 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'time': return <TimeToolkitPage />
     case 'regex': return <RegexLabPage />
     case 'text': return <TextToolkitPage />
+    case 'hinglish-convert': return <HinglishConverterPage />
     case 'data-gen': return <DataGeneratorPage />
     case 'vault': return <VaultPage />
     case 'git-repo': return <GitRepoPage />

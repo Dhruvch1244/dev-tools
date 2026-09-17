@@ -97,6 +97,19 @@ export const stringToJson = (text: string) => jsonFetch<ConvertResult>('/api/for
 export type ListConvertResult = { quoted: string; unquoted: string; itemCount: number }
 export const convertList = (text: string) => jsonFetch<ListConvertResult>('/api/list-convert', { text })
 
+export type WordBreakdownItem = { original: string; language: string; south: boolean; english: string; hindi: string }
+export type LanguageStat = { language: string; south: boolean; count: number }
+export type HinglishConvertResult = {
+  plainEnglish: string
+  hindi: string
+  breakdown: WordBreakdownItem[]
+  detectedLanguages: LanguageStat[]
+  recognizedCount: number
+  totalWords: number
+}
+export const convertHinglish = (text: string) =>
+  jsonFetch<HinglishConvertResult>('/api/hinglish-convert', { text })
+
 export async function fetchHistory(tool: string): Promise<HistoryEntry[]> {
   const res = await fetch(`/api/history/${tool}`)
   if (!res.ok) return []
