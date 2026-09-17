@@ -5,9 +5,11 @@ import {
   Bug,
   ChartBar,
   ChartPieSlice,
+  ClipboardText,
   CloudArrowDown,
   Database,
   Fingerprint,
+  FileArrowDown,
   FileCode,
   FileZip,
   GitDiff,
@@ -32,13 +34,16 @@ import {
   GitCommit,
   SquaresFour,
   Shapes,
+  Stairs,
   Clock,
   MagicWand,
   Gauge,
   Notebook,
+  Percent,
   GitMerge,
   Image,
   FilePdf,
+  Key,
   ListChecks,
   ShieldCheck,
   Stack,
@@ -83,6 +88,7 @@ import { PdfToolsPage } from './pages/PdfToolsPage'
 import { TaskListPage } from './pages/TaskListPage'
 import { SpringVizPage } from './pages/SpringVizPage'
 import { GitGraphPage } from './pages/GitGraphPage'
+import { ChangelogGeneratorPage } from './pages/ChangelogGeneratorPage'
 import { DiskTreemapPage } from './pages/DiskTreemapPage'
 import { DiagramStudioPage } from './pages/DiagramStudioPage'
 import { HomePage } from './pages/HomePage'
@@ -97,6 +103,10 @@ import { RowDiffPage } from './pages/RowDiffPage'
 import { MockServerPage } from './pages/MockServerPage'
 import { PostmanImportPage } from './pages/PostmanImportPage'
 import { HinglishConverterPage } from './pages/HinglishConverterPage'
+import { JacocoViewerPage } from './pages/JacocoViewerPage'
+import { JwtInspectorPage } from './pages/JwtInspectorPage'
+import { OpenApiImportPage } from './pages/OpenApiImportPage'
+import { MigrationTimelinePage } from './pages/MigrationTimelinePage'
 // lazy: it wildcard-imports every @phosphor-icons/react icon (1500+), which would otherwise
 // bloat the main bundle by ~5MB for every page load, not just when this tool is opened.
 const IconLibraryPage = lazy(() => import('./pages/IconLibraryPage').then((m) => ({ default: m.IconLibraryPage })))
@@ -111,6 +121,7 @@ export type Tool =
   | 'diagram-studio'
   | 'spring-viz'
   | 'git-graph'
+  | 'changelog-generator'
   | 'disk-treemap'
   | 'image-tools'
   | 'pdf-tools'
@@ -143,6 +154,8 @@ export type Tool =
   | 'top-analyzer'
   | 'reference-handbook'
   | 'bundle-stats'
+  | 'jacoco-viewer'
+  | 'jwt-inspector'
   | 'cors-check'
   | 'aws-helpers'
   | 'system'
@@ -153,8 +166,10 @@ export type Tool =
   | 'sql-insert'
   | 'schema-diff'
   | 'row-diff'
+  | 'migration-timeline'
   | 'mock-server'
   | 'postman-import'
+  | 'openapi-import'
   | 'icon-library'
 
 export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
@@ -178,6 +193,7 @@ export const GROUPS: ToolGroup[] = [
       { id: 'diagram-studio', label: 'Diagram Studio', hint: 'mermaid code · freeform canvas', icon: Shapes },
       { id: 'spring-viz', label: 'Spring Boot Visualizer', hint: 'controllers · services · routes', icon: TreeStructure },
       { id: 'git-graph', label: 'Git Commit Graph', hint: 'branch & merge visualizer', icon: GitCommit },
+      { id: 'changelog-generator', label: 'Changelog Generator', hint: 'git log → grouped release notes', icon: ClipboardText },
       { id: 'git-repo', label: 'Git Repo Overview', hint: 'status · branches · fetch', icon: GitBranch },
       { id: 'disk-treemap', label: 'Disk Usage Treemap', hint: 'where the space went', icon: SquaresFour },
     ],
@@ -224,11 +240,13 @@ export const GROUPS: ToolGroup[] = [
     tools: [
       { id: 'stack-trace', label: 'Stack Trace Analyzer', hint: 'collapse the noise', icon: Warning },
       { id: 'dep-tree', label: 'Dependency Tree', hint: 'maven / gradle', icon: Stack },
-      { id: 'spring-config', label: 'Spring Config', hint: 'yaml/properties diff', icon: Wrench },
+      { id: 'spring-config', label: 'Spring Config', hint: 'yaml/properties diff · effective config', icon: Wrench },
       { id: 'jar-inspect', label: 'JAR Inspector', hint: 'manifest · classes · dupes', icon: FileZip },
       { id: 'top-analyzer', label: 'top / ps Analyzer', hint: 'sort · diff snapshots', icon: Gauge },
       { id: 'reference-handbook', label: 'Reference Handbook', hint: 'linux · makefile · git', icon: Terminal },
       { id: 'bundle-stats', label: 'Bundle Stats', hint: "what's inflating it", icon: ChartBar },
+      { id: 'jacoco-viewer', label: 'JaCoCo Coverage Viewer', hint: 'worst-covered classes first', icon: Percent },
+      { id: 'jwt-inspector', label: 'JWT Inspector', hint: 'claims · expiry · HMAC verify', icon: Key },
       { id: 'cors-check', label: 'CORS Checker', hint: 'why the preflight failed', icon: Globe },
       { id: 'aws-helpers', label: 'AWS Helpers', hint: 'ARN · IAM · certs', icon: ShieldCheck },
     ],
@@ -248,6 +266,7 @@ export const GROUPS: ToolGroup[] = [
       { id: 'sql-insert', label: 'CSV/Excel → SQL', hint: 'generate INSERT statements', icon: Database },
       { id: 'schema-diff', label: 'Schema/Migration Diff', hint: 'flag risky DDL changes', icon: GitDiff },
       { id: 'row-diff', label: 'Row-level Data Diff', hint: 'CSV/JSON, cell-by-cell', icon: Table },
+      { id: 'migration-timeline', label: 'Migration Timeline', hint: 'Flyway/Liquibase · risky DDL flags', icon: Stairs },
     ],
   },
   {
@@ -255,6 +274,7 @@ export const GROUPS: ToolGroup[] = [
     tools: [
       { id: 'mock-server', label: 'Mock Server', hint: 'serve JSON endpoints locally', icon: Robot },
       { id: 'postman-import', label: 'Postman/Insomnia Import', hint: 'into API Client collections', icon: CloudArrowDown },
+      { id: 'openapi-import', label: 'OpenAPI/Swagger Import', hint: 'spec → API Client collections', icon: FileArrowDown },
       { id: 'icon-library', label: 'Icon Library', hint: 'browse · copy SVG/JSX', icon: SquaresFour },
     ],
   },
@@ -282,6 +302,7 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'diagram-studio': return <DiagramStudioPage />
     case 'spring-viz': return <SpringVizPage />
     case 'git-graph': return <GitGraphPage />
+    case 'changelog-generator': return <ChangelogGeneratorPage />
     case 'disk-treemap': return <DiskTreemapPage />
     case 'image-tools': return <ImageToolsPage />
     case 'pdf-tools': return <PdfToolsPage />
@@ -314,6 +335,8 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'top-analyzer': return <TopAnalyzerPage />
     case 'reference-handbook': return <ReferenceHandbookPage />
     case 'bundle-stats': return <BundleStatsPage />
+    case 'jacoco-viewer': return <JacocoViewerPage />
+    case 'jwt-inspector': return <JwtInspectorPage />
     case 'cors-check': return <CorsCheckPage />
     case 'aws-helpers': return <AwsHelpersPage />
     case 'log-tailer': return <LogTailerPage />
@@ -323,8 +346,10 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'sql-insert': return <SqlInsertPage />
     case 'schema-diff': return <SchemaDiffPage />
     case 'row-diff': return <RowDiffPage />
+    case 'migration-timeline': return <MigrationTimelinePage />
     case 'mock-server': return <MockServerPage />
     case 'postman-import': return <PostmanImportPage />
+    case 'openapi-import': return <OpenApiImportPage />
     case 'icon-library': return <Suspense fallback={<div className="flex h-full items-center justify-center text-sm text-ink-faint">Loading icon set…</div>}><IconLibraryPage /></Suspense>
   }
 }

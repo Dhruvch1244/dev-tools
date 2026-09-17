@@ -88,6 +88,44 @@ export function resolvePlaceholders(flat: FlatMap): { resolved: FlatMap; unresol
   return { resolved, unresolved: Array.from(unresolved) }
 }
 
+export type Layer = { label: string; flat: FlatMap }
+
+/**
+ * Merges config layers in precedence order (later layers win, matching Spring Boot's own
+ * property-source order: base file < profile-specific file < env vars) and records which
+ * layer each final key actually came from.
+ */
+export function mergeWithOrigin(layers: Layer[]): { merged: FlatMap; origin: Record<string, string> } {
+  const merged: FlatMap = {}
+  const origin: Record<string, string> = {}
+  for (const layer of layers) {
+    for (const [k, v] of Object.entries(layer.flat)) {
+      merged[k] = v
+      origin[k] = layer.label
+    }
+  }
+  return { merged, origin }
+}
+
+/**
+ * Parses `KEY=VALUE` / `KEY: VALUE` lines (one per line, `#` comments allowed) as Spring Boot
+ * environment-variable overrides, applying its relaxed-binding rule: lowercase the key and turn
+ * `_` into `.` (so `SERVER_PORT` → `server.port`, `APP_DATASOURCE_URL` → `app.datasource.url`).
+ */
+export function parseEnvOverrides(text: string): FlatMap {
+  const flat: FlatMap = {}
+  for (const rawLine of text.split('\n')) {
+    const line = rawLine.trim()
+    if (!line || line.startsWith('#')) continue
+    const eq = line.search(/[=:]/)
+    if (eq === -1) continue
+    const key = line.slice(0, eq).trim()
+    const value = line.slice(eq + 1).trim()
+    if (key) flat[key.toLowerCase().replace(/_/g, '.')] = value
+  }
+  return flat
+}
+
 export type DiffRow = { key: string; a: string | null; b: string | null; status: 'same' | 'changed' | 'onlyA' | 'onlyB' }
 
 export function diffFlat(a: FlatMap, b: FlatMap): DiffRow[] {
