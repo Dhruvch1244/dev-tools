@@ -23,16 +23,20 @@ export type Theme = {
 }
 
 export const THEMES: Theme[] = [
+  // Paper: the flagship light theme. Warm off-white "desk" behind pure-white cards, near-black
+  // ink, and a single deep-teal accent. Every text tier clears WCAG AA (4.5:1) on both the card
+  // and the desk, and the accent pairs are darkened versions of the dark theme's hues so status
+  // colours read the same across schemes without neon glare on white.
   {
     id: 'light',
-    name: 'Light',
-    swatch: ['#ffffff', '#0891b2', '#7c3aed'],
+    name: 'Paper',
+    swatch: ['#f6f5f1', '#0f6f86', '#5b3fd0'],
     scheme: 'light',
     colors: {
-      void: '#eef0f4', surface: '#ffffff', panel: '#f5f6f9',
-      ink: '#1a1d29', inkSoft: '#4b5163', inkFaint: '#8b90a0',
-      rule: 'rgba(20,22,30,0.22)', ruleSoft: 'rgba(20,22,30,0.06)',
-      cyan: '#0891b2', emerald: '#059669', rose: '#e11d48', warm: '#b45309', violet: '#7c3aed',
+      void: '#f6f5f1', surface: '#ffffff', panel: '#fbfaf8',
+      ink: '#17181c', inkSoft: '#4a4d57', inkFaint: '#6b6e78',
+      rule: 'rgba(23,24,28,0.13)', ruleSoft: 'rgba(23,24,28,0.07)',
+      cyan: '#0f6f86', emerald: '#0b7a55', rose: '#c0264b', warm: '#a8560b', violet: '#5b3fd0',
     },
   },
   {
@@ -215,23 +219,56 @@ const VAR_MAP: Record<keyof ThemeColors, string> = {
 
 const STORAGE_KEY = 'devtools.theme'
 
-const DEFAULT_THEME_ID = 'void'
+/** Pseudo-theme: follow the OS light/dark preference, switching live when it changes. */
+export const SYSTEM_THEME_ID = 'system'
+const SYSTEM_LIGHT_ID = 'light'
+const SYSTEM_DARK_ID = 'void'
 
-export function applyTheme(id: string) {
-  const theme = THEMES.find((t) => t.id === id) ?? THEMES.find((t) => t.id === DEFAULT_THEME_ID) ?? THEMES[0]
-  const root = document.documentElement.style
-  for (const key of Object.keys(theme.colors) as (keyof ThemeColors)[]) {
-    root.setProperty(VAR_MAP[key], theme.colors[key])
-  }
-  root.setProperty('color-scheme', theme.scheme ?? 'dark')
-  localStorage.setItem(STORAGE_KEY, theme.id)
+const darkQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
+
+function resolveTheme(id: string): Theme {
+  const concrete = id === SYSTEM_THEME_ID ? (darkQuery?.matches === false ? SYSTEM_LIGHT_ID : SYSTEM_DARK_ID) : id
+  return THEMES.find((t) => t.id === concrete) ?? THEMES.find((t) => t.id === SYSTEM_DARK_ID) ?? THEMES[0]
 }
 
+function safeGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function paint(theme: Theme) {
+  const el = document.documentElement
+  for (const key of Object.keys(theme.colors) as (keyof ThemeColors)[]) {
+    el.style.setProperty(VAR_MAP[key], theme.colors[key])
+  }
+  const scheme = theme.scheme ?? 'dark'
+  el.style.setProperty('color-scheme', scheme)
+  el.dataset.scheme = scheme
+  window.dispatchEvent(new CustomEvent('devtools:themechange', { detail: { scheme } }))
+}
+
+darkQuery?.addEventListener('change', () => {
+  if (getStoredTheme() === SYSTEM_THEME_ID) paint(resolveTheme(SYSTEM_THEME_ID))
+})
+
+export function applyTheme(id: string) {
+  const stored = id === SYSTEM_THEME_ID ? SYSTEM_THEME_ID : resolveTheme(id).id
+  paint(resolveTheme(stored))
+  try {
+    localStorage.setItem(STORAGE_KEY, stored)
+  } catch {
+    /* storage unavailable — theme still applies for this session */
+  }
+}
+
+/** New installs follow the OS preference instead of forcing dark. */
 export function getStoredTheme(): string {
-  return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_THEME_ID
+  return safeGet(STORAGE_KEY) ?? SYSTEM_THEME_ID
 }
 
 export function getCurrentScheme(): 'dark' | 'light' {
-  const theme = THEMES.find((t) => t.id === getStoredTheme())
-  return theme?.scheme === 'light' ? 'light' : 'dark'
+  return resolveTheme(getStoredTheme()).scheme === 'light' ? 'light' : 'dark'
 }

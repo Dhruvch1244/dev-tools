@@ -508,7 +508,7 @@ export function SqlPage() {
               spellCheck={false}
               rows={7}
               placeholder="SELECT * FROM orders WHERE status = :status"
-              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
+              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
             />
             {suggest && filteredSuggestions.length > 0 && (
               <div
@@ -689,7 +689,7 @@ export function SqlPage() {
       <ConnectionDialog open={connDialogOpen} onClose={() => setConnDialogOpen(false)} onChanged={refreshConnections} />
 
       {sampleView && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" onClick={() => setSampleView(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] backdrop-blur-[2px] p-6" onClick={() => setSampleView(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             className="flex h-[32rem] w-[48rem] flex-col overflow-hidden rounded-[1.75rem] border border-rule-soft bg-surface p-5 shadow-2xl"

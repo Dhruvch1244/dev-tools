@@ -269,7 +269,7 @@ export function PlSqlAnalyzerPage() {
                       <Download size={13} weight="light" /> Export graph <CaretDown size={11} weight="bold" />
                     </Button>
                     {exportOpen && (
-                      <div className="absolute right-0 top-full z-20 mt-1.5 w-44 rounded-xl border border-rule bg-surface p-1 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+                      <div className="absolute right-0 top-full z-20 mt-1.5 w-44 rounded-xl border border-rule bg-surface p-1 shadow-[var(--shadow-pop)]">
                         <button onClick={() => exportGraph('dot')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">Graphviz (.dot)</button>
                         <button onClick={() => exportGraph('mermaid')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">Mermaid (.mmd)</button>
                         <button onClick={() => exportGraph('csv')} className="block w-full rounded-lg px-3 py-1.5 text-left text-xs text-ink-soft hover:bg-glass hover:text-ink">CSV (.csv)</button>

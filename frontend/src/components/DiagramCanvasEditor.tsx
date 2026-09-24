@@ -239,7 +239,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
         {selected?.kind === 'shape' && (
           <div className="flex items-center gap-1">
             {SHAPE_COLORS.map((c) => (
-              <button key={c} onClick={() => recolor(c)} className="h-5 w-5 rounded-full ring-1 ring-white/10" style={{ background: c }} />
+              <button key={c} onClick={() => recolor(c)} className="h-5 w-5 rounded-full ring-1 ring-rule" style={{ background: c }} />
             ))}
           </div>
         )}
@@ -308,7 +308,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
                 e.stopPropagation()
                 setEditingId(s.id)
               }}
-              className="absolute flex select-none items-center justify-center text-center text-[12.5px] text-void"
+              className="absolute flex select-none items-center justify-center text-center text-[12.5px] text-[var(--on-accent)]"
               style={{
                 left: s.x,
                 top: s.y,

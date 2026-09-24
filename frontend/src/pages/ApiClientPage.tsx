@@ -309,7 +309,7 @@ export function ApiClientPage() {
                   <CaretDown size={11} weight="bold" />
                 </button>
                 {envEditorOpen && (
-                  <div className="absolute right-0 top-full z-20 mt-1.5 w-80 rounded-2xl border border-rule bg-surface p-3 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)]">
+                  <div className="absolute right-0 top-full z-20 mt-1.5 w-80 rounded-2xl border border-rule bg-surface p-3 shadow-[var(--shadow-pop)]">
                     <div className="mb-2 flex items-center justify-between">
                       <SectionLabel>Environments</SectionLabel>
                       <button onClick={startNewEnv} className="text-ink-faint hover:text-cyan"><Plus size={12} weight="bold" /></button>

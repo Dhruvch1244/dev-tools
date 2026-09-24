@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
 import type { BeanKind, SpringVizCycle, SpringVizEdge, SpringVizNode } from '../lib/springVizApi'
 
-const LAYER_ORDER: BeanKind[] = ['RestController', 'Controller', 'Configuration', 'Service', 'Component', 'RemoteClient', 'Repository', 'ExternalService']
+const LAYER_ORDER: BeanKind[] = ['RestController', 'Controller', 'Configuration', 'Service', 'Component', 'Bean', 'RemoteClient', 'Repository', 'ExternalService']
 const LAYER_INDEX: Record<BeanKind, number> = {
   RestController: 0, Controller: 0, Configuration: 0,
-  Service: 1, Component: 1, RemoteClient: 1,
+  Service: 1, Component: 1, RemoteClient: 1, Bean: 1,
   Repository: 2,
   ExternalService: 3,
 }
@@ -17,6 +17,7 @@ const KIND_COLOR: Record<BeanKind, string> = {
   Configuration: 'var(--rose)',
   RemoteClient: 'var(--warm)',
   ExternalService: 'var(--ink-faint)',
+  Bean: 'var(--violet)',
 }
 
 const BOX_W = 168
@@ -35,6 +36,8 @@ export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringViz
     }
     return keys
   }, [cycles])
+
+  const edgeStyle: Record<string, string> = { injects: 'var(--ink-faint)', produces: 'var(--violet)', calls: 'var(--warm)' }
 
   const { positions, width, height } = useMemo(() => {
     const byLayer = new Map<number, SpringVizNode[]>()
@@ -105,8 +108,9 @@ export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringViz
                 key={i}
                 d={`M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`}
                 fill="none"
-                stroke={inCycle ? 'var(--rose)' : dimmed ? 'var(--rule)' : 'var(--ink-faint)'}
+                stroke={inCycle ? 'var(--rose)' : dimmed ? 'var(--rule)' : (edgeStyle[e.kind] ?? 'var(--ink-faint)')}
                 strokeWidth={inCycle ? 2.25 : 1.5}
+                strokeDasharray={e.kind === 'produces' ? '4 3' : undefined}
                 markerEnd={inCycle ? 'url(#arrow-warn)' : 'url(#arrow)'}
               />
             )
@@ -164,7 +168,7 @@ export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringViz
 export function GraphLegend() {
   return (
     <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-soft">
-      {(['RestController', 'Service', 'Repository', 'Component', 'RemoteClient', 'ExternalService', 'Configuration'] as BeanKind[]).map((k) => (
+      {(['RestController', 'Service', 'Repository', 'Component', 'Bean', 'RemoteClient', 'ExternalService', 'Configuration'] as BeanKind[]).map((k) => (
         <div key={k} className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ background: KIND_COLOR[k] }} />
           {k === 'RemoteClient' ? 'Feign Client' : k === 'ExternalService' ? 'External Service' : k}
