@@ -90,7 +90,7 @@ export function HinglishConverterPage() {
                     <SectionLabel>Plain English</SectionLabel>
                     <CopyButton text={result.plainEnglish} />
                   </div>
-                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
                     {result.plainEnglish}
                   </pre>
                 </div>
@@ -100,7 +100,7 @@ export function HinglishConverterPage() {
                     <SectionLabel>Hindi (हिंदी)</SectionLabel>
                     <CopyButton text={result.hindi} />
                   </div>
-                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
                     {result.hindi}
                   </pre>
                 </div>

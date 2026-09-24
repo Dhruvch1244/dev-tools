@@ -98,7 +98,7 @@ export function JsonXmlPage() {
                       className="absolute inset-0 rounded-xl bg-cyan"
                     />
                   )}
-                  <span className={`relative ${mode === m ? 'font-medium text-void' : 'text-ink-soft'}`}>
+                  <span className={`relative ${mode === m ? 'font-medium text-[var(--on-accent)]' : 'text-ink-soft'}`}>
                     {MODE_LABEL[m]}
                   </span>
                 </button>
@@ -186,7 +186,7 @@ export function JsonXmlPage() {
                     view === 'tree' ? (
                       <JsonTree data={jsonResult.data} />
                     ) : (
-                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
                         {jsonResult.pretty}
                       </pre>
                     )
@@ -204,7 +204,7 @@ export function JsonXmlPage() {
               {mode === 'xml' && xmlResult && (
                 <motion.div key="xml" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {xmlResult.valid ? (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
                       {xmlResult.pretty}
                     </pre>
                   ) : (
@@ -223,7 +223,7 @@ export function JsonXmlPage() {
                   {stringResult.error ? (
                     <ErrorBanner message={stringResult.error} />
                   ) : (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
                       {stringResult.output}
                     </pre>
                   )}
@@ -235,7 +235,7 @@ export function JsonXmlPage() {
                   {tsResult.error ? (
                     <ErrorBanner message={tsResult.error} />
                   ) : (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] leading-relaxed text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] leading-relaxed text-ink shadow-[var(--shadow-inset)]">
                       {tsResult.output}
                     </pre>
                   )}

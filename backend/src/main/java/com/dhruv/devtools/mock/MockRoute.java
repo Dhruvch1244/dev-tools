@@ -30,6 +30,14 @@ public class MockRoute {
     @Column(nullable = false)
     private int delayMs = 0;
 
+    /** Extra response headers as a JSON object, e.g. {"X-Trace-Id":"abc"} — values may use {{templates}}. */
+    @Lob
+    private String headersJson;
+
+    /** When true, {{path.id}} / {{query.x}} / {{header.X}} / {{body}} / {{uuid}} / {{now}} … are expanded in the body and headers. */
+    @Column
+    private Boolean templated;
+
     @Column(nullable = false)
     private boolean enabled = true;
 
@@ -55,6 +63,10 @@ public class MockRoute {
     public void setContentType(String contentType) { this.contentType = contentType; }
     public int getDelayMs() { return delayMs; }
     public void setDelayMs(int delayMs) { this.delayMs = delayMs; }
+    public String getHeadersJson() { return headersJson; }
+    public void setHeadersJson(String headersJson) { this.headersJson = headersJson; }
+    public boolean isTemplated() { return templated == null || templated; }
+    public void setTemplated(boolean templated) { this.templated = templated; }
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
     public Instant getCreatedAt() { return createdAt; }

@@ -134,7 +134,7 @@ export function FileSearchPage() {
               placeholder={'apple\nbanana\ncherry'}
               rows={6}
               spellCheck={false}
-              className="mb-3 w-full resize-none rounded-xl border border-rule bg-panel p-2.5 font-mono text-sm text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
+              className="mb-3 w-full resize-none rounded-xl border border-rule bg-panel p-2.5 font-mono text-sm text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
             />
 
             <div className="mb-4 flex flex-col gap-2">
@@ -219,7 +219,7 @@ export function FileSearchPage() {
                       <CopyButton text={tr.matches.map((m) => m.line).join('\n')} label="Copy" />
                     )}
                   </div>
-                  <div className="overflow-hidden rounded-2xl border border-rule bg-panel font-mono text-[13px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)]">
+                  <div className="overflow-hidden rounded-2xl border border-rule bg-panel font-mono text-[13px] shadow-[var(--shadow-inset)]">
                     {tr.matches.length === 0 ? (
                       <div className="p-3 text-ink-faint">No matches.</div>
                     ) : (

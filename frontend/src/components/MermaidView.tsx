@@ -6,6 +6,13 @@ import { ErrorBanner } from './ui'
 export function MermaidView({ code, onSvgReady }: { code: string; onSvgReady?: (svg: string | null) => void }) {
   const [svg, setSvg] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [scheme, setScheme] = useState(getCurrentScheme)
+
+  useEffect(() => {
+    const onTheme = () => setScheme(getCurrentScheme())
+    window.addEventListener('devtools:themechange', onTheme)
+    return () => window.removeEventListener('devtools:themechange', onTheme)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -16,7 +23,7 @@ export function MermaidView({ code, onSvgReady }: { code: string; onSvgReady?: (
       return
     }
     const t = setTimeout(() => {
-      renderMermaid(code, getCurrentScheme())
+      renderMermaid(code, scheme)
         .then((s) => {
           if (!cancelled) {
             setSvg(s)
@@ -36,7 +43,7 @@ export function MermaidView({ code, onSvgReady }: { code: string; onSvgReady?: (
       cancelled = true
       clearTimeout(t)
     }
-  }, [code])
+  }, [code, scheme])
 
   if (error) return <ErrorBanner message={error} />
   if (!svg) return <div className="text-sm text-ink-faint">Write some Mermaid syntax to see it rendered.</div>

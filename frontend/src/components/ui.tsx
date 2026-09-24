@@ -6,8 +6,8 @@ const spring = { type: 'spring', stiffness: 400, damping: 28 } as const
 
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-[1.75rem] bg-glass p-1.5 ring-1 ring-glass-strong ${className}`}>
-      <div className="flex h-full flex-col rounded-[calc(1.75rem-0.375rem)] border border-rule-soft bg-surface">
+    <div className={`panel-shell ${className}`}>
+      <div className="panel-core flex h-full flex-col">
         {children}
       </div>
     </div>
@@ -26,7 +26,7 @@ export function Button({
     'relative inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium tracking-tight transition-colors disabled:opacity-35 disabled:cursor-not-allowed'
   const variants: Record<string, string> = {
     default: 'bg-glass text-ink ring-1 ring-glass-strong hover:ring-glass-strong hover:bg-glass-strong',
-    primary: 'bg-cyan text-void shadow-[0_0_0_1px_rgba(47,230,242,0.4),0_8px_24px_-6px_rgba(47,230,242,0.55)] hover:brightness-110',
+    primary: 'bg-cyan text-[var(--on-accent)] shadow-[var(--shadow-accent)] hover:brightness-110',
     ghost: 'text-ink-soft hover:text-ink hover:bg-glass',
   }
   return (
@@ -48,7 +48,7 @@ export function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       spellCheck={false}
-      className="w-full flex-1 resize-none rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] leading-relaxed text-ink shadow-[inset_0_1px_2px_rgba(0,0,0,0.4)] outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
+      className="w-full flex-1 resize-none rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] leading-relaxed text-ink shadow-[var(--shadow-inset)] outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
       {...props}
     />
   )
@@ -104,17 +104,21 @@ export function SectionLabel({ children }: { children: ReactNode }) {
 export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 text-xs text-ink-soft">
-      <span
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label || undefined}
         onClick={() => onChange(!checked)}
-        className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${checked ? 'bg-cyan' : 'bg-white/10'}`}
+        className={`relative h-4 w-7 shrink-0 rounded-full transition-colors ${checked ? 'bg-cyan' : 'bg-ink/15'}`}
       >
         <motion.span
           layout
           transition={spring}
-          className="absolute top-0.5 h-3 w-3 rounded-full bg-void shadow"
+          className="absolute top-0.5 h-3 w-3 rounded-full bg-surface shadow"
           style={{ left: checked ? '14px' : '2px' }}
         />
-      </span>
+      </button>
       {label}
     </label>
   )

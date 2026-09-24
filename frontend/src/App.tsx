@@ -113,7 +113,6 @@ const IconLibraryPage = lazy(() => import('./pages/IconLibraryPage').then((m) =>
 import { SettingsPopover } from './components/SettingsPopover'
 import { CommandPalette, type PaletteItem } from './components/CommandPalette'
 import { GlobalSearch } from './components/GlobalSearch'
-import { applyTheme, getStoredTheme } from './lib/themes'
 import { applyFont, getStoredFont } from './lib/fonts'
 
 export type Tool =
@@ -388,14 +387,17 @@ function App() {
   const [activeTab, setActiveTab] = useState<Tool>(initialSession.activeTab)
   const [favourites, setFavourites] = useState<Tool[]>(loadFavourites)
   const [recents, setRecents] = useState<Tool[]>(loadRecents)
-  const [sidebarOpen, setSidebarOpen] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== '0')
+  // No stored preference yet: start collapsed on narrow viewports (tablets/phones reaching the app over the LAN).
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const stored = localStorage.getItem(SIDEBAR_KEY)
+    return stored === null ? window.innerWidth >= 900 : stored !== '0'
+  })
   const [navFilter, setNavFilter] = useState('')
   const [tabOverflowOpen, setTabOverflowOpen] = useState(false)
   const [hasHiddenTabs, setHasHiddenTabs] = useState(false)
   const tabRowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    applyTheme(getStoredTheme())
     applyFont(getStoredFont())
   }, [])
 
@@ -509,7 +511,8 @@ function App() {
               value={navFilter}
               onChange={(e) => setNavFilter(e.target.value)}
               placeholder="Filter tools…"
-              className="w-full rounded-xl border border-rule bg-panel py-1.5 pl-7 pr-2 text-xs text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[0_0_0_3px_rgba(47,230,242,0.12)]"
+              aria-label="Filter tools"
+              className="w-full rounded-xl border border-rule bg-panel py-1.5 pl-7 pr-2 text-xs text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
             />
           </div>
         </div>
@@ -553,11 +556,12 @@ function App() {
         </div>
       </aside>
 
-      <main className="relative z-10 flex flex-1 flex-col overflow-hidden p-5">
+      <main className="relative z-10 flex flex-1 flex-col overflow-hidden p-3 md:p-5">
         <div className="mb-3 flex shrink-0 items-center gap-1">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             title={`${sidebarOpen ? 'Hide' : 'Show'} sidebar (Alt+B)`}
+            aria-label={`${sidebarOpen ? 'Hide' : 'Show'} sidebar`}
             className="shrink-0 rounded-xl p-1.5 text-ink-faint transition-colors hover:bg-glass hover:text-ink"
           >
             <SidebarSimple size={16} weight="light" />
@@ -705,9 +709,10 @@ function NavRow({
           onToggleFavourite(tool.id)
         }}
         className={`absolute right-2 top-1/2 -translate-y-1/2 transition-opacity ${
-          isFavourite ? 'text-warm' : 'text-ink-faint opacity-0 hover:text-warm group-hover:opacity-100'
+          isFavourite ? 'text-warm' : 'text-ink-faint opacity-0 hover:text-warm focus-visible:opacity-100 group-hover:opacity-100'
         }`}
         title={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
+        aria-label={isFavourite ? `Remove ${tool.label} from favourites` : `Add ${tool.label} to favourites`}
       >
         <Star size={13} weight={isFavourite ? 'fill' : 'light'} />
       </button>
