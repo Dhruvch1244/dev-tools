@@ -55,7 +55,7 @@ export const WORLD_THEMES: Theme[] = [
   {
     id: 'constellation', name: 'Constellation', fx: 'constellation', tagline: 'Everything is a graph. Find the edges.',
     swatch: ['#07080c', '#28e0ec', '#ff2e7e'],
-    colors: c('#07080c', '#0d0f16', '#131623', '#f2f4f8', '#a8afc0', '#737b90', 'rgba(255,255,255,0.17)', 'rgba(255,255,255,0.06)', '#28e0ec', '#34e8ab', '#ff2e7e', '#f2b45e', '#9a6bff'),
+    colors: c('#07080c', '#0d0f16', '#131623', '#f2f4f8', '#a8afc0', '#798095', 'rgba(255,255,255,0.17)', 'rgba(255,255,255,0.06)', '#28e0ec', '#34e8ab', '#ff2e7e', '#f2b45e', '#9a6bff'),
   },
   {
     id: 'synthwave', name: 'Synthwave', fx: 'synthwave', tagline: 'Neon sun, endless grid, zero bugs.',
@@ -110,7 +110,7 @@ export const WORLD_THEMES: Theme[] = [
   {
     id: 'snowfall', name: 'Snowfall', fx: 'snow', tagline: 'Code freeze, but make it cosy.',
     swatch: ['#0f1720', '#9ad1ff', '#e4f2ff'],
-    colors: c('#0d151e', '#152030', '#1c2b3d', '#f0f6fc', '#b9c8d8', '#7f91a5', 'rgba(200,225,255,0.2)', 'rgba(200,225,255,0.07)', '#9ad1ff', '#86e1b4', '#ff8fa3', '#ffd28a', '#b8a8ff'),
+    colors: c('#0d151e', '#152030', '#1c2b3d', '#f0f6fc', '#b9c8d8', '#8294a7', 'rgba(200,225,255,0.2)', 'rgba(200,225,255,0.07)', '#9ad1ff', '#86e1b4', '#ff8fa3', '#ffd28a', '#b8a8ff'),
   },
   {
     id: 'sakura', name: 'Sakura', fx: 'petals', scheme: 'light', tagline: 'Petals drift past while tests pass.',
@@ -120,7 +120,7 @@ export const WORLD_THEMES: Theme[] = [
   {
     id: 'bubblegum', name: 'Bubblegum Pop', fx: 'blobs', scheme: 'light', tagline: 'Pastel blobs, loud ideas.',
     swatch: ['#f5f0ff', '#6d28d9', '#db2777'],
-    colors: c('#f3eeff', '#ffffff', '#faf7ff', '#1f1635', '#4a3f6b', '#6e6390', 'rgba(60,30,120,0.15)', 'rgba(60,30,120,0.07)', '#6d28d9', '#047857', '#db2777', '#a45200', '#7c3aed'),
+    colors: c('#f3eeff', '#ffffff', '#faf7ff', '#1f1635', '#4a3f6b', '#6e6390', 'rgba(60,30,120,0.15)', 'rgba(60,30,120,0.07)', '#6d28d9', '#047857', '#cc226d', '#a45200', '#7c3aed'),
   },
 ]
 
@@ -149,9 +149,9 @@ export const THEMES: Theme[] = [
     scheme: 'light',
     colors: {
       void: '#eee8d5', surface: '#fdf6e3', panel: '#f5efdc',
-      ink: '#073642', inkSoft: '#586e75', inkFaint: '#93a1a1',
+      ink: '#073642', inkSoft: '#47585e', inkFaint: '#5c6a6a',
       rule: 'rgba(7,54,66,0.22)', ruleSoft: 'rgba(7,54,66,0.07)',
-      cyan: '#2aa198', emerald: '#859900', rose: '#dc322f', warm: '#b58900', violet: '#6c71c4',
+      cyan: '#1e726c', emerald: '#5f6e00', rose: '#c82522', warm: '#826200', violet: '#585ebc',
     },
   },
   {
@@ -161,9 +161,9 @@ export const THEMES: Theme[] = [
     scheme: 'light',
     colors: {
       void: '#e6e9ef', surface: '#eff1f5', panel: '#e6e9ef',
-      ink: '#4c4f69', inkSoft: '#5c5f77', inkFaint: '#8c8fa1',
+      ink: '#484b63', inkSoft: '#52556a', inkFaint: '#64677a',
       rule: 'rgba(76,79,105,0.20)', ruleSoft: 'rgba(76,79,105,0.06)',
-      cyan: '#04a5e5', emerald: '#40a02b', rose: '#d20f39', warm: '#df8e1d', violet: '#8839ef',
+      cyan: '#036f9a', emerald: '#2f7620', rose: '#cd0f38', warm: '#905c13', violet: '#8534ef',
     },
   },
   {
@@ -173,9 +173,9 @@ export const THEMES: Theme[] = [
     scheme: 'light',
     colors: {
       void: '#eaeaeb', surface: '#fafafa', panel: '#f0f0f1',
-      ink: '#383a42', inkSoft: '#5c5f66', inkFaint: '#a0a1a7',
+      ink: '#383a42', inkSoft: '#54565d', inkFaint: '#676870',
       rule: 'rgba(56,58,66,0.20)', ruleSoft: 'rgba(56,58,66,0.06)',
-      cyan: '#0184bc', emerald: '#50a14f', rose: '#e45649', warm: '#c18401', violet: '#a626a4',
+      cyan: '#016f9e', emerald: '#3a7539', rose: '#c82c1e', warm: '#8c6001', violet: '#a626a4',
     },
   },
   {
@@ -185,9 +185,9 @@ export const THEMES: Theme[] = [
     scheme: 'light',
     colors: {
       void: '#e5e9f0', surface: '#eceff4', panel: '#e5e9f0',
-      ink: '#2e3440', inkSoft: '#4c566a', inkFaint: '#7b88a1',
+      ink: '#2e3440', inkSoft: '#4c566a', inkFaint: '#5c6881',
       rule: 'rgba(46,52,64,0.20)', ruleSoft: 'rgba(46,52,64,0.06)',
-      cyan: '#5e81ac', emerald: '#8fbcbb', rose: '#bf616a', warm: '#d08770', violet: '#b48ead',
+      cyan: '#4b6a91', emerald: '#436f6e', rose: '#ac4650', warm: '#a45036', violet: '#86597d',
     },
   },
   {
@@ -196,7 +196,7 @@ export const THEMES: Theme[] = [
     swatch: ['#050506', '#2fe6f2', '#9a6bff'],
     colors: {
       void: '#050506', surface: '#0b0c11', panel: '#101218',
-      ink: '#f2f4f8', inkSoft: '#9ba1b0', inkFaint: '#5c6274',
+      ink: '#f2f4f8', inkSoft: '#9ba1b0', inkFaint: '#767d92',
       rule: 'rgba(255,255,255,0.18)', ruleSoft: 'rgba(255,255,255,0.05)',
       cyan: '#2fe6f2', emerald: '#34e8ab', rose: '#ff6f8f', warm: '#f2b45e', violet: '#9a6bff',
     },
@@ -207,9 +207,9 @@ export const THEMES: Theme[] = [
     swatch: ['#282a36', '#bd93f9', '#ff79c6'],
     colors: {
       void: '#191a21', surface: '#282a36', panel: '#333545',
-      ink: '#f8f8f2', inkSoft: '#c6c8d1', inkFaint: '#6272a4',
+      ink: '#f8f8f2', inkSoft: '#c6c8d1', inkFaint: '#949fc1',
       rule: 'rgba(255,255,255,0.19)', ruleSoft: 'rgba(255,255,255,0.05)',
-      cyan: '#8be9fd', emerald: '#50fa7b', rose: '#ff5555', warm: '#f1fa8c', violet: '#bd93f9',
+      cyan: '#8be9fd', emerald: '#50fa7b', rose: '#ff7474', warm: '#f1fa8c', violet: '#bd93f9',
     },
   },
   {
@@ -218,9 +218,9 @@ export const THEMES: Theme[] = [
     swatch: ['#2e3440', '#88c0d0', '#b48ead'],
     colors: {
       void: '#242933', surface: '#2e3440', panel: '#3b4252',
-      ink: '#eceff4', inkSoft: '#d8dee9', inkFaint: '#767e93',
+      ink: '#eceff4', inkSoft: '#d8dee9', inkFaint: '#a9aebb',
       rule: 'rgba(216,222,233,0.20)', ruleSoft: 'rgba(216,222,233,0.06)',
-      cyan: '#88c0d0', emerald: '#a3be8c', rose: '#bf616a', warm: '#ebcb8b', violet: '#b48ead',
+      cyan: '#88c0d0', emerald: '#a3be8c', rose: '#d9a1a6', warm: '#ebcb8b', violet: '#c4a7bf',
     },
   },
   {
@@ -229,7 +229,7 @@ export const THEMES: Theme[] = [
     swatch: ['#1a1b26', '#7dcfff', '#bb9af7'],
     colors: {
       void: '#13141c', surface: '#1a1b26', panel: '#232433',
-      ink: '#c0caf5', inkSoft: '#9aa5d1', inkFaint: '#565f89',
+      ink: '#c0caf5', inkSoft: '#9aa5d1', inkFaint: '#828bb1',
       rule: 'rgba(192,202,245,0.19)', ruleSoft: 'rgba(192,202,245,0.05)',
       cyan: '#7dcfff', emerald: '#9ece6a', rose: '#f7768e', warm: '#e0af68', violet: '#bb9af7',
     },
@@ -240,9 +240,9 @@ export const THEMES: Theme[] = [
     swatch: ['#282828', '#fabd2f', '#fe8019'],
     colors: {
       void: '#1d2021', surface: '#282828', panel: '#3c3836',
-      ink: '#ebdbb2', inkSoft: '#bdae93', inkFaint: '#928374',
+      ink: '#ebdbb2', inkSoft: '#c7baa3', inkFaint: '#ada296',
       rule: 'rgba(235,219,178,0.20)', ruleSoft: 'rgba(235,219,178,0.06)',
-      cyan: '#8ec07c', emerald: '#b8bb26', rose: '#fb4934', warm: '#fabd2f', violet: '#d3869b',
+      cyan: '#8ec07c', emerald: '#b8bb26', rose: '#fc7d6e', warm: '#fabd2f', violet: '#d68fa3',
     },
   },
   {
@@ -251,7 +251,7 @@ export const THEMES: Theme[] = [
     swatch: ['#1e1e2e', '#89dceb', '#cba6f7'],
     colors: {
       void: '#11111b', surface: '#1e1e2e', panel: '#313244',
-      ink: '#cdd6f4', inkSoft: '#a6adc8', inkFaint: '#6c7086',
+      ink: '#cdd6f4', inkSoft: '#acb3cc', inkFaint: '#989bac',
       rule: 'rgba(205,214,244,0.20)', ruleSoft: 'rgba(205,214,244,0.06)',
       cyan: '#89dceb', emerald: '#a6e3a1', rose: '#f38ba8', warm: '#f9e2af', violet: '#cba6f7',
     },
@@ -262,9 +262,9 @@ export const THEMES: Theme[] = [
     swatch: ['#002b36', '#2aa198', '#6c71c4'],
     colors: {
       void: '#00212b', surface: '#002b36', panel: '#073642',
-      ink: '#eee8d5', inkSoft: '#93a1a1', inkFaint: '#586e75',
+      ink: '#eee8d5', inkSoft: '#a7b3b3', inkFaint: '#879da5',
       rule: 'rgba(147,161,161,0.24)', ruleSoft: 'rgba(147,161,161,0.08)',
-      cyan: '#2aa198', emerald: '#859900', rose: '#dc322f', warm: '#b58900', violet: '#6c71c4',
+      cyan: '#2daba2', emerald: '#8ea300', rose: '#e87977', warm: '#c29300', violet: '#9094d3',
     },
   },
   {
@@ -273,9 +273,9 @@ export const THEMES: Theme[] = [
     swatch: ['#2d2a2e', '#78dce8', '#ab9df2'],
     colors: {
       void: '#221f22', surface: '#2d2a2e', panel: '#3a373b',
-      ink: '#fcfcfa', inkSoft: '#c1c0c0', inkFaint: '#727072',
+      ink: '#fcfcfa', inkSoft: '#c1c0c0', inkFaint: '#a4a2a4',
       rule: 'rgba(252,252,250,0.20)', ruleSoft: 'rgba(252,252,250,0.06)',
-      cyan: '#78dce8', emerald: '#a9dc76', rose: '#ff6188', warm: '#ffd866', violet: '#ab9df2',
+      cyan: '#78dce8', emerald: '#a9dc76', rose: '#ff7597', warm: '#ffd866', violet: '#ab9df2',
     },
   },
   {
@@ -284,9 +284,9 @@ export const THEMES: Theme[] = [
     swatch: ['#282c34', '#56b6c2', '#c678dd'],
     colors: {
       void: '#21252b', surface: '#282c34', panel: '#333842',
-      ink: '#abb2bf', inkSoft: '#8f96a3', inkFaint: '#5c6370',
+      ink: '#c5cad3', inkSoft: '#b5bac2', inkFaint: '#9ca2ad',
       rule: 'rgba(171,178,191,0.20)', ruleSoft: 'rgba(171,178,191,0.06)',
-      cyan: '#56b6c2', emerald: '#98c379', rose: '#e06c75', warm: '#e5c07b', violet: '#c678dd',
+      cyan: '#56b6c2', emerald: '#98c379', rose: '#e6878f', warm: '#e5c07b', violet: '#cd88e1',
     },
   },
   {
@@ -295,9 +295,9 @@ export const THEMES: Theme[] = [
     swatch: ['#191724', '#9ccfd8', '#c4a7e7'],
     colors: {
       void: '#141220', surface: '#191724', panel: '#26233a',
-      ink: '#e0def4', inkSoft: '#b9b6d3', inkFaint: '#6e6a86',
+      ink: '#e0def4', inkSoft: '#b9b6d3', inkFaint: '#8e8aa3',
       rule: 'rgba(224,222,244,0.20)', ruleSoft: 'rgba(224,222,244,0.06)',
-      cyan: '#9ccfd8', emerald: '#31748f', rose: '#eb6f92', warm: '#f6c177', violet: '#c4a7e7',
+      cyan: '#9ccfd8', emerald: '#4097bb', rose: '#eb6f92', warm: '#f6c177', violet: '#c4a7e7',
     },
   },
   {
@@ -306,9 +306,9 @@ export const THEMES: Theme[] = [
     swatch: ['#2d353b', '#83c092', '#e69875'],
     colors: {
       void: '#232a2e', surface: '#2d353b', panel: '#374247',
-      ink: '#d3c6aa', inkSoft: '#a8b39e', inkFaint: '#7a8478',
+      ink: '#ded5c0', inkSoft: '#c0c8b9', inkFaint: '#a8afa7',
       rule: 'rgba(211,198,170,0.20)', ruleSoft: 'rgba(211,198,170,0.06)',
-      cyan: '#7fbbb3', emerald: '#a7c080', rose: '#e67e80', warm: '#dbbc7f', violet: '#d699b6',
+      cyan: '#7fbbb3', emerald: '#a7c080', rose: '#eb9597', warm: '#dbbc7f', violet: '#d79db9',
     },
   },
 ]

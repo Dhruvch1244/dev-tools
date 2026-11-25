@@ -27,7 +27,7 @@
   --glass-strong: color-mix(in srgb, var(--ink) 6.5%, transparent);
   --ink: #f2f4f8;
   --ink-soft: #9ba1b0;
-  --ink-faint: #5c6274;
+  --ink-faint: #767d92;
   --rule: rgba(255, 255, 255, 0.18);
   --rule-soft: rgba(255, 255, 255, 0.05);
 
