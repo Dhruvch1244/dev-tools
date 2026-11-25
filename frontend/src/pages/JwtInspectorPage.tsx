@@ -46,7 +46,7 @@ export function JwtInspectorPage() {
 
   return (
     <div className="flex h-full gap-4">
-      <div className="flex w-[420px] shrink-0 flex-col gap-4">
+      <div className="flex w-[min(420px,100%)] shrink-0 flex-col gap-4">
         <Panel>
           <div className="flex flex-col gap-2 p-4">
             <SectionLabel>Token</SectionLabel>

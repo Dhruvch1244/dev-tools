@@ -771,11 +771,11 @@ textarea, pre, code, .font-mono {
 }
 @keyframes dashMove { to { background-position: 10px 0; } }
 
-/* --- phones: every multi-pane tool stacks into one scrolling column ---
-   Most tools are side-by-side "input | output" layouts sized for a desktop. Below 768px those
+/* --- phones & portrait tablets: every multi-pane tool stacks into one scrolling column ---
+   Most tools are side-by-side "input | output" layouts sized for a desktop. Below 900px those
    panes stack vertically, take the full width, keep a usable height, and the page scrolls —
    instead of the right-hand pane being clipped off-screen (found by layout-regression.mjs). */
-@media (max-width: 767px) {
+@media (max-width: 899px) {
   .page-slot {
     overflow-y: auto;
     overflow-x: hidden;
@@ -784,12 +784,12 @@ textarea, pre, code, .font-mono {
     height: auto;
     min-height: 100%;
   }
-  .page-slot .flex:not(.flex-col):has(> .panel-shell, > .resizable-panel) {
+  .page-slot .flex:not(.flex-col):has(> .panel-shell, > .resizable-panel, > .flex-col > .panel-shell) {
     flex-direction: column;
     height: auto;
     overflow: visible;
   }
-  .page-slot .flex:not(.flex-col):has(> .panel-shell, > .resizable-panel) > * {
+  .page-slot .flex:not(.flex-col):has(> .panel-shell, > .resizable-panel, > .flex-col > .panel-shell) > * {
     width: 100% !important;
     max-width: 100%;
     flex: none;

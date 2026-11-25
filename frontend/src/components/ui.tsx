@@ -86,7 +86,7 @@ export function ErrorBanner({ message }: { message: string }) {
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={spring}
-      className="rounded-2xl border border-rose/25 bg-rose/[0.08] px-3.5 py-2.5 text-sm text-rose"
+      className="min-w-0 rounded-2xl border border-rose/25 bg-rose/[0.08] px-3.5 py-2.5 text-sm text-rose [overflow-wrap:anywhere]"
     >
       {message}
     </motion.div>
