@@ -90,7 +90,7 @@ export function GlobalSearch({ onOpenTool }: { onOpenTool: (tool: string) => voi
         className="flex shrink-0 items-center gap-2 rounded-xl border border-rule bg-panel px-2.5 py-2 text-[0.875rem] text-ink-faint transition-colors hover:border-cyan/40 hover:text-ink-soft"
       >
         <MagnifyingGlass size={13} weight="light" />
-        <kbd className="rounded bg-glass-strong px-1 py-0.5 font-mono text-[0.6875rem]">⌃⇧F</kbd>
+        <kbd className="rounded bg-glass-strong px-1 py-0.5 font-mono text-[0.6875rem] text-ink-soft">⌃⇧F</kbd>
       </button>
 
       {createPortal(

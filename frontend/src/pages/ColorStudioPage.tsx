@@ -111,7 +111,7 @@ export function ColorStudioPage() {
                   <div key={k} className={`flex items-center gap-2 rounded-xl px-3 py-2 ${ok ? 'bg-emerald/10 text-emerald' : 'bg-rose/10 text-rose'}`}>
                     {ok ? <CheckCircle size={17} weight="fill" /> : <XCircle size={17} weight="fill" />}
                     <span className="text-[0.875rem] font-semibold">{k}</span>
-                    <span className="ml-auto text-[0.75rem] opacity-80">{need}:1 · {hint}</span>
+                    <span className="ml-auto text-[0.75rem]">{need}:1 · {hint}</span>
                   </div>
                 )
               })}

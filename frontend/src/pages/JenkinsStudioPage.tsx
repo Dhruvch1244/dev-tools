@@ -964,7 +964,7 @@ function FlowRail({ run }: { run: RunState }) {
           waiting: 'ring-warm/70 text-warm bg-warm/10 stage-waiting',
           done: 'ring-emerald/50 text-emerald bg-emerald/10',
           failed: 'ring-rose/60 text-rose bg-rose/10',
-          skipped: 'ring-rule-soft text-ink-faint opacity-50',
+          skipped: 'ring-rule-soft text-ink-faint line-through decoration-ink-faint/40',
         }
         const extra = s.id === 'ci' && run.ciBuild ? `#${run.ciBuild}` : s.id === 'cd' && run.cdBuild ? `#${run.cdBuild}` : s.id === 'helm' && run.helm?.best ? run.helm.best : ''
         return (

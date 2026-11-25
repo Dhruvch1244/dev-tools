@@ -243,7 +243,7 @@ export function ConsoleView({ text, follow, filter, height = '26rem' }: { text: 
       {lines.length === 0 && <div className="text-ink-faint">{filter ? 'No lines match the filter.' : 'Waiting for console output…'}</div>}
       {lines.map(([n, l]) => (
         <div key={n} className="flex gap-3 whitespace-pre-wrap break-all">
-          <span className="w-10 shrink-0 select-none text-right text-ink-faint/60">{n}</span>
+          <span className="w-10 shrink-0 select-none text-right text-ink-faint">{n}</span>
           <span className={lineClass(l)}>{l || ' '}</span>
         </div>
       ))}

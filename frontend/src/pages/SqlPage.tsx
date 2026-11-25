@@ -545,7 +545,7 @@ export function SqlPage() {
                 >
                   <Warning size={13} weight="fill" className="mt-0.5 shrink-0" />
                   <span>
-                    <span className="font-mono opacity-70">L{issue.line}</span> {issue.message}
+                    <span className="font-mono font-semibold">L{issue.line}</span> {issue.message}
                   </span>
                 </div>
               ))}

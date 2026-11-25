@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FxKind } from '../lib/themes'
 import { getCurrentFx } from '../lib/themes'
 import { getMotion, motionFactor, type MotionLevel } from '../lib/appearance'
+import { WorldDecor } from './WorldDecor'
 
 /**
  * The animated "world" behind the app. Canvas particle scenes for the busy ones (constellation,
@@ -58,6 +59,7 @@ export function Backdrop() {
       )}
       {fx === 'ocean' && <div className="fx-ocean-rays" />}
       {canvasKinds.includes(fx) && <ParticleCanvas kind={fx} motion={motion} key={fx} />}
+      <WorldDecor fx={fx} />
       {(fx === 'matrix' || fx === 'arcade' || fx === 'cyber') && <div className="fx-scanlines" />}
     </div>
   )

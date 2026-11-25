@@ -118,7 +118,7 @@ export function CommandPalette<T extends string>({
       >
         <MagnifyingGlass size={13} weight="light" />
         <span className="min-w-0 flex-1 truncate whitespace-nowrap text-left">Jump to…</span>
-        <kbd className="shrink-0 rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[0.75rem]">Ctrl K</kbd>
+        <kbd className="shrink-0 rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[0.75rem] text-ink-soft">Ctrl K</kbd>
       </button>
 
       {createPortal(

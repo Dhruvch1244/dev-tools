@@ -36,14 +36,28 @@ const CHECKS: [keyof Theme['colors'], number, string][] = [
   ['violet', 4.5, 'accent text'],
 ]
 
+/** bg-glass / bg-glass-strong = ink at 3.5% / 6.5% over a surface — chips, tabs, stat tiles. */
+function tint(ink: string, bg: string, pct: number): string {
+  const a = rgb(ink)
+  const b = rgb(bg)
+  return '#' + [0, 1, 2].map((i) => Math.round(a[i] * pct + b[i] * (1 - pct)).toString(16).padStart(2, '0')).join('')
+}
+
 let fails = 0
 for (const t of THEMES) {
   const bad: string[] = []
   const light = t.scheme === 'light'
-  for (const bgKey of ['surface', 'panel', 'void'] as const) {
+  const bgs: [string, string][] = [
+    ['surface', t.colors.surface],
+    ['panel', t.colors.panel],
+    ['void', t.colors.void],
+    ['glass-strong on void', tint(t.colors.ink, t.colors.void, 0.065)],
+    ['glass-strong on surface', tint(t.colors.ink, t.colors.surface, 0.065)],
+  ]
+  for (const [bgName, bg] of bgs) {
     for (const [k, min, what] of CHECKS) {
-      const r = contrast(t.colors[k], t.colors[bgKey])
-      if (r < min) bad.push(`${k} on ${bgKey} ${r.toFixed(2)} < ${min} (${what})`)
+      const r = contrast(t.colors[k], bg)
+      if (r < min) bad.push(`${k} on ${bgName} ${r.toFixed(2)} < ${min} (${what})`)
     }
   }
   // primary button: on-accent text over the cyan fill

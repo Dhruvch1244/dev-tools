@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "test:contrast": "node --experimental-strip-types --no-warnings scripts/theme-contrast.ts",
     "test:layout": "node scripts/layout-regression.mjs",
+    "test:ux": "node scripts/ux-audit.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
