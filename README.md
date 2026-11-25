@@ -22,9 +22,18 @@ Everything is bigger and alive now:
   pinned to tiny pixel sizes any more (the smallest text in the app is ~11.7px at L).
 - **14 animated worlds** on top of the classic editor themes: Constellation, Synthwave,
   Phosphor Rain, Aurora, Cyberpunk, Lava Lamp, Deep Ocean, Hyperspace, Firefly Forest,
-  Arcade, Disco Night, Snowfall, Sakura and Bubblegum Pop. Each paints its own animated
-  backdrop (canvas particles or pure CSS) behind slightly translucent panels.
+  Arcade, Disco Night, Snowfall, Sakura and Bubblegum Pop. Each paints an animated
+  backdrop (canvas particles or pure CSS) plus its own scenery — shooting stars, palms
+  and a neon horizon, a city skyline with blinking windows, mountains, a moon and fog,
+  seaweed and fish, a ringed planet, marching pixel bugs, a pulsing dance floor, a
+  blossom branch — and changes the UI itself: neon chrome headings (Synthwave),
+  phosphor monospace type and CRT flicker (Phosphor Rain), cut-corner panels and
+  glitching titles (Cyberpunk), pixel headings with hard shadows (Arcade), bubbly
+  rounded panels (Ocean, Bubblegum), a per-world cursor spotlight colour.
   **Alt+T** hops to the next world, or hit "Surprise me".
+- **Readable in every theme**: all 30 themes meet WCAG contrast — body text ≥ 7:1,
+  secondary/hint text and all accent colours ≥ 4.5:1 — on panels, page background and
+  the tinted chips/tabs, verified automatically (see below).
 - **Motion level**: Off · Calm · **Lively** · Crazy. Lively adds page transitions, a
   cursor spotlight, flowing gradients and click ripples; Crazy adds spark bursts, a
   comet trail and 3D-tilting tiles. "Off" stops every animation; the OS reduce-motion
@@ -333,6 +342,20 @@ at `%USERPROFILE%\.devtools-suite\` — not next to the jar — so downloading a
 release (a new extracted folder) never loses your data. If you have an older
 release with `devtools-history.mv.db` sitting next to `run.bat`, the first run
 of a new version copies it into the new location automatically.
+
+## Automated UX checks
+
+```
+cd frontend
+npm run test:contrast   # token audit: every theme's text colours vs every background (no app needed)
+npm run test:layout     # every tool × 5 sizes/text sizes/themes, with very long input → overflow, clipping, tiny text
+npm run test:ux         # every theme × tools: real rendered text contrast + JS errors + failed API calls
+```
+
+`test:layout` and `test:ux` need the app running and Playwright installed
+(`npm i -g playwright && npx playwright install chromium`). Current state: 0 failing
+pairings across 30 themes, 365/365 layout combinations clean, and every keyboard focus
+stop shows a visible focus ring.
 
 ## Layout regression check
 
