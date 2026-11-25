@@ -98,6 +98,12 @@
    means an overflowing child gets clipped by an ancestor's overflow-hidden instead of
    scrolling — the "I can't see everything" bug. Force shrinkability by default; anything
    that genuinely needs its intrinsic size can override with min-h-0/min-w-0 removed. */
+/* The main pane next to resizable side panes always keeps a usable width; the side panes
+   shrink first (they flex-shrink, down to 10rem) when text is large or the window narrow. */
+.resizable-panel ~ .panel-shell.flex-1 {
+  min-width: 15rem;
+}
+
 @layer base {
   /* In the base layer so an explicit utility (min-w-[14rem]) on the same element still wins. */
   .flex-1, .flex-auto, .flex-initial, .grid {
@@ -356,6 +362,7 @@ textarea, pre, code, .font-mono {
   box-shadow: 0 0 0 1px var(--glass-strong);
 }
 .panel-core {
+  min-width: 0; /* a panel never grows past its shell to fit a long error or a wide SVG */
   border-radius: calc(1.75rem - 0.375rem);
   border: 1px solid var(--rule-soft);
   background: var(--surface);
@@ -802,6 +809,10 @@ textarea, pre, code, .font-mono {
   }
   .page-slot .grid:has(> .panel-shell) > .panel-shell {
     min-height: 20rem;
+  }
+  /* a col-span-2 child would otherwise conjure an implicit, squashed second column */
+  .page-slot .grid:has(> .panel-shell, > div > .panel-shell) > * {
+    grid-column: auto / span 1 !important;
   }
   .resizable-panel > .absolute {
     display: none;

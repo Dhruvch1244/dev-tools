@@ -33,6 +33,8 @@ const CONFIGS = [
   { name: 'laptop-XXL', width: 1280, height: 800, text: 'xxl', theme: 'synthwave' },
   { name: 'tablet-XL', width: 820, height: 1180, text: 'xl', theme: 'light' },
   { name: 'phone-L', width: 390, height: 844, text: 'l', theme: 'matrix' },
+  // Arcade swaps the display font for a much wider monospace — catches headings that only fit in Bebas Neue
+  { name: 'arcade-XL', width: 1366, height: 768, text: 'xl', theme: 'arcade' },
 ]
 const configArg = process.argv.find((a) => a.startsWith('--config='))
 const configs = configArg ? CONFIGS.filter((c) => configArg.slice(9).split(',').includes(c.name)) : quick ? CONFIGS.slice(0, 2) : CONFIGS

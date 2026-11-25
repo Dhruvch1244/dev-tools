@@ -88,7 +88,7 @@ function LinuxCommandsTab() {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex shrink-0 flex-wrap items-center gap-3">
         <div className="flex gap-1 rounded-2xl border border-rule bg-panel p-1">
           {(['reference', 'recipes', 'chmod', 'explain'] as LinuxSubTab[]).map((t) => (
             <button
@@ -104,7 +104,7 @@ function LinuxCommandsTab() {
         </div>
         {(tab === 'reference' || tab === 'recipes') && (
           <input
-            className="devtools-input flex-1"
+            className="devtools-input min-w-[12rem] flex-1"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter (e.g. port, kill, tar, permissions)…"
@@ -332,7 +332,7 @@ function GitTab() {
 
   return (
     <div className="flex h-full flex-col gap-4">
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex shrink-0 flex-wrap items-center gap-3">
         <div className="flex gap-1 rounded-2xl border border-rule bg-panel p-1">
           {(['reference', 'recipes', 'explain'] as GitSubTab[]).map((t) => (
             <button
@@ -348,7 +348,7 @@ function GitTab() {
         </div>
         {tab !== 'explain' && (
           <input
-            className="devtools-input flex-1"
+            className="devtools-input min-w-[12rem] flex-1"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Filter (e.g. stash, squash, undo, rebase)…"

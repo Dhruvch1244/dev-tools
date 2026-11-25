@@ -167,7 +167,7 @@ export function DiagramStudioPage() {
           </Panel></ResizablePanel>
 
           <Panel className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-center justify-end border-b border-rule-soft p-2">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-b border-rule-soft p-2">
               <Button variant="ghost" onClick={() => mermaidSvg && downloadMermaidPng(mermaidSvg)} disabled={!mermaidSvg}>
                 <DownloadSimple size={14} weight="light" /> Export PNG
               </Button>

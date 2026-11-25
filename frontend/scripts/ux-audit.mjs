@@ -55,9 +55,19 @@ function measure() {
   const root = parse(getComputedStyle(document.body).backgroundColor) ?? [0, 0, 0, 1]
   const bgOf = (el) => {
     const chain = []
+    const r0 = el.getBoundingClientRect()
     for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
       const c = parse(getComputedStyle(e).backgroundColor)
       if (c && c[3] > 0) chain.push(c)
+      // a sliding "active pill" is often an absolutely-positioned sibling painted behind the text
+      for (let sib = e.previousElementSibling; sib; sib = sib.previousElementSibling) {
+        const sc = getComputedStyle(sib)
+        if (sc.position !== 'absolute') continue
+        const sr = sib.getBoundingClientRect()
+        const covers = sr.left <= r0.left + 1 && sr.right >= r0.right - 1 && sr.top <= r0.top + 1 && sr.bottom >= r0.bottom - 1
+        const bc = parse(sc.backgroundColor)
+        if (covers && bc && bc[3] > 0) chain.push([bc[0], bc[1], bc[2], bc[3] * Number(sc.opacity)])
+      }
     }
     let bg = root
     for (let i = chain.length - 1; i >= 0; i--) bg = over(chain[i], bg)
