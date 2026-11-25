@@ -42,12 +42,12 @@ export function LogPatternMinerPage() {
               <ChartBar size={14} weight="light" /> {loading ? 'Mining…' : 'Mine patterns'}
             </Button>
           </div>
-          <div className="text-[10.5px] text-ink-faint">
+          <div className="text-[0.75rem] text-ink-faint">
             Replaces numbers, hex, UUIDs, and quoted strings with placeholders, then groups lines by the resulting
             template — turns thousands of near-duplicate lines into the handful of distinct things that actually happened.
           </div>
           {result && (
-            <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[11px] text-ink-soft">
+            <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[0.8125rem] text-ink-soft">
               {result.linesScanned.toLocaleString()} lines scanned · {result.templates.length} distinct patterns
             </div>
           )}
@@ -65,14 +65,14 @@ export function LogPatternMinerPage() {
               {result.templates.map((t, i) => (
                 <div key={i} className="rounded-xl border border-rule-soft bg-glass px-3 py-2.5">
                   <div className="mb-1.5 flex items-center gap-2">
-                    <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[10.5px] font-medium text-cyan">{t.count.toLocaleString()}×</span>
+                    <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] font-medium text-cyan">{t.count.toLocaleString()}×</span>
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-glass-strong">
                       <div className="h-full rounded-full bg-cyan/60" style={{ width: `${Math.max(3, (t.count / maxCount) * 100)}%` }} />
                     </div>
                     <CopyButton text={t.template} label="" />
                   </div>
-                  <div className="truncate font-mono text-[12px] text-ink" title={t.template}>{t.template}</div>
-                  <div className="mt-0.5 truncate font-mono text-[10.5px] text-ink-faint" title={t.example}>e.g. {t.example}</div>
+                  <div className="truncate font-mono text-[0.875rem] text-ink" title={t.template}>{t.template}</div>
+                  <div className="mt-0.5 truncate font-mono text-[0.75rem] text-ink-faint" title={t.example}>e.g. {t.example}</div>
                 </div>
               ))}
             </div>

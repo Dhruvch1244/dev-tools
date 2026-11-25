@@ -5,12 +5,118 @@ call-graph/table-usage mapper, a local secrets Vault, a Git repo overview with b
 switching and a commit graph, an offline API client, SVG tools, fill-in-the-blank
 Command Templates, DB/regex/cron/disk visual tools, everyday Image/PDF tools (including
 local background removal), 40GB-scale file search, SQL Workspace, a Task List, Notes with
-nested folders/backlinks/colors/syntax highlighting, and more — **34 tools**
-across 5 sidebar groups, reachable via the sidebar, a filter box, or the Ctrl+K
+nested folders/backlinks/colors/syntax highlighting, a **Jenkins Pipeline Studio**
+(CI → CD → Proceed → Helm tag → rehydration), and more — **72 tools**
+across 12 sidebar groups, reachable via the sidebar, a filter box, or the Ctrl+K
 command palette. Runs entirely on your machine as a single Java process — no
 external services, no telemetry, no internet required after download.
 
 ![Home — the full tool directory](docs/screenshots/01-home.png)
+
+## Look & feel
+
+Everything is bigger and alive now:
+
+- **Text size** (Appearance → S / M / **L** / XL / XXL, default L = 17px). The whole UI is
+  rem-based, so a bigger text size also gives proportionally roomier spacing — nothing is
+  pinned to tiny pixel sizes any more (the smallest text in the app is ~11.7px at L).
+- **14 animated worlds** on top of the classic editor themes: Constellation, Synthwave,
+  Phosphor Rain, Aurora, Cyberpunk, Lava Lamp, Deep Ocean, Hyperspace, Firefly Forest,
+  Arcade, Disco Night, Snowfall, Sakura and Bubblegum Pop. Each paints its own animated
+  backdrop (canvas particles or pure CSS) behind slightly translucent panels.
+  **Alt+T** hops to the next world, or hit "Surprise me".
+- **Motion level**: Off · Calm · **Lively** · Crazy. Lively adds page transitions, a
+  cursor spotlight, flowing gradients and click ripples; Crazy adds spark bursts, a
+  comet trail and 3D-tilting tiles. "Off" stops every animation; the OS reduce-motion
+  setting starts you on Calm. (There's also a Konami-code party mode.)
+- **Fonts**: Bebas Neue display headings, Hanken Grotesk interface text (switchable to
+  Space Grotesk / Space Mono / system), and the existing code fonts.
+- Every tool gets an animated header; green pipelines and saved helm tags celebrate
+  with confetti.
+
+![Home — hero, release-train card and world picker](docs/screenshots/20-home-lively.png)
+
+## CI/CD & Release
+
+- **Jenkins Pipeline Studio** — talks to Jenkins' own REST API through this app's
+  backend (so no CORS, and your API token never sits in page JavaScript):
+  - **Jobs & builds**: browse folders/multibranch jobs, build with a generated
+    parameter form, follow the queue item to the build, and watch it live — an animated
+    stage view (Pipeline Stage View API), progress against the estimated duration,
+    and a live-tailing, colour-coded console with filter. Paste any job or build URL
+    to jump straight to it. Stop and Rebuild (same parameters) included.
+  - **Proceed / Abort**: when a pipeline pauses on an `input` step, an approval card
+    appears with any input parameters (e.g. a change ticket) — one click proceeds or
+    aborts it. CSRF crumbs and session cookies are handled for you.
+  - **Release flows**: save a CI → CD chain once, run it with one button. It triggers
+    CI (or reuses an existing CI build), captures values from the CI log by regex
+    (e.g. `VERSION=(\S+)`), templates them into the CD parameters
+    (`VERSION=${ci.VERSION}`, `ENV=${env}`), waits for the approval gate (ask me /
+    auto-proceed), then extracts the Helm tag and saves it to the Rehydration Board.
+  - **Helm tag finder**: scans a build's full console (streamed, not buffered),
+    parameters and description with an ordered, editable list of patterns
+    (`HELM_TAG=`, `helm push` "Pushed:", `helm package` .tgz, `helm upgrade --version`,
+    `--set image.tag=` …). Within a pattern the last occurrence wins (retries take their
+    final value). Every `helm upgrade/install` line is also parsed into release, chart,
+    version, image tag and namespace. Works on pasted console text too.
+  - **Demo Jenkins**: a built-in, simulated Jenkins (served by this app at
+    `/demo-jenkins`) with CI/CD/rehydrate pipelines, approval gates and helm output,
+    so every feature can be tried — and is integration-tested — without a real Jenkins.
+- **Rehydration Board** — every captured Helm tag as a service × environment matrix,
+  with full history per cell, **drift warnings** where environments differ, snapshots
+  ("freeze UAT as it is right now"), compare any two environments or snapshots,
+  export as YAML / JSON / `helm upgrade` commands / `svc=tag` / `.env` / CSV, and
+  **Rehydrate**: trigger your rehydration job with the whole manifest, or one build per
+  service, then watch it in Pipeline Studio.
+- **Jenkinsfile Visualizer** — stage graph (sequential, parallel, nested), `when`
+  conditions, input gates, parameters, environment, and lint (no timeout around
+  `input`, secrets in `environment {}`, swallowed exceptions, missing post/timeout…).
+- **Helm Values Merge** — layer values files exactly like `-f a.yaml -f b.yaml --set …`
+  (maps merge, lists replace, `null` deletes), see where every effective value came
+  from, and diff two environments.
+- **Kubernetes Manifest Lint** — multi-doc YAML / `helm template` output: missing
+  requests/limits and probes, `:latest`, privileged, literal secrets in env, selectors
+  that match nothing, Ingress → missing Service, removed apiVersions; hygiene score.
+- **Dockerfile Linter** — stage view plus ~25 best-practice rules (unpinned base images,
+  apt without `-y`/cleanup, secrets in ENV/ARG, cache-busting `COPY .`, root user,
+  shell-form CMD…).
+- **Semver Toolkit** — compare, bump (major/minor/patch/pre*), and npm-style range
+  checks (`^ ~ x || a - b`) over a list of versions.
+
+![Jenkins Pipeline Studio — a release flow that just captured its helm tag](docs/screenshots/21-jenkins-release-flow.png)
+
+![Rehydration Board](docs/screenshots/22-rehydration-board.png)
+
+## Network & Ops
+
+- **Env Health Board** — ping DIT/UAT/PROD health URLs server-side (no CORS),
+  up/degraded/down by status, latency and "body must contain", latency sparklines,
+  auto-refresh, import URLs from the Vault.
+- **CIDR / Subnet Calculator** — network/broadcast/hosts/mask, bit view, split into
+  subnets, "is this IP inside?", IP range → minimal CIDR blocks, overlap checker.
+- **cURL Converter** — paste any curl (bash or cmd, `Copy as cURL`), get JS fetch,
+  axios, Python requests, Java HttpClient, Spring RestClient, Go, HTTPie or PowerShell.
+- **URL Parser & Builder** — colour-coded parts, editable fields and query-param
+  table, encode/decode variants.
+- **HTTP Reference** — status codes (with "where you'll see it" hints for Spring,
+  nginx, k8s and Jenkins), headers and method semantics, searchable.
+
+## More utilities
+
+- **JSONPath Playground** — live queries with filters (`[?(@.a > 1 && @.b =~ /x/i)]`),
+  slices, recursive descent; click a result to get its path.
+- **SQL Formatter** — clause-per-line pretty print (indent, keyword case, leading
+  commas) or minify.
+- **Base & Bitwise** — any base up to 36 with BigInt, clickable bit grid, two's
+  complement at 8/16/32/64 bits, AND/OR/XOR/shift.
+- **Unit Converter** — bytes (SI vs IEC, JVM `-Xmx4G` style), durations (human,
+  ISO-8601, ms), and "how long will this transfer take".
+- **Scratchpad** — multi-tab, colour-tagged, autosaving notes in the browser.
+- **Focus Timer** — Pomodoro / stopwatch with laps / countdown, chime, desktop
+  notification, daily stats.
+- **Color Studio** — WCAG contrast checker with live preview, conversions, palettes,
+  CSS variables.
+
 
 ## Vault
 
@@ -227,6 +333,21 @@ at `%USERPROFILE%\.devtools-suite\` — not next to the jar — so downloading a
 release (a new extracted folder) never loses your data. If you have an older
 release with `devtools-history.mv.db` sitting next to `run.bat`, the first run
 of a new version copies it into the new location automatically.
+
+## Layout regression check
+
+`frontend/scripts/layout-regression.mjs` opens **every tool** at desktop, laptop + XXL
+text, tablet + XL text and phone sizes, fills every text field with very long content,
+and reports horizontal overflow, clipped text, labels spilling out of buttons, and text
+smaller than ~11.5px — with a screenshot per tool and size.
+
+```
+java -jar backend/target/devtools-suite.jar      # in one terminal
+cd frontend && node scripts/layout-regression.mjs # [baseUrl] [outDir] [--quick] [--only=a,b] [--config=phone-L]
+```
+
+It needs Playwright (`npm i -g playwright && npx playwright install chromium`). On phones
+every multi-pane tool now stacks into a single scrolling column.
 
 ## Building from source
 

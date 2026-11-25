@@ -124,7 +124,7 @@ export function PdfToolsPage() {
                 <button
                   key={t.id}
                   onClick={() => switchTab(t.id)}
-                  className={`rounded-lg py-1.5 text-[11px] font-medium transition-colors ${tab === t.id ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                  className={`rounded-lg py-1.5 text-[0.8125rem] font-medium transition-colors ${tab === t.id ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
                 >
                   {t.label}
                 </button>
@@ -148,7 +148,7 @@ export function PdfToolsPage() {
                 {images.length > 0 && (
                   <div className="flex flex-col gap-1">
                     {images.map((f, i) => (
-                      <div key={i} className="flex items-center gap-1.5 rounded-lg bg-glass px-2 py-1 text-[11px] text-ink-soft">
+                      <div key={i} className="flex items-center gap-1.5 rounded-lg bg-glass px-2 py-1 text-[0.8125rem] text-ink-soft">
                         <span className="flex-1 truncate">{i + 1}. {f.name}</span>
                         <button onClick={() => setImages((prev) => prev.filter((_, pi) => pi !== i))} className="text-ink-faint hover:text-rose">
                           <X size={11} weight="bold" />
@@ -178,7 +178,7 @@ export function PdfToolsPage() {
                     <button
                       key={f}
                       onClick={() => setOutFormat(f)}
-                      className={`rounded-lg px-2.5 py-1.5 text-[11px] font-medium uppercase transition-colors ${
+                      className={`rounded-lg px-2.5 py-1.5 text-[0.8125rem] font-medium uppercase transition-colors ${
                         outFormat === f ? 'bg-glass-strong text-ink' : 'bg-glass text-ink-faint hover:text-ink-soft'
                       }`}
                     >
@@ -188,7 +188,7 @@ export function PdfToolsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-[11px] text-ink-soft">
+                  <div className="flex items-center justify-between text-[0.8125rem] text-ink-soft">
                     <span>DPI</span>
                     <span className="font-mono text-ink-faint">{dpi}</span>
                   </div>
@@ -218,7 +218,7 @@ export function PdfToolsPage() {
                 {mergeFiles.length > 0 && (
                   <div className="flex flex-col gap-1">
                     {mergeFiles.map((f, i) => (
-                      <div key={i} className="flex items-center gap-1.5 rounded-lg bg-glass px-2 py-1 text-[11px] text-ink-soft">
+                      <div key={i} className="flex items-center gap-1.5 rounded-lg bg-glass px-2 py-1 text-[0.8125rem] text-ink-soft">
                         <span className="flex-1 truncate">{i + 1}. {f.name}</span>
                         <button onClick={() => moveMergeFile(i, -1)} disabled={i === 0} className="text-ink-faint hover:text-cyan disabled:opacity-30">
                           <CaretUp size={11} weight="bold" />

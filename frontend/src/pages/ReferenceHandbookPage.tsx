@@ -123,12 +123,12 @@ function LinuxCommandsTab() {
                     {cat.commands.map((c) => (
                       <div key={c.cmd} className="group rounded-lg border border-rule-soft bg-glass px-2.5 py-1.5">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="truncate font-mono text-[11.5px] text-cyan">{c.cmd}</span>
+                          <span className="truncate font-mono text-[0.8125rem] text-cyan">{c.cmd}</span>
                           <span className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
                             <CopyButton text={c.cmd} label="" />
                           </span>
                         </div>
-                        <div className="text-[11px] text-ink-faint">{c.description}</div>
+                        <div className="text-[0.8125rem] text-ink-faint">{c.description}</div>
                       </div>
                     ))}
                   </div>
@@ -142,12 +142,12 @@ function LinuxCommandsTab() {
             <div className="flex flex-col gap-2">
               {filteredRecipes.map((r, i) => (
                 <div key={i} className="rounded-xl border border-rule-soft bg-glass p-3">
-                  <div className="mb-1 text-[13px] text-ink-soft">{r.question}</div>
+                  <div className="mb-1 text-[0.9375rem] text-ink-soft">{r.question}</div>
                   <div className="flex items-center justify-between gap-2 rounded-lg bg-panel px-2.5 py-1.5">
-                    <span className="font-mono text-[12.5px] text-cyan">{r.command}</span>
+                    <span className="font-mono text-[0.875rem] text-cyan">{r.command}</span>
                     <CopyButton text={r.command} label="" />
                   </div>
-                  {r.note && <div className="mt-1 text-[10.5px] text-warm">{r.note}</div>}
+                  {r.note && <div className="mt-1 text-[0.75rem] text-warm">{r.note}</div>}
                 </div>
               ))}
               {filteredRecipes.length === 0 && <div className="text-sm text-ink-faint">No recipes match "{query}"</div>}
@@ -239,7 +239,7 @@ function MakefileTab() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
           />
         </div>
       </Panel></ResizablePanel>
@@ -274,7 +274,7 @@ function MakefileTab() {
             ) : (
               <div className="flex flex-col gap-3">
                 <div>
-                  <div className="mb-1 text-[10px] uppercase tracking-wide text-ink-faint">
+                  <div className="mb-1 text-[0.75rem] uppercase tracking-wide text-ink-faint">
                     Build order for <span className="font-mono text-cyan">make {selected}</span>
                   </div>
                   <div className="flex flex-wrap items-center gap-1 font-mono text-xs text-ink-soft">
@@ -296,7 +296,7 @@ function MakefileTab() {
                           {t}{target.prerequisites.length > 0 && <span className="text-ink-faint">: {target.prerequisites.join(' ')}</span>}
                         </div>
                         {target.recipe.map((line, i) => (
-                          <div key={i} className="font-mono text-[11.5px] text-ink-soft">$ {resolveVariable(line, parsed.variables)}</div>
+                          <div key={i} className="font-mono text-[0.8125rem] text-ink-soft">$ {resolveVariable(line, parsed.variables)}</div>
                         ))}
                       </div>
                     )
@@ -367,12 +367,12 @@ function GitTab() {
                     {cat.commands.map((c) => (
                       <div key={c.cmd} className="group rounded-lg border border-rule-soft bg-glass px-2.5 py-1.5">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="truncate font-mono text-[11.5px] text-cyan">{c.cmd}</span>
+                          <span className="truncate font-mono text-[0.8125rem] text-cyan">{c.cmd}</span>
                           <span className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
                             <CopyButton text={c.cmd} label="" />
                           </span>
                         </div>
-                        <div className="text-[11px] text-ink-faint">{c.description}</div>
+                        <div className="text-[0.8125rem] text-ink-faint">{c.description}</div>
                       </div>
                     ))}
                   </div>
@@ -386,12 +386,12 @@ function GitTab() {
             <div className="flex flex-col gap-2">
               {filteredRecipes.map((r, i) => (
                 <div key={i} className="rounded-xl border border-rule-soft bg-glass p-3">
-                  <div className="mb-1 text-[13px] text-ink-soft">{r.question}</div>
+                  <div className="mb-1 text-[0.9375rem] text-ink-soft">{r.question}</div>
                   <div className="flex items-center justify-between gap-2 rounded-lg bg-panel px-2.5 py-1.5">
-                    <span className="font-mono text-[12.5px] text-cyan">{r.command}</span>
+                    <span className="font-mono text-[0.875rem] text-cyan">{r.command}</span>
                     <CopyButton text={r.command} label="" />
                   </div>
-                  {r.note && <div className="mt-1 text-[10.5px] text-warm">{r.note}</div>}
+                  {r.note && <div className="mt-1 text-[0.75rem] text-warm">{r.note}</div>}
                 </div>
               ))}
               {filteredRecipes.length === 0 && <div className="text-sm text-ink-faint">No recipes match "{query}"</div>}

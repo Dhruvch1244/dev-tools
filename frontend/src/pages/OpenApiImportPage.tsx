@@ -69,7 +69,7 @@ export function OpenApiImportPage() {
           </label>
           {requests.length > 0 && (
             <>
-              <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+              <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
                 Target API Client collection (existing name adds to it, new name creates one)
                 <input className="devtools-input" value={collectionName} onChange={(e) => setCollectionName(e.target.value)} />
               </label>
@@ -78,7 +78,7 @@ export function OpenApiImportPage() {
               </Button>
             </>
           )}
-          {doneMsg && <div className="text-[11.5px] text-emerald">{doneMsg}</div>}
+          {doneMsg && <div className="text-[0.8125rem] text-emerald">{doneMsg}</div>}
         </div>
       </Panel>
 
@@ -92,9 +92,9 @@ export function OpenApiImportPage() {
             <div className="flex flex-col gap-1">
               {requests.map((r, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-lg bg-glass px-2.5 py-1.5 text-xs">
-                  <span className="w-14 shrink-0 font-mono text-[10px] font-semibold text-cyan">{r.method}</span>
+                  <span className="w-14 shrink-0 font-mono text-[0.75rem] font-semibold text-cyan">{r.method}</span>
                   <span className="flex-1 truncate">{r.name}</span>
-                  <span className="shrink-0 truncate font-mono text-[10.5px] text-ink-faint" style={{ maxWidth: '40%' }}>{r.url}</span>
+                  <span className="shrink-0 truncate font-mono text-[0.75rem] text-ink-faint" style={{ maxWidth: '40%' }}>{r.url}</span>
                 </div>
               ))}
             </div>

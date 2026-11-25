@@ -67,7 +67,7 @@ export function RegexLabPage() {
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`rounded-lg px-3 py-1 text-[11px] font-medium capitalize transition-colors ${
+                  className={`rounded-lg px-3 py-1 text-[0.8125rem] font-medium capitalize transition-colors ${
                     mode === m ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                   }`}
                 >
@@ -107,7 +107,7 @@ export function RegexLabPage() {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </Panel>
@@ -116,7 +116,7 @@ export function RegexLabPage() {
             <Panel className="flex flex-col overflow-hidden">
               <div className="p-4">
                 <SectionLabel>Highlighted ({matches.length} match{matches.length === 1 ? '' : 'es'})</SectionLabel>
-                <div className="max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-2xl border border-rule bg-panel p-3 font-mono text-[13px] text-ink">
+                <div className="max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.9375rem] text-ink">
                   {segments.map((s, i) => (
                     <span key={i} className={s.matched ? 'rounded bg-cyan/20 text-cyan' : ''}>
                       {s.text}
@@ -168,7 +168,7 @@ export function RegexLabPage() {
                     }`}
                   >
                     <div>{ex.label}</div>
-                    <div className="truncate font-mono text-[10px] text-ink-faint">{ex.pattern}</div>
+                    <div className="truncate font-mono text-[0.75rem] text-ink-faint">{ex.pattern}</div>
                   </button>
                 ))}
               </div>

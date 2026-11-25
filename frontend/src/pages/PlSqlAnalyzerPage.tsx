@@ -178,12 +178,12 @@ export function PlSqlAnalyzerPage() {
             <Button variant="primary" onClick={scan} disabled={!path.trim() || loading}>
               {loading ? 'Scanning…' : 'Scan'}
             </Button>
-            <div className="text-[10.5px] text-ink-faint">
+            <div className="text-[0.75rem] text-ink-faint">
               Heuristic scan of .sql/.pks/.pkb/.prc/.fnc/.trg files — not a real PL/SQL parser, treat results as a strong
               starting point, not ground truth.
             </div>
             {result && (
-              <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[11px] text-ink-soft">
+              <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[0.8125rem] text-ink-soft">
                 {result.filesScanned} files · {routines.length} routines · {result.risks.length} risk flags
               </div>
             )}
@@ -240,11 +240,11 @@ export function PlSqlAnalyzerPage() {
                     onClick={() => { setSelectedRoutine(r.qualifiedName); setTab('graph') }}
                     className="flex items-center gap-2 rounded-lg bg-glass px-2.5 py-1.5 text-left text-xs hover:bg-glass-strong"
                   >
-                    <span className="shrink-0 rounded-full px-2 py-0.5 text-[9.5px] font-medium uppercase" style={{ color: KIND_COLOR[r.kind], background: 'var(--glass-strong)' }}>
+                    <span className="shrink-0 rounded-full px-2 py-0.5 text-[0.6875rem] font-medium uppercase" style={{ color: KIND_COLOR[r.kind], background: 'var(--glass-strong)' }}>
                       {r.kind}
                     </span>
                     <span className="flex-1 truncate font-mono text-ink">{r.qualifiedName}</span>
-                    <span className="shrink-0 text-[10.5px] text-ink-faint">{r.filePath}:{r.line}</span>
+                    <span className="shrink-0 text-[0.75rem] text-ink-faint">{r.filePath}:{r.line}</span>
                   </button>
                 ))}
                 {filteredRoutines.length === 0 && <div className="text-xs text-ink-faint">No matches.</div>}
@@ -286,7 +286,7 @@ export function PlSqlAnalyzerPage() {
                       <SectionLabel>Callers ({callers.length})</SectionLabel>
                       {callers.length === 0 && <div className="text-xs text-ink-faint">Nothing calls this (that we found).</div>}
                       {callers.map((r, i) => (
-                        <button key={i} onClick={() => setSelectedRoutine(r.qualifiedName)} className="truncate rounded-lg bg-glass px-2 py-1 text-left font-mono text-[11px] text-ink-soft hover:bg-glass-strong">
+                        <button key={i} onClick={() => setSelectedRoutine(r.qualifiedName)} className="truncate rounded-lg bg-glass px-2 py-1 text-left font-mono text-[0.8125rem] text-ink-soft hover:bg-glass-strong">
                           {r.qualifiedName}
                         </button>
                       ))}
@@ -295,11 +295,11 @@ export function PlSqlAnalyzerPage() {
                     <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-cyan/40 bg-glass p-3 text-center">
                       <FileCode size={20} weight="light" className="text-cyan" />
                       <div className="font-mono text-xs text-ink">{selected.qualifiedName}</div>
-                      <div className="text-[10.5px] text-ink-faint">{selected.filePath}:{selected.line}</div>
+                      <div className="text-[0.75rem] text-ink-faint">{selected.filePath}:{selected.line}</div>
                       {selected.tables.length > 0 && (
                         <div className="mt-1 flex flex-wrap justify-center gap-1">
                           {selected.tables.map((t, i) => (
-                            <span key={i} className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px]" style={{ color: t.access === 'WRITE' ? 'var(--rose)' : 'var(--emerald)' }}>
+                            <span key={i} className="rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem]" style={{ color: t.access === 'WRITE' ? 'var(--rose)' : 'var(--emerald)' }}>
                               {t.access === 'WRITE' ? '✎' : '👁'} {t.table}
                             </span>
                           ))}
@@ -314,7 +314,7 @@ export function PlSqlAnalyzerPage() {
                         <button
                           key={i}
                           onClick={() => byQualifiedName.has(c.toLowerCase()) && setSelectedRoutine(c)}
-                          className="flex items-center gap-1.5 truncate rounded-lg bg-glass px-2 py-1 text-left font-mono text-[11px] text-ink-soft hover:bg-glass-strong"
+                          className="flex items-center gap-1.5 truncate rounded-lg bg-glass px-2 py-1 text-left font-mono text-[0.8125rem] text-ink-soft hover:bg-glass-strong"
                         >
                           <ArrowRight size={10} weight="bold" className="shrink-0 text-ink-faint" /> {c}
                         </button>
@@ -332,11 +332,11 @@ export function PlSqlAnalyzerPage() {
                     <div className="flex items-center gap-2">
                       <Database size={13} weight="light" className="text-ink-faint" />
                       <span className="font-mono text-sm text-ink">{t.table}</span>
-                      <span className="ml-auto text-[10.5px] text-ink-faint">{t.reads.length} read · {t.writes.length} write</span>
+                      <span className="ml-auto text-[0.75rem] text-ink-faint">{t.reads.length} read · {t.writes.length} write</span>
                     </div>
                     <div className="flex flex-wrap gap-1">
-                      {t.reads.map((r, i2) => <span key={`r${i2}`} className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-emerald">👁 {r}</span>)}
-                      {t.writes.map((r, i2) => <span key={`w${i2}`} className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-rose">✎ {r}</span>)}
+                      {t.reads.map((r, i2) => <span key={`r${i2}`} className="rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] text-emerald">👁 {r}</span>)}
+                      {t.writes.map((r, i2) => <span key={`w${i2}`} className="rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] text-rose">✎ {r}</span>)}
                     </div>
                   </div>
                 ))}
@@ -349,11 +349,11 @@ export function PlSqlAnalyzerPage() {
                 {risksByKind.length === 0 && <div className="text-xs text-ink-faint">No risk patterns flagged.</div>}
                 {risksByKind.map(([kind, items]) => (
                   <div key={kind} className="flex flex-col gap-1.5">
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-warm">
+                    <div className="flex items-center gap-1.5 text-[0.8125rem] font-medium text-warm">
                       <Warning size={13} weight="light" /> {kind} ({items.length})
                     </div>
                     {items.map((r, i) => (
-                      <div key={i} className="rounded-lg bg-glass px-2.5 py-1.5 text-[11px]">
+                      <div key={i} className="rounded-lg bg-glass px-2.5 py-1.5 text-[0.8125rem]">
                         <span className="font-mono text-ink-faint">{r.filePath}:{r.line}</span>
                         <span className="ml-2 text-ink-soft">{r.message}</span>
                       </div>

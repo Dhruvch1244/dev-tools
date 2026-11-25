@@ -174,7 +174,7 @@ export function TaskListPage() {
             <div className="flex flex-wrap items-center gap-1.5">
               <button
                 onClick={() => setTagFilter(null)}
-                className={`rounded-full px-2.5 py-1 text-[10.5px] ${tagFilter === null ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
+                className={`rounded-full px-2.5 py-1 text-[0.75rem] ${tagFilter === null ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
               >
                 All
               </button>
@@ -182,7 +182,7 @@ export function TaskListPage() {
                 <button
                   key={tag}
                   onClick={() => setTagFilter(tag)}
-                  className={`rounded-full px-2.5 py-1 text-[10.5px] ${tagFilter === tag ? 'bg-glass-strong text-cyan' : 'text-ink-faint hover:bg-glass'}`}
+                  className={`rounded-full px-2.5 py-1 text-[0.75rem] ${tagFilter === tag ? 'bg-glass-strong text-cyan' : 'text-ink-faint hover:bg-glass'}`}
                 >
                   #{tag}
                 </button>
@@ -231,7 +231,7 @@ export function TaskListPage() {
                               {t.title}
                             </button>
                           )}
-                          <div className="flex flex-wrap items-center gap-1.5 text-[10.5px] text-ink-faint">
+                          <div className="flex flex-wrap items-center gap-1.5 text-[0.75rem] text-ink-faint">
                             <span>{timingLine(t)}</span>
                             {t.dueDate && (
                               <span className={overdue ? 'font-medium text-rose' : ''}>
@@ -246,7 +246,7 @@ export function TaskListPage() {
 
                         <button
                           onClick={() => setExpandedId(expanded ? null : t.id)}
-                          className="mt-0.5 flex shrink-0 items-center gap-1 text-[10.5px] text-ink-faint hover:text-ink-soft"
+                          className="mt-0.5 flex shrink-0 items-center gap-1 text-[0.75rem] text-ink-faint hover:text-ink-soft"
                         >
                           {expanded ? <CaretDown size={11} weight="bold" /> : <CaretRight size={11} weight="bold" />}
                           {t.checklist.length > 0 && `${doneCount}/${t.checklist.length}`}
@@ -260,7 +260,7 @@ export function TaskListPage() {
                       {expanded && (
                         <div className="ml-9 flex flex-col gap-2 border-t border-rule-soft pt-2">
                           <div className="flex items-center gap-2">
-                            <label className="flex items-center gap-1.5 text-[10.5px] text-ink-faint">
+                            <label className="flex items-center gap-1.5 text-[0.75rem] text-ink-faint">
                               Priority
                               <select
                                 className="devtools-input w-auto py-1"
@@ -272,7 +272,7 @@ export function TaskListPage() {
                                 ))}
                               </select>
                             </label>
-                            <label className="flex items-center gap-1.5 text-[10.5px] text-ink-faint">
+                            <label className="flex items-center gap-1.5 text-[0.75rem] text-ink-faint">
                               Due
                               <input
                                 type="date"

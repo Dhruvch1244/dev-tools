@@ -59,7 +59,7 @@ export function AvroSchemaPage() {
               value={writerText}
               onChange={(e) => setWriterText(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12.5px] text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] text-ink outline-none focus:border-cyan/50"
             />
             {writer.errors.map((e, i) => <ErrorBanner key={i} message={e} />)}
           </div>
@@ -71,7 +71,7 @@ export function AvroSchemaPage() {
               value={readerText}
               onChange={(e) => setReaderText(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12.5px] text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] text-ink outline-none focus:border-cyan/50"
             />
             {reader.errors.map((e, i) => <ErrorBanner key={i} message={e} />)}
           </div>
@@ -107,7 +107,7 @@ export function AvroSchemaPage() {
                 <CopyButton text={ddl} />
               </div>
             </div>
-            <pre className="whitespace-pre-wrap font-mono text-[12px] text-ink-soft">{ddl || '—'}</pre>
+            <pre className="whitespace-pre-wrap font-mono text-[0.875rem] text-ink-soft">{ddl || '—'}</pre>
           </div>
         </Panel>
       </div>

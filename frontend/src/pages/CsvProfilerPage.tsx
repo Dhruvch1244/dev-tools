@@ -91,8 +91,8 @@ export function CsvProfilerPage() {
         <Panel>
           <div className="flex flex-col gap-3 p-4">
             <div className="flex gap-1 rounded-xl border border-rule bg-panel p-1">
-              <button onClick={() => setMode('upload')} className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium ${mode === 'upload' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Upload</button>
-              <button onClick={() => setMode('path')} className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium ${mode === 'path' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Local path</button>
+              <button onClick={() => setMode('upload')} className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium ${mode === 'upload' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Upload</button>
+              <button onClick={() => setMode('path')} className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium ${mode === 'path' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Local path</button>
             </div>
 
             {mode === 'upload' ? (
@@ -153,9 +153,9 @@ export function CsvProfilerPage() {
                   <div key={c.name} className="rounded-xl border border-rule bg-panel p-3">
                     <div className="mb-1 flex items-center justify-between">
                       <span className="font-mono text-sm text-cyan">{c.name}</span>
-                      <span className="rounded bg-glass-strong px-1.5 py-0.5 text-[10px] uppercase text-ink-faint">{c.inferredType}</span>
+                      <span className="rounded bg-glass-strong px-1.5 py-0.5 text-[0.75rem] uppercase text-ink-faint">{c.inferredType}</span>
                     </div>
-                    <div className="flex flex-col gap-0.5 text-[11px] text-ink-soft">
+                    <div className="flex flex-col gap-0.5 text-[0.8125rem] text-ink-soft">
                       <div>{c.nonNullCount} non-null, {c.nullCount} null</div>
                       <div>{c.approxDistinctCount}{c.distinctCountTruncated ? '+' : ''} distinct values</div>
                       {c.minValue != null && <div>range: {c.minValue} – {c.maxValue}</div>}

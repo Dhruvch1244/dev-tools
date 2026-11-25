@@ -77,7 +77,7 @@ export function ResizablePanel({
   }
 
   return (
-    <div className="relative flex shrink-0" style={{ width }}>
+    <div className="resizable-panel relative flex shrink-0" style={{ width }}>
       <div className={`min-w-0 flex-1 ${className}`}>{children}</div>
       <div
         onMouseDown={startDrag}

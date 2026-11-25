@@ -84,7 +84,7 @@ export function ImageToolsPage() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
+                  className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium transition-colors ${
                     tab === t ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                   }`}
                 >
@@ -108,7 +108,7 @@ export function ImageToolsPage() {
               />
             </label>
             {isBatch && (
-              <div className="text-[11px] text-ink-faint">Multiple images selected — result downloads as a zip instead of a side-by-side preview.</div>
+              <div className="text-[0.8125rem] text-ink-faint">Multiple images selected — result downloads as a zip instead of a side-by-side preview.</div>
             )}
 
             {tab === 'convert' ? (
@@ -119,7 +119,7 @@ export function ImageToolsPage() {
                     <button
                       key={f}
                       onClick={() => setFormat(f)}
-                      className={`rounded-lg px-2.5 py-1.5 text-[11px] font-medium uppercase transition-colors ${
+                      className={`rounded-lg px-2.5 py-1.5 text-[0.8125rem] font-medium uppercase transition-colors ${
                         format === f ? 'bg-glass-strong text-ink' : 'bg-glass text-ink-faint hover:text-ink-soft'
                       }`}
                     >
@@ -168,7 +168,7 @@ export function ImageToolsPage() {
                   <input type="checkbox" checked={bgEdgesOnly} onChange={(e) => setBgEdgesOnly(e.target.checked)} className="accent-cyan" />
                   Only remove connected background (safer — won't punch holes in the subject)
                 </label>
-                {isBatch && <div className="text-[11px] text-warm">Pick a single image for background removal — batch isn't supported here.</div>}
+                {isBatch && <div className="text-[0.8125rem] text-warm">Pick a single image for background removal — batch isn't supported here.</div>}
               </>
             )}
 
@@ -204,7 +204,7 @@ export function ImageToolsPage() {
             <div className="flex h-full flex-col items-center justify-center gap-4">
               <div className="flex max-h-40 w-72 flex-col gap-1 overflow-auto rounded-2xl border border-rule bg-panel p-3">
                 {files.map((f, i) => (
-                  <div key={i} className="truncate text-[11px] text-ink-soft">{f.name}</div>
+                  <div key={i} className="truncate text-[0.8125rem] text-ink-soft">{f.name}</div>
                 ))}
               </div>
               {resultUrl ? (
@@ -285,7 +285,7 @@ function Slider({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between text-[11px] text-ink-soft">
+      <div className="flex items-center justify-between text-[0.8125rem] text-ink-soft">
         <span>{label}</span>
         <span className="font-mono text-ink-faint">{format(value)}</span>
       </div>

@@ -107,7 +107,7 @@ export function EncodeDecodePage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </Panel>
@@ -118,7 +118,7 @@ export function EncodeDecodePage() {
                   <SectionLabel>Encoded</SectionLabel>
                   <CopyButton text={encoded} />
                 </div>
-                <textarea readOnly value={encoded} spellCheck={false} className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none" />
+                <textarea readOnly value={encoded} spellCheck={false} className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none" />
               </div>
             </Panel>
             <Panel className="flex flex-1 flex-col overflow-hidden">
@@ -127,7 +127,7 @@ export function EncodeDecodePage() {
                   <SectionLabel>Decoded (treats input as encoded)</SectionLabel>
                   <CopyButton text={decoded} />
                 </div>
-                <textarea readOnly value={decoded} spellCheck={false} className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none" />
+                <textarea readOnly value={decoded} spellCheck={false} className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none" />
               </div>
             </Panel>
           </div>
@@ -166,9 +166,9 @@ function JwtDecoder() {
             onChange={(e) => setToken(e.target.value)}
             spellCheck={false}
             placeholder="eyJhbGciOiJI..."
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
           />
-          <div className="mt-2 text-[11px] text-ink-faint">
+          <div className="mt-2 text-[0.8125rem] text-ink-faint">
             Decodes header + payload only — signature is not verified (no secret is entered here).
           </div>
         </div>
@@ -178,7 +178,7 @@ function JwtDecoder() {
         <Panel className="flex flex-col overflow-hidden">
           <div className="p-4">
             <SectionLabel>Header</SectionLabel>
-            <pre className="max-h-48 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[12.5px] text-ink">
+            <pre className="max-h-48 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] text-ink">
               {header ? JSON.stringify(header, null, 2) : '—'}
             </pre>
           </div>
@@ -186,7 +186,7 @@ function JwtDecoder() {
         <Panel className="flex flex-1 flex-col overflow-hidden">
           <div className="flex flex-1 flex-col p-4">
             <SectionLabel>Payload</SectionLabel>
-            <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[12.5px] text-ink">
+            <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] text-ink">
               {payload ? JSON.stringify(payload, null, 2) : '—'}
             </pre>
             {typeof exp === 'number' && (
@@ -226,7 +226,7 @@ function HashPanel() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
           />
           <SectionLabel>HMAC key (optional)</SectionLabel>
           <input
@@ -249,11 +249,11 @@ function HashPanel() {
             <div className="flex flex-col gap-2">
               {Object.entries(results).map(([label, value]) => (
                 <div key={label} className="rounded-xl border border-rule-soft bg-glass p-2.5">
-                  <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wide text-ink-faint">
+                  <div className="mb-1 flex items-center justify-between text-[0.75rem] uppercase tracking-wide text-ink-faint">
                     {label}
                     <CopyButton text={value} />
                   </div>
-                  <div className="break-all font-mono text-[11.5px] text-ink">{value}</div>
+                  <div className="break-all font-mono text-[0.8125rem] text-ink">{value}</div>
                 </div>
               ))}
             </div>

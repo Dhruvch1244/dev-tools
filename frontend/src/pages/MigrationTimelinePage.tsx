@@ -79,7 +79,7 @@ export function MigrationTimelinePage() {
             <Button variant="primary" onClick={() => scan(path)} disabled={!path.trim() || loading}>
               <Stairs size={14} weight="light" /> {loading ? 'Scanning…' : 'Scan'}
             </Button>
-            <div className="text-[11px] text-ink-faint">
+            <div className="text-[0.8125rem] text-ink-faint">
               Recognizes Flyway files by filename (<code>V1__desc.sql</code>, <code>V1.1__desc.sql</code>,{' '}
               <code>R__desc.sql</code>) and Liquibase changeSets by content-sniffing a{' '}
               <code>&lt;databaseChangeLog&gt;</code> XML root. Heuristic, regex/tag-based — not a real
@@ -129,7 +129,7 @@ export function MigrationTimelinePage() {
 
         {result && (
           <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-rule-soft px-4 py-3 text-[11px] text-ink-faint">
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-rule-soft px-4 py-3 text-[0.8125rem] text-ink-faint">
               <div>
                 {result.filesScanned} file(s) scanned · {result.migrations.length} migration(s)
                 {result.risks.length > 0 && <span className="text-rose"> · {result.risks.length} risk(s) flagged</span>}
@@ -143,25 +143,25 @@ export function MigrationTimelinePage() {
                   {result.migrations.map((m: MigrationEntry, i: number) => (
                     <div key={i} className="rounded-xl border border-rule-soft bg-glass px-3 py-2">
                       <div className="flex items-center gap-3">
-                        <span className={`w-16 shrink-0 text-[9.5px] font-semibold uppercase tracking-wide ${TOOL_COLOR[m.tool]}`}>{m.tool}</span>
-                        <span className="w-16 shrink-0 font-mono text-[11.5px] font-semibold text-ink">{m.version}</span>
-                        <span className="flex-1 truncate text-[12.5px] text-ink-soft">{m.description}</span>
+                        <span className={`w-16 shrink-0 text-[0.6875rem] font-semibold uppercase tracking-wide ${TOOL_COLOR[m.tool]}`}>{m.tool}</span>
+                        <span className="w-16 shrink-0 font-mono text-[0.8125rem] font-semibold text-ink">{m.version}</span>
+                        <span className="flex-1 truncate text-[0.875rem] text-ink-soft">{m.description}</span>
                         {m.risks.length > 0 && (
                           <button
                             onClick={() => toggle(i)}
-                            className="flex shrink-0 items-center gap-1 rounded-full bg-rose/15 px-2 py-0.5 text-[10.5px] font-medium text-rose hover:bg-rose/25"
+                            className="flex shrink-0 items-center gap-1 rounded-full bg-rose/15 px-2 py-0.5 text-[0.75rem] font-medium text-rose hover:bg-rose/25"
                           >
                             <Warning size={11} weight="bold" /> {m.risks.length}
                           </button>
                         )}
-                        <span className="shrink-0 truncate font-mono text-[10px] text-ink-faint" style={{ maxWidth: '20%' }} title={m.filePath}>
+                        <span className="shrink-0 truncate font-mono text-[0.75rem] text-ink-faint" style={{ maxWidth: '20%' }} title={m.filePath}>
                           {m.fileName}
                         </span>
                       </div>
                       {expanded.has(i) && m.risks.length > 0 && (
                         <div className="mt-2 flex flex-col gap-1 border-t border-rule-soft pt-2">
                           {m.risks.map((r, ri) => (
-                            <div key={ri} className="text-[11px] text-rose">
+                            <div key={ri} className="text-[0.8125rem] text-rose">
                               line {r.line} — {r.message}
                             </div>
                           ))}

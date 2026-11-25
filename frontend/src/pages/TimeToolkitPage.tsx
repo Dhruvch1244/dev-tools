@@ -33,7 +33,7 @@ function WorldClock() {
       <div className="flex flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
           <SectionLabel>World clock</SectionLabel>
-          <span className="text-[10.5px] text-ink-faint">updates live</span>
+          <span className="text-[0.75rem] text-ink-faint">updates live</span>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-rule">
@@ -84,9 +84,9 @@ function WorldClock() {
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-rule">
-          <table className="w-full text-left text-[12px]">
+          <table className="w-full text-left text-[0.875rem]">
             <thead>
-              <tr className="border-b border-rule-soft text-[10px] uppercase tracking-wide text-ink-faint">
+              <tr className="border-b border-rule-soft text-[0.75rem] uppercase tracking-wide text-ink-faint">
                 <th className="px-3 py-2 font-medium">City</th>
                 <th className="px-3 py-2 font-medium">Timezone</th>
                 <th className="px-3 py-2 font-medium">Local time</th>
@@ -220,8 +220,8 @@ function AnyTimeConverter() {
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
               {TIMEZONES.map((z) => (
                 <div key={z} className="flex flex-col rounded-lg bg-glass px-2.5 py-1.5">
-                  <span className="text-[10px] uppercase tracking-wide text-ink-faint">{z}</span>
-                  <span className="font-mono text-[12px] text-ink">
+                  <span className="text-[0.75rem] uppercase tracking-wide text-ink-faint">{z}</span>
+                  <span className="font-mono text-[0.875rem] text-ink">
                     {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: z }).format(instant)}
                   </span>
                 </div>
@@ -361,7 +361,7 @@ export function TimeToolkitPage() {
               <button
                 key={p.expr}
                 onClick={() => setCronExpr(p.expr)}
-                className={`rounded-full px-2.5 py-1 text-[11px] transition-colors ${
+                className={`rounded-full px-2.5 py-1 text-[0.8125rem] transition-colors ${
                   cronExpr === p.expr ? 'bg-glass-strong text-ink' : 'bg-glass text-ink-faint hover:text-ink-soft'
                 }`}
               >
@@ -382,13 +382,13 @@ export function TimeToolkitPage() {
                     <div className="flex gap-1">
                       <div className="flex w-10 shrink-0 flex-col justify-end gap-[3px] pt-[18px]">
                         {DAY_LABELS.map((d) => (
-                          <div key={d} className="flex h-[14px] items-center text-[9px] text-ink-faint">{d}</div>
+                          <div key={d} className="flex h-[14px] items-center text-[0.6875rem] text-ink-faint">{d}</div>
                         ))}
                       </div>
                       <div className="flex flex-col gap-[3px]">
                         <div className="flex gap-[3px]">
                           {Array.from({ length: 24 }, (_, h) => (
-                            <div key={h} className="w-[14px] shrink-0 text-center text-[8px] text-ink-faint">{h % 3 === 0 ? h : ''}</div>
+                            <div key={h} className="w-[14px] shrink-0 text-center text-[0.6875rem] text-ink-faint">{h % 3 === 0 ? h : ''}</div>
                           ))}
                         </div>
                         {cron.heatmap!.map((row, d) => (

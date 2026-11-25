@@ -121,7 +121,7 @@ function HeaderList({ headers }: { headers: Record<string, string[]> }) {
   const entries = Object.entries(headers)
   if (entries.length === 0) return <div className="text-xs text-ink-faint">No headers.</div>
   return (
-    <div className="flex flex-col gap-0.5 font-mono text-[11.5px]">
+    <div className="flex flex-col gap-0.5 font-mono text-[0.8125rem]">
       {entries.map(([k, v]) => (
         <div key={k} className={k.toLowerCase().startsWith('access-control') ? 'text-cyan' : 'text-ink-soft'}>
           {k}: {v.join(', ')}

@@ -16,14 +16,14 @@ const Rail = ({ node }: { node: RegexNode }) => {
 
     case 'lit':
       return (
-        <span className="rounded-md border border-rule bg-panel px-2 py-1 font-mono text-[12px] text-ink">
+        <span className="rounded-md border border-rule bg-panel px-2 py-1 font-mono text-[0.875rem] text-ink">
           {node.text}
         </span>
       )
 
     case 'class':
       return (
-        <span className="rounded-md border border-warm/40 bg-warm/[0.08] px-2 py-1 font-mono text-[12px] text-warm">
+        <span className="rounded-md border border-warm/40 bg-warm/[0.08] px-2 py-1 font-mono text-[0.875rem] text-warm">
           {node.text}
         </span>
       )
@@ -31,22 +31,22 @@ const Rail = ({ node }: { node: RegexNode }) => {
     case 'shorthand':
       return (
         <span className="flex flex-col items-center rounded-md border border-violet/40 bg-violet/[0.08] px-2 py-1 text-center">
-          <span className="font-mono text-[12px] text-violet">{node.text}</span>
-          <span className="text-[9px] text-ink-faint">{shorthandLabel(node.text)}</span>
+          <span className="font-mono text-[0.875rem] text-violet">{node.text}</span>
+          <span className="text-[0.6875rem] text-ink-faint">{shorthandLabel(node.text)}</span>
         </span>
       )
 
     case 'dot':
       return (
         <span className="flex flex-col items-center rounded-md border border-rule bg-panel px-2 py-1 text-center">
-          <span className="font-mono text-[12px] text-ink">.</span>
-          <span className="text-[9px] text-ink-faint">any char</span>
+          <span className="font-mono text-[0.875rem] text-ink">.</span>
+          <span className="text-[0.6875rem] text-ink-faint">any char</span>
         </span>
       )
 
     case 'anchor':
       return (
-        <span className="rounded-full border border-emerald/40 bg-emerald/[0.1] px-2.5 py-1 text-[10.5px] text-emerald">
+        <span className="rounded-full border border-emerald/40 bg-emerald/[0.1] px-2.5 py-1 text-[0.75rem] text-emerald">
           {node.text}
         </span>
       )
@@ -54,7 +54,7 @@ const Rail = ({ node }: { node: RegexNode }) => {
     case 'group':
       return (
         <div className="flex flex-col items-start gap-1 rounded-xl border border-cyan/30 bg-cyan/[0.04] p-2">
-          <span className="rounded-full bg-cyan/15 px-2 py-0.5 text-[9.5px] font-medium uppercase tracking-wide text-cyan">{node.label}</span>
+          <span className="rounded-full bg-cyan/15 px-2 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-cyan">{node.label}</span>
           <Rail node={node.inner} />
         </div>
       )
@@ -62,7 +62,7 @@ const Rail = ({ node }: { node: RegexNode }) => {
     case 'quant':
       return (
         <div className="flex flex-col items-center gap-1 rounded-xl border border-dashed border-warm/40 bg-warm/[0.04] p-2">
-          <span className="rounded-full bg-warm/15 px-2 py-0.5 text-[9.5px] font-medium text-warm">× {node.label}</span>
+          <span className="rounded-full bg-warm/15 px-2 py-0.5 text-[0.6875rem] font-medium text-warm">× {node.label}</span>
           <Rail node={node.inner} />
         </div>
       )
@@ -70,10 +70,10 @@ const Rail = ({ node }: { node: RegexNode }) => {
     case 'alt':
       return (
         <div className="flex flex-col gap-1.5 rounded-xl border border-rose/30 bg-rose/[0.04] p-2">
-          <span className="rounded-full bg-rose/15 px-2 py-0.5 text-[9.5px] font-medium uppercase tracking-wide text-rose self-start">one of</span>
+          <span className="rounded-full bg-rose/15 px-2 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-rose self-start">one of</span>
           {node.branches.map((b, i) => (
             <div key={i} className="flex items-center gap-1.5">
-              <span className="text-[10px] text-ink-faint">{i + 1}.</span>
+              <span className="text-[0.75rem] text-ink-faint">{i + 1}.</span>
               <Rail node={b} />
             </div>
           ))}
@@ -86,11 +86,11 @@ export function RegexDiagram({ node }: { node: RegexNode }) {
   return (
     <div className="flex min-h-full items-center justify-center p-8">
       <div className="flex items-center gap-2 rounded-2xl border border-rule bg-panel p-4">
-        <span className="rounded-full border border-rule px-2 py-1 text-[10px] text-ink-faint">start</span>
+        <span className="rounded-full border border-rule px-2 py-1 text-[0.75rem] text-ink-faint">start</span>
         <div className="h-[1.5px] w-4 bg-ink-faint" />
         <Rail node={node} />
         <div className="h-[1.5px] w-4 bg-ink-faint" />
-        <span className="rounded-full border border-rule px-2 py-1 text-[10px] text-ink-faint">end</span>
+        <span className="rounded-full border border-rule px-2 py-1 text-[0.75rem] text-ink-faint">end</span>
       </div>
     </div>
   )

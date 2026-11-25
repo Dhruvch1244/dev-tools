@@ -46,13 +46,13 @@ export function DependencyTreePage() {
         <div className="flex flex-1 flex-col gap-2 p-4">
           <div className="flex items-center justify-between">
             <SectionLabel>Paste `mvn dependency:tree` or `gradlew dependencies` output</SectionLabel>
-            <button onClick={() => setText(SAMPLE)} className="shrink-0 text-[11px] text-ink-faint hover:text-cyan">Try a sample</button>
+            <button onClick={() => setText(SAMPLE)} className="shrink-0 text-[0.8125rem] text-ink-faint hover:text-cyan">Try a sample</button>
           </div>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
           />
         </div>
       </Panel></ResizablePanel>
@@ -80,7 +80,7 @@ export function DependencyTreePage() {
               ) : (
                 <div className="flex flex-col gap-2">
                   {paths.map((path, i) => (
-                    <div key={i} className="rounded-xl border border-rule-soft bg-glass p-2.5 font-mono text-[12px] text-ink-soft">
+                    <div key={i} className="rounded-xl border border-rule-soft bg-glass p-2.5 font-mono text-[0.875rem] text-ink-soft">
                       {path.map((seg, si) => (
                         <div key={si} style={{ paddingLeft: si * 16 }} className={si === path.length - 1 ? 'text-cyan' : ''}>
                           {si > 0 && '↳ '}{seg}
@@ -107,7 +107,7 @@ function Tree({ nodes }: { nodes: DepNode[] }) {
         <div key={i}>
           <div
             style={{ paddingLeft: n.depth * 18 }}
-            className={`whitespace-pre-wrap break-all py-0.5 font-mono text-[12.5px] ${n.conflict ? 'text-warm' : 'text-ink-soft'}`}
+            className={`whitespace-pre-wrap break-all py-0.5 font-mono text-[0.875rem] ${n.conflict ? 'text-warm' : 'text-ink-soft'}`}
           >
             {n.conflict && '⚠ '}{n.coordinate}
           </div>

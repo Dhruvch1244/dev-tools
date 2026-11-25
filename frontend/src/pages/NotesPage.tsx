@@ -417,7 +417,7 @@ export function NotesPage() {
               </Button>
             </div>
 
-            <div className="mb-2 text-[10.5px] text-ink-faint">
+            <div className="mb-2 text-[0.75rem] text-ink-faint">
               Started {formatTimestamp(activeNote.createdAt)} · Last edited {formatTimestamp(activeNote.updatedAt)}
             </div>
 
@@ -428,7 +428,7 @@ export function NotesPage() {
                 scheduleSave(draftTitle, draftBody, e.target.value)
               }}
               placeholder="tags, comma, separated"
-              className="mb-3 bg-transparent text-[11px] text-ink-faint outline-none"
+              className="mb-3 bg-transparent text-[0.8125rem] text-ink-faint outline-none"
             />
 
             <div className="grid flex-1 grid-cols-2 gap-3 overflow-hidden">
@@ -451,7 +451,7 @@ export function NotesPage() {
                   onDragOver={(e) => e.preventDefault()}
                   spellCheck={false}
                   placeholder={'Markdown supported. Link a note with [[Note Title]]. Type / for tables, tasks, images…'}
-                  className="h-full w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                  className="h-full w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
                 />
                 {slash && (
                   <SlashMenu commands={filteredSlashCommands} activeIndex={slashIndex} position={slash.pos} onSelect={selectSlashCommand} />
@@ -477,7 +477,7 @@ export function NotesPage() {
               </div>
               {preview && (
                 <div
-                  className="prose-note overflow-auto rounded-2xl border border-rule bg-panel p-3.5 text-[13.5px] text-ink-soft"
+                  className="prose-note overflow-auto rounded-2xl border border-rule bg-panel p-3.5 text-[0.9375rem] text-ink-soft"
                   onClick={(e) => {
                     const target = e.target as HTMLElement
                     const wikiTitle = target.dataset.wikiLink
@@ -496,7 +496,7 @@ export function NotesPage() {
                     <button
                       key={b.id}
                       onClick={() => setActiveNoteId(b.id)}
-                      className="rounded-full bg-glass-strong px-2.5 py-1 text-[11px] text-cyan hover:bg-glass-strong"
+                      className="rounded-full bg-glass-strong px-2.5 py-1 text-[0.8125rem] text-cyan hover:bg-glass-strong"
                     >
                       {b.title}
                     </button>

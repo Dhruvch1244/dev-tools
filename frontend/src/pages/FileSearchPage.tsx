@@ -72,7 +72,7 @@ export function FileSearchPage() {
             <div className="mb-3 flex gap-1 rounded-xl border border-rule bg-panel p-1">
               <button
                 onClick={() => setMode('upload')}
-                className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
+                className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium transition-colors ${
                   mode === 'upload' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                 }`}
               >
@@ -80,7 +80,7 @@ export function FileSearchPage() {
               </button>
               <button
                 onClick={() => setMode('path')}
-                className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors ${
+                className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium transition-colors ${
                   mode === 'path' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                 }`}
               >
@@ -100,7 +100,7 @@ export function FileSearchPage() {
                   />
                 </label>
                 {file && (
-                  <div className="mb-3 flex items-center gap-1.5 text-[11px] text-ink-faint">
+                  <div className="mb-3 flex items-center gap-1.5 text-[0.8125rem] text-ink-faint">
                     <FileText size={12} weight="light" />
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </div>
@@ -118,7 +118,7 @@ export function FileSearchPage() {
                     className="w-full bg-transparent font-mono text-xs text-ink outline-none placeholder:text-ink-faint"
                   />
                 </div>
-                <div className="mb-3 text-[11px] text-ink-faint">
+                <div className="mb-3 text-[0.8125rem] text-ink-faint">
                   Read directly off disk by the backend — no upload, so this scales to tens of GB.
                 </div>
               </>
@@ -126,7 +126,7 @@ export function FileSearchPage() {
 
             <div className="mb-1.5 flex items-center justify-between">
               <SectionLabel>Search terms (one per line)</SectionLabel>
-              {termCount > 0 && <span className="text-[10px] text-ink-faint">{termCount}</span>}
+              {termCount > 0 && <span className="text-[0.75rem] text-ink-faint">{termCount}</span>}
             </div>
             <textarea
               value={terms}
@@ -219,7 +219,7 @@ export function FileSearchPage() {
                       <CopyButton text={tr.matches.map((m) => m.line).join('\n')} label="Copy" />
                     )}
                   </div>
-                  <div className="overflow-hidden rounded-2xl border border-rule bg-panel font-mono text-[13px] shadow-[var(--shadow-inset)]">
+                  <div className="overflow-hidden rounded-2xl border border-rule bg-panel font-mono text-[0.9375rem] shadow-[var(--shadow-inset)]">
                     {tr.matches.length === 0 ? (
                       <div className="p-3 text-ink-faint">No matches.</div>
                     ) : (

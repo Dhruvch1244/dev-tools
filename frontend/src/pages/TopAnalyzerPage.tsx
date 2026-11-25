@@ -68,7 +68,7 @@ export function TopAnalyzerPage() {
               value={before}
               onChange={(e) => setBefore(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[11.5px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
           </div>
         </Panel>
@@ -80,7 +80,7 @@ export function TopAnalyzerPage() {
                 value={after}
                 onChange={(e) => setAfter(e.target.value)}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[11.5px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </Panel>
@@ -93,9 +93,9 @@ export function TopAnalyzerPage() {
             diffs.length === 0 ? (
               <div className="text-sm text-ink-faint">Paste both snapshots to see the delta per process.</div>
             ) : (
-              <table className="w-full text-left text-[12px]">
+              <table className="w-full text-left text-[0.875rem]">
                 <thead>
-                  <tr className="text-[10px] uppercase tracking-wide text-ink-faint">
+                  <tr className="text-[0.75rem] uppercase tracking-wide text-ink-faint">
                     <th className="py-1">PID</th><th>Command</th><th>CPU before → after</th><th>Δ CPU</th><th>Δ MEM</th><th></th>
                   </tr>
                 </thead>
@@ -124,9 +124,9 @@ export function TopAnalyzerPage() {
           ) : sorted.length === 0 ? (
             <div className="text-sm text-ink-faint">Paste a snapshot above to see the sorted process table.</div>
           ) : (
-            <table className="w-full text-left text-[12px]">
+            <table className="w-full text-left text-[0.875rem]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wide text-ink-faint">
+                <tr className="text-[0.75rem] uppercase tracking-wide text-ink-faint">
                   <th className="py-1">PID</th><th>User</th><th>Command</th><th>%CPU</th><th>%MEM</th><th></th>
                 </tr>
               </thead>

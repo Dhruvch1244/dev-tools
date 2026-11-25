@@ -27,7 +27,7 @@ export function ResultChart({ data }: { data: ChartData }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <div className="text-[11px] text-ink-faint">
+        <div className="text-[0.8125rem] text-ink-faint">
           Auto-charted from {data.series.map((s) => s.key).join(', ')}
         </div>
         <div className="flex gap-1 rounded-lg border border-rule bg-panel p-0.5">
@@ -35,7 +35,7 @@ export function ResultChart({ data }: { data: ChartData }) {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`rounded-md px-2 py-0.5 text-[10.5px] capitalize transition-colors ${
+              className={`rounded-md px-2 py-0.5 text-[0.75rem] capitalize transition-colors ${
                 mode === m ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
               }`}
             >
@@ -103,7 +103,7 @@ export function ResultChart({ data }: { data: ChartData }) {
       {data.series.length > 1 && (
         <div className="flex flex-wrap gap-3">
           {data.series.map((s, si) => (
-            <div key={s.key} className="flex items-center gap-1.5 text-[11px] text-ink-soft">
+            <div key={s.key} className="flex items-center gap-1.5 text-[0.8125rem] text-ink-soft">
               <span className="h-2 w-2 rounded-full" style={{ background: SERIES_COLORS[si % SERIES_COLORS.length] }} />
               {s.key}
             </div>

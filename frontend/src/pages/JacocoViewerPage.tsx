@@ -89,14 +89,14 @@ export function JacocoViewerPage() {
                 const p = linePct(c)
                 return (
                   <div key={i} className="flex items-center gap-3">
-                    <span className="w-96 shrink-0 truncate font-mono text-[11.5px] text-ink-soft" title={`${c.packageName}.${c.className}`}>
+                    <span className="w-96 shrink-0 truncate font-mono text-[0.8125rem] text-ink-soft" title={`${c.packageName}.${c.className}`}>
                       <span className="text-ink-faint">{c.packageName}.</span>
                       {c.className}
                     </span>
                     <div className="relative h-4 flex-1 rounded bg-glass">
                       <div className={`absolute top-0 h-4 rounded ${pctColor(p)}`} style={{ width: `${p ?? 0}%` }} />
                     </div>
-                    <span className="w-32 shrink-0 text-right font-mono text-[11.5px] text-ink-faint">
+                    <span className="w-32 shrink-0 text-right font-mono text-[0.8125rem] text-ink-faint">
                       {p === null ? 'no lines' : `${p.toFixed(1)}% (${c.lineCovered}/${c.lineCovered + c.lineMissed})`}
                     </span>
                   </div>

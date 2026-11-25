@@ -148,14 +148,14 @@ export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringViz
               }}
             >
               <div className="truncate text-xs font-semibold text-ink">{n.simpleName}</div>
-              <div className="truncate text-[10px] text-ink-faint">{external ? 'external service' : n.packageName}</div>
+              <div className="truncate text-[0.75rem] text-ink-faint">{external ? 'external service' : n.packageName}</div>
               <div className="mt-0.5 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: KIND_COLOR[n.kind] }} />
-                <span className="text-[9.5px] uppercase tracking-wide text-ink-faint">{n.kind}</span>
-                {n.endpointCount > 0 && <span className="text-[9.5px] text-cyan">· {n.endpointCount} routes</span>}
+                <span className="text-[0.6875rem] uppercase tracking-wide text-ink-faint">{n.kind}</span>
+                {n.endpointCount > 0 && <span className="text-[0.6875rem] text-cyan">· {n.endpointCount} routes</span>}
               </div>
               {showProjects && n.project && !external && (
-                <div className="absolute -top-1.5 left-2 rounded-full bg-void px-1.5 text-[8.5px] text-ink-faint ring-1 ring-rule">{n.project}</div>
+                <div className="absolute -top-1.5 left-2 rounded-full bg-void px-1.5 text-[0.6875rem] text-ink-faint ring-1 ring-rule">{n.project}</div>
               )}
             </div>
           )
@@ -167,7 +167,7 @@ export function SpringVizGraph({ nodes, edges, cycles = [] }: { nodes: SpringViz
 
 export function GraphLegend() {
   return (
-    <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-soft">
+    <div className="flex flex-wrap items-center gap-3 text-[0.8125rem] text-ink-soft">
       {(['RestController', 'Service', 'Repository', 'Component', 'Bean', 'RemoteClient', 'ExternalService', 'Configuration'] as BeanKind[]).map((k) => (
         <div key={k} className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ background: KIND_COLOR[k] }} />

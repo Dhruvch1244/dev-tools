@@ -149,7 +149,7 @@ export function ConnectionDialog({
                 >
                   <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: c.colorTag ?? '#2fe6f2' }} />
                   <span className="flex-1 truncate">{c.name}</span>
-                  {c.readOnly && <span className="text-[9px] text-ink-faint">RO</span>}
+                  {c.readOnly && <span className="text-[0.6875rem] text-ink-faint">RO</span>}
                 </button>
               ))}
             </div>
@@ -187,7 +187,7 @@ export function ConnectionDialog({
                 value={form.jdbcUrl}
                 onChange={(e) => setForm({ ...form, jdbcUrl: e.target.value })}
               />
-              <div className="mt-1 text-[10.5px] text-ink-faint">e.g. {DRIVER_URL_EXAMPLES[form.driver]}</div>
+              <div className="mt-1 text-[0.75rem] text-ink-faint">e.g. {DRIVER_URL_EXAMPLES[form.driver]}</div>
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
@@ -244,7 +244,7 @@ export function ConnectionDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-faint">{label}</span>
+      <span className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-ink-faint">{label}</span>
       {children}
     </label>
   )

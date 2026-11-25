@@ -37,17 +37,17 @@ export function SqlInsertPage() {
             <input type="file" accept=".csv,.xlsx,.xls" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="hidden" />
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+          <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
             Table name
             <input className="devtools-input font-mono" value={tableName} onChange={(e) => setTableName(e.target.value)} />
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+          <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
             CSV delimiter
             <input className="devtools-input font-mono" value={delimiter} onChange={(e) => setDelimiter(e.target.value)} maxLength={1} />
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+          <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
             <div className="flex items-center justify-between">
               <span>Rows per INSERT batch</span>
               <span className="font-mono text-ink-faint">{batchSize}</span>
@@ -69,11 +69,11 @@ export function SqlInsertPage() {
           )}
           {result && (
             <>
-              <div className="mb-2 flex items-center justify-between text-[11px] text-ink-faint">
+              <div className="mb-2 flex items-center justify-between text-[0.8125rem] text-ink-faint">
                 <span>{result.rowCount.toLocaleString()} rows · {result.columns.length} columns</span>
                 <CopyButton text={result.sql} />
               </div>
-              <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink">
+              <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink">
                 {result.sql}
               </pre>
             </>

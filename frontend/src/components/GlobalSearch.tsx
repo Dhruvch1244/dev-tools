@@ -87,10 +87,10 @@ export function GlobalSearch({ onOpenTool }: { onOpenTool: (tool: string) => voi
       <button
         onClick={() => setOpen(true)}
         title="Search across all tool data (Ctrl Shift F)"
-        className="flex items-center gap-2 rounded-xl border border-rule bg-panel px-2.5 py-1.5 text-xs text-ink-faint transition-colors hover:border-cyan/40 hover:text-ink-soft"
+        className="flex shrink-0 items-center gap-2 rounded-xl border border-rule bg-panel px-2.5 py-2 text-[0.875rem] text-ink-faint transition-colors hover:border-cyan/40 hover:text-ink-soft"
       >
         <MagnifyingGlass size={13} weight="light" />
-        <kbd className="rounded bg-glass-strong px-1 py-0.5 font-mono text-[9.5px]">⌃⇧F</kbd>
+        <kbd className="rounded bg-glass-strong px-1 py-0.5 font-mono text-[0.6875rem]">⌃⇧F</kbd>
       </button>
 
       {createPortal(
@@ -121,7 +121,7 @@ export function GlobalSearch({ onOpenTool }: { onOpenTool: (tool: string) => voi
                     placeholder="Search notes, tasks, vault, templates, API collections…"
                     className="flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-ink-faint"
                   />
-                  <kbd className="rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[10px] text-ink-faint">Esc</kbd>
+                  <kbd className="rounded bg-glass-strong px-1.5 py-0.5 font-mono text-[0.75rem] text-ink-faint">Esc</kbd>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-2">
@@ -144,11 +144,11 @@ export function GlobalSearch({ onOpenTool }: { onOpenTool: (tool: string) => voi
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="shrink-0 rounded-full bg-glass px-2 py-0.5 text-[9.5px] font-medium uppercase tracking-wide text-cyan">{r.type}</span>
-                            <span className={`flex-1 truncate text-[13px] font-medium ${active ? 'text-ink' : 'text-ink-soft'}`}>{r.title}</span>
-                            <span className="shrink-0 text-[10px] text-ink-faint">{TOOL_LABEL[r.tool] ?? r.tool}</span>
+                            <span className="shrink-0 rounded-full bg-glass px-2 py-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-cyan">{r.type}</span>
+                            <span className={`flex-1 truncate text-[0.9375rem] font-medium ${active ? 'text-ink' : 'text-ink-soft'}`}>{r.title}</span>
+                            <span className="shrink-0 text-[0.75rem] text-ink-faint">{TOOL_LABEL[r.tool] ?? r.tool}</span>
                           </div>
-                          {r.snippet && <div className="truncate pl-1 text-[11px] text-ink-faint">{r.snippet}</div>}
+                          {r.snippet && <div className="truncate pl-1 text-[0.8125rem] text-ink-faint">{r.snippet}</div>}
                         </button>
                       )
                     })

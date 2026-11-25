@@ -256,7 +256,7 @@ export function ApiClientPage() {
                 onClick={() => loadRequest(r)}
                 className={`group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-xs ${selectedRequestId === r.id ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
               >
-                <span className="w-12 shrink-0 font-mono text-[10px] font-semibold" style={{ color: METHOD_COLOR[r.method] }}>{r.method}</span>
+                <span className="w-12 shrink-0 font-mono text-[0.75rem] font-semibold" style={{ color: METHOD_COLOR[r.method] }}>{r.method}</span>
                 <span className="flex-1 truncate">{r.name}</span>
                 <Trash size={11} weight="light" className="shrink-0 opacity-0 hover:text-rose group-hover:opacity-100" onClick={(e) => { e.stopPropagation(); removeRequest(r.id) }} />
               </button>
@@ -326,11 +326,11 @@ export function ApiClientPage() {
                           <button onClick={() => setActiveEnvId(env.id)} className={`flex-1 truncate px-1.5 py-1.5 text-left text-xs ${activeEnvId === env.id ? 'text-ink' : 'text-ink-faint'}`}>
                             {env.name}
                           </button>
-                          <button onClick={() => startEditEnv(env)} className="rounded px-1.5 py-1 text-[10px] text-ink-faint opacity-0 hover:text-cyan group-hover:opacity-100">Edit</button>
+                          <button onClick={() => startEditEnv(env)} className="rounded px-1.5 py-1 text-[0.75rem] text-ink-faint opacity-0 hover:text-cyan group-hover:opacity-100">Edit</button>
                           <Trash size={11} weight="light" className="mr-1 shrink-0 text-ink-faint opacity-0 hover:text-rose group-hover:opacity-100" onClick={() => removeEnv(env.id)} />
                         </div>
                       ))}
-                      {environments.length === 0 && <div className="px-2 py-1 text-[11px] text-ink-faint">No environments yet.</div>}
+                      {environments.length === 0 && <div className="px-2 py-1 text-[0.8125rem] text-ink-faint">No environments yet.</div>}
                     </div>
 
                     {envEditing !== null && (
@@ -339,8 +339,8 @@ export function ApiClientPage() {
                         <div className="flex max-h-40 flex-col gap-1.5 overflow-auto">
                           {envVars.map((v, i) => (
                             <div key={i} className="flex items-center gap-1.5">
-                              <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="varName" value={v.key} onChange={(e) => updateEnvVar(i, { key: e.target.value })} />
-                              <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="value" value={v.value} onChange={(e) => updateEnvVar(i, { value: e.target.value })} />
+                              <input className="devtools-input flex-1 font-mono text-[0.8125rem]" placeholder="varName" value={v.key} onChange={(e) => updateEnvVar(i, { key: e.target.value })} />
+                              <input className="devtools-input flex-1 font-mono text-[0.8125rem]" placeholder="value" value={v.value} onChange={(e) => updateEnvVar(i, { value: e.target.value })} />
                             </div>
                           ))}
                         </div>
@@ -363,8 +363,8 @@ export function ApiClientPage() {
               <SectionLabel>Headers</SectionLabel>
               {headers.map((h, i) => (
                 <div key={i} className="flex items-center gap-1.5">
-                  <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="Header" value={h.key} onChange={(e) => updateHeader(i, { key: e.target.value })} />
-                  <input className="devtools-input flex-1 font-mono text-[11px]" placeholder="Value" value={h.value} onChange={(e) => updateHeader(i, { value: e.target.value })} />
+                  <input className="devtools-input flex-1 font-mono text-[0.8125rem]" placeholder="Header" value={h.key} onChange={(e) => updateHeader(i, { key: e.target.value })} />
+                  <input className="devtools-input flex-1 font-mono text-[0.8125rem]" placeholder="Value" value={h.value} onChange={(e) => updateHeader(i, { value: e.target.value })} />
                 </div>
               ))}
               <SectionLabel>Body</SectionLabel>
@@ -373,7 +373,7 @@ export function ApiClientPage() {
                 onChange={(e) => setBody(e.target.value)}
                 spellCheck={false}
                 placeholder="Request body (JSON, XML, plain text…)"
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </Panel>
@@ -391,16 +391,16 @@ export function ApiClientPage() {
                     <span className="text-ink-faint">{response.durationMs}ms</span>
                     <span className="text-ink-faint">{response.bodyBytes} B</span>
                     <div className="ml-auto flex gap-1 rounded-lg border border-rule bg-panel p-0.5">
-                      <button onClick={() => setResponseTab('body')} className={`rounded-md px-2 py-1 text-[10.5px] font-medium ${responseTab === 'body' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Body</button>
-                      <button onClick={() => setResponseTab('headers')} className={`rounded-md px-2 py-1 text-[10.5px] font-medium ${responseTab === 'headers' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Headers</button>
+                      <button onClick={() => setResponseTab('body')} className={`rounded-md px-2 py-1 text-[0.75rem] font-medium ${responseTab === 'body' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Body</button>
+                      <button onClick={() => setResponseTab('headers')} className={`rounded-md px-2 py-1 text-[0.75rem] font-medium ${responseTab === 'headers' ? 'bg-glass-strong text-ink' : 'text-ink-faint'}`}>Headers</button>
                     </div>
                     <CopyButton text={responseTab === 'body' ? response.body : JSON.stringify(response.headers, null, 2)} />
                   </div>
                   <div className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3">
                     {responseTab === 'body' ? (
-                      <pre className="whitespace-pre-wrap break-all font-mono text-[12px] text-ink-soft">{response.body || '—'}</pre>
+                      <pre className="whitespace-pre-wrap break-all font-mono text-[0.875rem] text-ink-soft">{response.body || '—'}</pre>
                     ) : (
-                      <div className="flex flex-col gap-1 font-mono text-[11.5px] text-ink-soft">
+                      <div className="flex flex-col gap-1 font-mono text-[0.8125rem] text-ink-soft">
                         {Object.entries(response.headers).map(([k, v]) => (
                           <div key={k}>{k}: <span className="text-ink-faint">{v}</span></div>
                         ))}

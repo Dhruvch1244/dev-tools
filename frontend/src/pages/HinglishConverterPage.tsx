@@ -73,13 +73,13 @@ export function HinglishConverterPage() {
                     {result.detectedLanguages.map((l) => (
                       <span
                         key={l.language}
-                        className="rounded-full bg-glass-strong px-2.5 py-1 text-[10.5px] font-medium"
+                        className="rounded-full bg-glass-strong px-2.5 py-1 text-[0.75rem] font-medium"
                         style={{ color: l.south ? 'var(--emerald)' : 'var(--cyan)' }}
                       >
                         {l.language} · {l.count}
                       </span>
                     ))}
-                    <span className="text-[10.5px] text-ink-faint">
+                    <span className="text-[0.75rem] text-ink-faint">
                       {result.recognizedCount}/{result.totalWords} words recognized
                     </span>
                   </div>
@@ -90,7 +90,7 @@ export function HinglishConverterPage() {
                     <SectionLabel>Plain English</SectionLabel>
                     <CopyButton text={result.plainEnglish} />
                   </div>
-                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink shadow-[var(--shadow-inset)]">
                     {result.plainEnglish}
                   </pre>
                 </div>
@@ -100,7 +100,7 @@ export function HinglishConverterPage() {
                     <SectionLabel>Hindi (हिंदी)</SectionLabel>
                     <CopyButton text={result.hindi} />
                   </div>
-                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
+                  <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink shadow-[var(--shadow-inset)]">
                     {result.hindi}
                   </pre>
                 </div>
@@ -111,7 +111,7 @@ export function HinglishConverterPage() {
                     <div className="overflow-hidden rounded-2xl border border-rule">
                       <table className="w-full text-left text-xs">
                         <thead>
-                          <tr className="bg-glass text-[10.5px] uppercase tracking-wide text-ink-faint">
+                          <tr className="bg-glass text-[0.75rem] uppercase tracking-wide text-ink-faint">
                             <th className="px-3 py-2 font-medium">Original</th>
                             <th className="px-3 py-2 font-medium">Language</th>
                             <th className="px-3 py-2 font-medium">English</th>

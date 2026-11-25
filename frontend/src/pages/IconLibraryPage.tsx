@@ -67,7 +67,7 @@ export function IconLibraryPage() {
           <select className="devtools-input w-auto text-xs" value={weight} onChange={(e) => setWeight(e.target.value)}>
             {WEIGHTS.map((w) => <option key={w} value={w}>{w}</option>)}
           </select>
-          <span className="shrink-0 text-[10.5px] text-ink-faint">
+          <span className="shrink-0 text-[0.75rem] text-ink-faint">
             {shown.length.toLocaleString()} of {matched.length.toLocaleString()} shown
           </span>
         </div>
@@ -79,12 +79,12 @@ export function IconLibraryPage() {
             {shown.map(([name, Icon]) => (
               <div key={name} className="group flex flex-col items-center gap-1.5 rounded-xl border border-rule-soft bg-glass px-2 py-3 text-center">
                 <Icon size={22} weight={weight as never} />
-                <span className="w-full truncate text-[9.5px] text-ink-faint" title={name}>{name}</span>
+                <span className="w-full truncate text-[0.6875rem] text-ink-faint" title={name}>{name}</span>
                 <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                   <button onClick={() => copyJsx(name)} title="Copy JSX + import" className="rounded p-1 text-ink-faint hover:bg-glass-strong hover:text-cyan">
-                    {copied === `${name}-jsx` ? <span className="text-[9px] text-emerald">✓</span> : <Copy size={11} weight="light" />}
+                    {copied === `${name}-jsx` ? <span className="text-[0.6875rem] text-emerald">✓</span> : <Copy size={11} weight="light" />}
                   </button>
-                  <button onClick={() => copySvg(name, Icon)} title="Copy raw SVG" className="rounded px-1 text-[9px] text-ink-faint hover:bg-glass-strong hover:text-cyan">
+                  <button onClick={() => copySvg(name, Icon)} title="Copy raw SVG" className="rounded px-1 text-[0.6875rem] text-ink-faint hover:bg-glass-strong hover:text-cyan">
                     {copied === `${name}-svg` ? '✓' : 'SVG'}
                   </button>
                 </div>

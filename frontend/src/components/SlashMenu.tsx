@@ -38,7 +38,7 @@ export function SlashMenu({
           }`}
         >
           <span className="text-xs font-medium">{cmd.label}</span>
-          {cmd.hint && <span className="text-[10px] text-ink-faint">{cmd.hint}</span>}
+          {cmd.hint && <span className="text-[0.75rem] text-ink-faint">{cmd.hint}</span>}
         </button>
       ))}
     </div>

@@ -55,7 +55,7 @@ export function StackTracePage() {
               spellCheck={false}
               rows={14}
               placeholder={'java.lang.NullPointerException: ...\n\tat com.dhruv.app.Service.doThing(Service.java:42)\n\t...'}
-              className="resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
             <Button variant="ghost" onClick={() => setText(SAMPLE)}>Try a sample</Button>
           </div>
@@ -81,7 +81,7 @@ export function StackTracePage() {
                 return (
                   <div key={bi} className="rounded-2xl border border-rule bg-panel">
                     <div className="flex items-center justify-between border-b border-rule-soft px-3.5 py-2.5">
-                      <div className={`font-mono text-[13px] ${block.causedByIndex != null ? 'text-warm' : 'text-rose'}`}>{block.header}</div>
+                      <div className={`font-mono text-[0.9375rem] ${block.causedByIndex != null ? 'text-warm' : 'text-rose'}`}>{block.header}</div>
                       <CopyButton text={block.header + '\n' + block.frames.map((f) => f.raw).join('\n')} />
                     </div>
                     {shown.length > 0 && (
@@ -89,7 +89,7 @@ export function StackTracePage() {
                         {shown.map((f, fi) => (
                           <div
                             key={fi}
-                            className={`whitespace-pre-wrap break-all px-3.5 py-1 font-mono text-[12px] ${
+                            className={`whitespace-pre-wrap break-all px-3.5 py-1 font-mono text-[0.875rem] ${
                               f.isAppCode ? 'bg-cyan/[0.06] text-cyan' : 'text-ink-faint'
                             }`}
                           >
@@ -97,7 +97,7 @@ export function StackTracePage() {
                           </div>
                         ))}
                         {hiddenCount > 0 && (
-                          <div className="px-3.5 py-1.5 text-[11px] italic text-ink-faint">
+                          <div className="px-3.5 py-1.5 text-[0.8125rem] italic text-ink-faint">
                             … {hiddenCount} framework frame{hiddenCount === 1 ? '' : 's'} hidden
                           </div>
                         )}

@@ -45,7 +45,7 @@ export function SchemaDiffPage() {
               value={before}
               onChange={(e) => setBefore(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[11.5px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
           </div>
         </Panel>
@@ -56,7 +56,7 @@ export function SchemaDiffPage() {
               value={after}
               onChange={(e) => setAfter(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[11.5px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
           </div>
         </Panel>
@@ -76,21 +76,21 @@ export function SchemaDiffPage() {
           ) : (
             <div className="flex flex-col gap-2">
               {riskyCount > 0 && (
-                <div className="mb-1 flex items-center gap-2 rounded-xl border border-rose/40 bg-rose/5 px-3 py-2 text-[12px] text-rose">
+                <div className="mb-1 flex items-center gap-2 rounded-xl border border-rose/40 bg-rose/5 px-3 py-2 text-[0.875rem] text-rose">
                   <Warning size={14} weight="fill" /> {riskyCount} risky change{riskyCount > 1 ? 's' : ''} found
                 </div>
               )}
               {result.addedTables.map((t) => (
-                <div key={`add-${t}`} className="rounded-lg bg-glass px-3 py-2 text-[12px] text-emerald">+ new table <span className="font-mono">{t}</span></div>
+                <div key={`add-${t}`} className="rounded-lg bg-glass px-3 py-2 text-[0.875rem] text-emerald">+ new table <span className="font-mono">{t}</span></div>
               ))}
               {result.droppedTables.map((t) => (
-                <div key={`drop-${t}`} className="rounded-lg bg-glass px-3 py-2 text-[12px] text-rose">− dropped table <span className="font-mono">{t}</span></div>
+                <div key={`drop-${t}`} className="rounded-lg bg-glass px-3 py-2 text-[0.875rem] text-rose">− dropped table <span className="font-mono">{t}</span></div>
               ))}
               {result.changes.length === 0 && result.addedTables.length === 0 && result.droppedTables.length === 0 && (
                 <div className="text-sm text-ink-faint">No differences found.</div>
               )}
               {result.changes.map((c, i) => (
-                <div key={i} className={`flex items-start gap-2 rounded-lg px-3 py-2 text-[12px] ${c.risky ? 'bg-rose/5' : 'bg-glass'}`}>
+                <div key={i} className={`flex items-start gap-2 rounded-lg px-3 py-2 text-[0.875rem] ${c.risky ? 'bg-rose/5' : 'bg-glass'}`}>
                   {c.risky && <Warning size={13} weight="fill" className="mt-0.5 shrink-0 text-rose" />}
                   <div>
                     <span className="font-mono text-ink">{c.table}</span>
@@ -101,7 +101,7 @@ export function SchemaDiffPage() {
                         {' '}changed column <span className="font-mono">{c.before.name}</span>: <span className="font-mono">{c.before.type}{c.before.nullable ? '' : ' NOT NULL'}</span> → <span className="font-mono">{c.after.type}{c.after.nullable ? '' : ' NOT NULL'}</span>
                       </span>
                     )}
-                    {c.reason && <div className="mt-0.5 text-[11px] text-rose">{c.reason}</div>}
+                    {c.reason && <div className="mt-0.5 text-[0.8125rem] text-rose">{c.reason}</div>}
                   </div>
                 </div>
               ))}

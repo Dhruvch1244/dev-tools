@@ -212,17 +212,17 @@ export function VaultPage() {
         <div className="border-t border-rule-soft p-3">
           <SectionLabel>Encryption</SectionLabel>
           {!encStatus ? (
-            <div className="mt-2 text-[10.5px] text-ink-faint">Loading…</div>
+            <div className="mt-2 text-[0.75rem] text-ink-faint">Loading…</div>
           ) : !encStatus.enabled ? (
             <div className="mt-2 flex flex-col gap-1.5">
-              <div className="text-[10.5px] text-ink-faint">Secrets are stored as plaintext.</div>
+              <div className="text-[0.75rem] text-ink-faint">Secrets are stored as plaintext.</div>
               <Button variant="ghost" onClick={handleEnable} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
                 <ShieldCheck size={13} weight="light" /> Enable encryption
               </Button>
             </div>
           ) : encStatus.unlocked ? (
             <div className="mt-2 flex flex-col gap-1.5">
-              <div className="flex items-center gap-1.5 text-[10.5px] text-cyan">
+              <div className="flex items-center gap-1.5 text-[0.75rem] text-cyan">
                 <LockSimpleOpen size={12} weight="bold" /> Unlocked
               </div>
               <Button variant="ghost" onClick={handleLock} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
@@ -237,7 +237,7 @@ export function VaultPage() {
             </div>
           ) : (
             <div className="mt-2 flex flex-col gap-1.5">
-              <div className="flex items-center gap-1.5 text-[10.5px] text-warm">
+              <div className="flex items-center gap-1.5 text-[0.75rem] text-warm">
                 <LockSimple size={12} weight="bold" /> Locked
               </div>
               <Button variant="primary" onClick={handleUnlock} disabled={encBusy} className="w-full justify-start px-2.5 py-1.5 text-xs">
@@ -318,22 +318,22 @@ export function VaultPage() {
               <div key={group[0].name.trim().toLowerCase()} className="rounded-xl border border-rule-soft bg-glass px-3.5 py-3">
                 <div className="mb-2 flex items-center gap-2">
                   <span className="text-sm font-medium text-ink">{group[0].name}</span>
-                  {group.length > 1 && <span className="text-[10.5px] text-ink-faint">{group.length} environments</span>}
+                  {group.length > 1 && <span className="text-[0.75rem] text-ink-faint">{group.length} environments</span>}
                 </div>
                 <div className="flex flex-col gap-2">
                   {group.map((e) => (
                     <div key={e.id} className="group flex flex-col gap-1.5 rounded-lg border border-rule-soft bg-panel px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan">
+                        <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] font-medium uppercase tracking-wide text-cyan">
                           {e.environment}
                         </span>
                         {e.url && (
-                          <a href={e.url} target="_blank" rel="noreferrer" className="truncate text-[11.5px] text-cyan hover:underline">
+                          <a href={e.url} target="_blank" rel="noreferrer" className="truncate text-[0.8125rem] text-cyan hover:underline">
                             {e.url}
                           </a>
                         )}
                         <div className="ml-auto flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                          <button onClick={() => startEdit(e)} className="rounded-md px-2 py-1 text-[10.5px] text-ink-faint hover:bg-glass-strong hover:text-ink">
+                          <button onClick={() => startEdit(e)} className="rounded-md px-2 py-1 text-[0.75rem] text-ink-faint hover:bg-glass-strong hover:text-ink">
                             Edit
                           </button>
                           <button onClick={() => remove(e.id, e.name)} className="rounded-md p-1 text-ink-faint hover:text-rose">
@@ -341,9 +341,9 @@ export function VaultPage() {
                           </button>
                         </div>
                       </div>
-                      {e.username && <div className="text-[11.5px] text-ink-soft">user: <span className="font-mono">{e.username}</span></div>}
+                      {e.username && <div className="text-[0.8125rem] text-ink-soft">user: <span className="font-mono">{e.username}</span></div>}
                       <div className="flex items-center gap-1.5">
-                        <span className="flex-1 truncate rounded-lg bg-glass px-2.5 py-1.5 font-mono text-[12px] text-ink">
+                        <span className="flex-1 truncate rounded-lg bg-glass px-2.5 py-1.5 font-mono text-[0.875rem] text-ink">
                           {e.locked ? (
                             <span className="flex items-center gap-1.5 text-ink-faint"><LockSimple size={12} weight="bold" /> Locked — unlock the vault to view</span>
                           ) : revealed.has(e.id) ? (
@@ -359,7 +359,7 @@ export function VaultPage() {
                           <Copy size={14} weight="light" />
                         </button>
                       </div>
-                      {e.notes && <div className="text-[11px] text-ink-faint">{e.notes}</div>}
+                      {e.notes && <div className="text-[0.8125rem] text-ink-faint">{e.notes}</div>}
                     </div>
                   ))}
                 </div>

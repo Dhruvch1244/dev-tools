@@ -74,7 +74,7 @@ export function PartMergePage() {
               </div>
               <div>
                 <SectionLabel>Files merged, in order</SectionLabel>
-                <div className="flex flex-col gap-0.5 font-mono text-[11.5px] text-ink-soft">
+                <div className="flex flex-col gap-0.5 font-mono text-[0.8125rem] text-ink-soft">
                   {result.mergedFileNames.map((n, i) => <div key={i}>{n}</div>)}
                 </div>
               </div>
