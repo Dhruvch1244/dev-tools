@@ -49,7 +49,7 @@ export function ChangelogGeneratorPage() {
           <div className="flex flex-col gap-3 p-4">
             <SectionLabel>Paste git log output</SectionLabel>
             <div className="flex items-center justify-between gap-2 rounded-lg bg-glass px-2 py-1.5">
-              <code className="truncate text-[10px] text-ink-soft">{LOG_COMMAND}</code>
+              <code className="truncate text-[0.75rem] text-ink-soft">{LOG_COMMAND}</code>
               <CopyButton text={LOG_COMMAND} label="" />
             </div>
             <textarea
@@ -57,7 +57,7 @@ export function ChangelogGeneratorPage() {
               onChange={(e) => setText(e.target.value)}
               spellCheck={false}
               placeholder={SAMPLE}
-              className="h-56 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[11.5px] text-ink outline-none focus:border-cyan/50"
+              className="h-56 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.8125rem] text-ink outline-none focus:border-cyan/50"
             />
             <Button variant="ghost" onClick={() => setText(SAMPLE)}>Try a sample</Button>
             <SectionLabel>Section heading</SectionLabel>
@@ -67,7 +67,7 @@ export function ChangelogGeneratorPage() {
               onChange={(e) => setHeading(e.target.value)}
               placeholder="Unreleased, or v1.4.0 - 2026-09-17"
             />
-            <div className="text-[11px] text-ink-faint">
+            <div className="text-[0.8125rem] text-ink-faint">
               Groups Conventional-Commit-style subjects (<code>feat:</code>, <code>fix:</code>,
               <code> perf:</code>, …) into a Keep-a-Changelog section. Commits that don't follow
               that convention land under "Other". A <code>!</code> before the colon (e.g.{' '}
@@ -89,7 +89,7 @@ export function ChangelogGeneratorPage() {
         {entries.length > 0 && (
           <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex shrink-0 items-center justify-between gap-2 border-b border-rule-soft px-4 py-3">
-              <div className="text-[11px] text-ink-faint">
+              <div className="text-[0.8125rem] text-ink-faint">
                 {entries.length} commit(s) · {groups.length} type(s)
                 {breakingCount > 0 && <span className="text-rose"> · {breakingCount} breaking</span>}
               </div>
@@ -105,7 +105,7 @@ export function ChangelogGeneratorPage() {
               </div>
             </div>
             <div className="flex-1 overflow-auto p-4">
-              <pre className="whitespace-pre-wrap font-mono text-[12.5px] leading-relaxed text-ink-soft">{markdown}</pre>
+              <pre className="whitespace-pre-wrap font-mono text-[0.875rem] leading-relaxed text-ink-soft">{markdown}</pre>
             </div>
           </div>
         )}

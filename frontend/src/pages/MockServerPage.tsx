@@ -295,7 +295,7 @@ export function MockServerPage() {
               <MethodBadge method={r.method} />
               <button onClick={() => startEdit(r)} className="flex min-w-0 flex-1 flex-col text-left">
                 <span className={`truncate font-mono ${r.enabled ? 'text-ink' : 'text-ink-faint line-through'}`}>{r.path}</span>
-                <span className="text-[10.5px] text-ink-faint">
+                <span className="text-[0.75rem] text-ink-faint">
                   <StatusText status={r.status} />
                   {r.delayMs > 0 && ` · ${r.delayMs}ms`}
                   {r.headersJson && ' · headers'}
@@ -345,7 +345,7 @@ export function MockServerPage() {
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`rounded-lg px-3 py-1 text-[11px] font-medium transition-colors ${tab === t ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                className={`rounded-lg px-3 py-1 text-[0.8125rem] font-medium transition-colors ${tab === t ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
               >
                 {t === 'editor' ? 'Route' : `Request log${log.length ? ` · ${log.length}` : ''}`}
               </button>
@@ -395,7 +395,7 @@ export function MockServerPage() {
                     />
                   </div>
                 </div>
-                <div className="text-[11px] text-ink-faint">
+                <div className="text-[0.8125rem] text-ink-faint">
                   <span className="font-mono">{'{name}'}</span> captures a segment, <span className="font-mono">*</span> matches any one segment,
                   a trailing <span className="font-mono">/**</span> matches the rest. The most specific route wins.
                 </div>
@@ -444,7 +444,7 @@ export function MockServerPage() {
                 <div className="flex items-center justify-between">
                   <SectionLabel>Response body</SectionLabel>
                   {form.contentType.includes('json') && (
-                    <button onClick={formatBody} className="-mt-2 text-[11px] text-ink-faint hover:text-cyan">Format JSON</button>
+                    <button onClick={formatBody} className="-mt-2 text-[0.8125rem] text-ink-faint hover:text-cyan">Format JSON</button>
                   )}
                 </div>
                 <textarea
@@ -452,9 +452,9 @@ export function MockServerPage() {
                   onChange={(e) => setForm({ ...form, responseBody: e.target.value })}
                   spellCheck={false}
                   rows={12}
-                  className="resize-y rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink shadow-[var(--shadow-inset)] outline-none focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
+                  className="resize-y rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink shadow-[var(--shadow-inset)] outline-none focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
                 />
-                {bodyJsonError && <div className="-mt-1 text-[11px] text-warm">Not valid JSON yet: {bodyJsonError}</div>}
+                {bodyJsonError && <div className="-mt-1 text-[0.8125rem] text-warm">Not valid JSON yet: {bodyJsonError}</div>}
 
                 <SectionLabel>Response headers (JSON object, optional)</SectionLabel>
                 <textarea
@@ -463,9 +463,9 @@ export function MockServerPage() {
                   spellCheck={false}
                   rows={3}
                   placeholder={'{\n  "X-Request-Id": "{{uuid}}"\n}'}
-                  className="resize-y rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink shadow-[var(--shadow-inset)] outline-none focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
+                  className="resize-y rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink shadow-[var(--shadow-inset)] outline-none focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
                 />
-                {headersError && <div className="-mt-1 text-[11px] text-rose">{headersError}</div>}
+                {headersError && <div className="-mt-1 text-[0.8125rem] text-rose">{headersError}</div>}
 
                 <div className="flex flex-wrap gap-2">
                   <Button variant="primary" onClick={save} disabled={!form.path.trim() || !!headersError}>
@@ -500,7 +500,7 @@ export function MockServerPage() {
                           <PaperPlaneRight size={12} weight="light" /> {testing ? 'Sending…' : 'Send'}
                         </Button>
                       </div>
-                      <div className="mt-2 flex items-center gap-1 text-[11px] text-ink-faint">
+                      <div className="mt-2 flex items-center gap-1 text-[0.8125rem] text-ink-faint">
                         <span className="truncate font-mono">{shareUrl}{testPath}</span>
                         <CopyButton text={`${shareUrl}${testPath}`} label="" />
                       </div>
@@ -510,11 +510,11 @@ export function MockServerPage() {
                             <StatusText status={testResult.status} strong />
                             <span className="text-ink-faint">{testResult.ms} ms</span>
                           </div>
-                          <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-xl border border-rule-soft bg-surface p-3 font-mono text-[11.5px] text-ink">
+                          <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-xl border border-rule-soft bg-surface p-3 font-mono text-[0.8125rem] text-ink">
                             {testResult.body || '(empty body)'}
                           </pre>
                           {testResult.headers.length > 0 && (
-                            <details className="text-[11px] text-ink-faint">
+                            <details className="text-[0.8125rem] text-ink-faint">
                               <summary className="cursor-pointer">Response headers ({testResult.headers.length})</summary>
                               <div className="mt-1 font-mono">
                                 {testResult.headers.map(([k, v]) => (
@@ -533,7 +533,7 @@ export function MockServerPage() {
                   <SectionLabel>Templates</SectionLabel>
                   <div className="flex flex-col gap-1.5">
                     {TEMPLATE_HELP.map(([code, desc]) => (
-                      <div key={code} className="flex flex-wrap items-baseline gap-x-2 text-[11.5px]">
+                      <div key={code} className="flex flex-wrap items-baseline gap-x-2 text-[0.8125rem]">
                         <code className="font-mono text-cyan">{code}</code>
                         <span className="text-ink-faint">{desc}</span>
                       </div>
@@ -560,12 +560,12 @@ function EmptyState({ shareUrl, onNew, lanAvailable }: { shareUrl: string; onNew
           calls work out of the box (CORS preflights are answered), so a React/Angular dev server on another port or machine can use it too.
         </p>
       </div>
-      <ol className="flex flex-col gap-2 text-[13px] text-ink-soft">
+      <ol className="flex flex-col gap-2 text-[0.9375rem] text-ink-soft">
         <li><span className="mr-2 font-mono text-ink-faint">1</span>Create a route — pick a method, path, status and body.</li>
         <li><span className="mr-2 font-mono text-ink-faint">2</span>Open the URL or scan the QR code from your phone.</li>
         <li><span className="mr-2 font-mono text-ink-faint">3</span>Watch the Request log to see exactly what each device sent.</li>
       </ol>
-      <div className="rounded-2xl border border-rule-soft bg-panel p-3.5 text-[12px] leading-relaxed text-ink-soft">
+      <div className="rounded-2xl border border-rule-soft bg-panel p-3.5 text-[0.875rem] leading-relaxed text-ink-soft">
         <span className="font-medium text-ink">Can't connect from another device?</span> Both devices must be on the same network, and the
         OS firewall must allow Java to accept connections on port 8383 — on Windows, allow <span className="font-mono">java.exe</span> for
         Private networks when prompted (or in Windows Defender Firewall → Allow an app). Only <span className="font-mono">/mock/**</span> is
@@ -606,7 +606,7 @@ function RequestLog({
   }
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-[11px] text-ink-faint">
+      <div className="flex items-center gap-2 text-[0.8125rem] text-ink-faint">
         <span>Last {log.length} requests</span>
         {unmatchedCount > 0 && <span className="text-warm">· {unmatchedCount} matched no route</span>}
         <button onClick={onClear} className="ml-auto flex items-center gap-1 hover:text-rose">
@@ -614,8 +614,8 @@ function RequestLog({
         </button>
       </div>
       <div className="overflow-hidden rounded-2xl border border-rule-soft">
-        <table className="w-full text-left text-[12px]">
-          <thead className="bg-panel text-[10.5px] uppercase tracking-[0.08em] text-ink-faint">
+        <table className="w-full text-left text-[0.875rem]">
+          <thead className="bg-panel text-[0.75rem] uppercase tracking-[0.08em] text-ink-faint">
             <tr>
               <th className="px-3 py-2 font-medium">Time</th>
               <th className="px-3 py-2 font-medium">From</th>
@@ -638,14 +638,14 @@ function RequestLog({
                     <td className="px-3 py-1.5">
                       <span className="mr-2"><MethodBadge method={e.method} /></span>
                       <span className="font-mono text-ink">{e.path}{e.query ? `?${e.query}` : ''}</span>
-                      {!route && <span className="ml-2 text-[10.5px] text-warm">no match</span>}
+                      {!route && <span className="ml-2 text-[0.75rem] text-warm">no match</span>}
                     </td>
                     <td className="px-3 py-1.5"><StatusText status={e.status} /></td>
                     <td className="px-3 py-1.5 text-right font-mono text-ink-faint">{e.durationMs}</td>
                   </tr>
                   {expanded === e.seq && (
                     <tr className="border-t border-rule-soft bg-panel">
-                      <td colSpan={5} className="px-3 py-2.5 text-[11.5px]">
+                      <td colSpan={5} className="px-3 py-2.5 text-[0.8125rem]">
                         <div className="grid gap-1 text-ink-soft">
                           {route && <div>Matched <span className="font-mono text-ink">{route.method} {route.path}</span></div>}
                           {e.origin && <div>Origin <span className="font-mono text-ink">{e.origin}</span></div>}
@@ -688,7 +688,7 @@ function QrStrip({ url }: { url: string }) {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+    <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
       {label}
       {children}
     </label>
@@ -719,7 +719,7 @@ export function MethodBadge({ method }: { method: string }) {
     DELETE: 'bg-rose/12 text-rose',
   }
   return (
-    <span className={`inline-block w-14 shrink-0 rounded-md px-1.5 py-0.5 text-center font-mono text-[10px] font-semibold ${color[method] ?? 'bg-glass-strong text-ink-soft'}`}>
+    <span className={`inline-block w-14 shrink-0 rounded-md px-1.5 py-0.5 text-center font-mono text-[0.75rem] font-semibold ${color[method] ?? 'bg-glass-strong text-ink-soft'}`}>
       {method}
     </span>
   )

@@ -18,10 +18,10 @@ export function PlanView({ plan }: { plan: ParsedPlan }) {
       <div className="flex gap-2">
         {plan.rows.map((row, i) => (
           <div key={i} className="flex min-w-[10rem] shrink-0 flex-col gap-1 rounded-xl border border-rule-soft bg-glass p-2.5">
-            <div className="text-[10px] uppercase tracking-wide text-ink-faint">Step {i + 1}</div>
+            <div className="text-[0.75rem] uppercase tracking-wide text-ink-faint">Step {i + 1}</div>
             {row.map((cell, ci) =>
               cell === null || cell === '' ? null : (
-                <div key={ci} className="text-[11.5px] text-ink-soft">
+                <div key={ci} className="text-[0.8125rem] text-ink-soft">
                   <span className="text-ink-faint">{plan.columns[ci]}: </span>
                   <span className="font-mono text-ink">{String(cell)}</span>
                 </div>
@@ -41,8 +41,8 @@ function PlanNodeView({ node }: { node: PlanNode }) {
         style={{ marginLeft: node.depth * 20 }}
         className="flex items-center gap-2 rounded-lg border border-rule-soft bg-glass px-2.5 py-1.5"
       >
-        <span className="font-mono text-[12.5px] text-ink">{node.label}</span>
-        {node.detail && <span className="text-[10.5px] text-ink-faint">{node.detail}</span>}
+        <span className="font-mono text-[0.875rem] text-ink">{node.label}</span>
+        {node.detail && <span className="text-[0.75rem] text-ink-faint">{node.detail}</span>}
       </div>
       <div className="flex flex-col gap-1.5 pt-1.5">
         {node.children.map((c, i) => (

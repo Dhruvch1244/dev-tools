@@ -52,7 +52,7 @@ export function GitGraphPage() {
           <div className="flex flex-col gap-3 p-4">
             <SectionLabel>Paste git log output</SectionLabel>
             <div className="flex items-center justify-between gap-2 rounded-lg bg-glass px-2 py-1.5">
-              <code className="truncate text-[10px] text-ink-soft">{LOG_COMMAND}</code>
+              <code className="truncate text-[0.75rem] text-ink-soft">{LOG_COMMAND}</code>
               <CopyButton text={LOG_COMMAND} label="" />
             </div>
             <textarea
@@ -61,7 +61,7 @@ export function GitGraphPage() {
               spellCheck={false}
               rows={10}
               placeholder="Run the command above in your repo and paste its output here."
-              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[11px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
             <Button variant="ghost" onClick={() => setText(SAMPLE)}>Try a sample</Button>
             {error && <ErrorBanner message={error} />}
@@ -124,14 +124,14 @@ export function GitGraphPage() {
                   <button
                     onClick={() => navigator.clipboard.writeText(c.hash)}
                     title={`Copy full hash (${c.hash})`}
-                    className="flex shrink-0 items-center gap-1 font-mono text-[10.5px] text-ink-faint hover:text-cyan"
+                    className="flex shrink-0 items-center gap-1 font-mono text-[0.75rem] text-ink-faint hover:text-cyan"
                   >
                     {c.hash.slice(0, 7)}
                     <Copy size={10} weight="light" className="opacity-0 transition-opacity group-hover:opacity-100" />
                   </button>
                   <span className="truncate text-ink">{c.subject}</span>
-                  <span className="ml-auto shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
-                  <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                  <span className="ml-auto shrink-0 text-[0.75rem] text-ink-faint">{c.author}</span>
+                  <span className="shrink-0 text-[0.75rem] text-ink-faint">{c.date}</span>
                 </div>
               ))}
             </div>

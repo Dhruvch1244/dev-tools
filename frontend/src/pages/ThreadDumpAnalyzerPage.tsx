@@ -43,7 +43,7 @@ export function ThreadDumpAnalyzerPage() {
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
             placeholder='Paste the output of "jstack &lt;pid&gt;" or a "kill -3" dump here…'
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[11px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.8125rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
           />
           {text && <Button variant="ghost" onClick={() => setText('')}>Clear</Button>}
         </div>
@@ -66,7 +66,7 @@ export function ThreadDumpAnalyzerPage() {
                     <Warning size={16} weight="fill" /> {result.deadlockCycles.length} deadlock cycle{result.deadlockCycles.length > 1 ? 's' : ''} detected
                   </div>
                   {result.deadlockCycles.map((cycle, i) => (
-                    <div key={i} className="font-mono text-[11.5px] text-ink-soft">
+                    <div key={i} className="font-mono text-[0.8125rem] text-ink-soft">
                       {cycle.map((name, j) => (
                         <span key={j}>
                           <button onClick={() => setSelected(name)} className="text-cyan hover:underline">{name}</button>
@@ -83,7 +83,7 @@ export function ThreadDumpAnalyzerPage() {
               <div className="flex flex-wrap items-center gap-1.5 p-3">
                 <button
                   onClick={() => setStateFilter(null)}
-                  className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${stateFilter === null ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
+                  className={`rounded-full px-2.5 py-1 text-[0.8125rem] font-medium ${stateFilter === null ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass'}`}
                 >
                   All ({result.threads.length})
                 </button>
@@ -91,7 +91,7 @@ export function ThreadDumpAnalyzerPage() {
                   <button
                     key={state}
                     onClick={() => setStateFilter(state)}
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${stateFilter === state ? 'bg-glass-strong' : 'hover:bg-glass'}`}
+                    className={`rounded-full px-2.5 py-1 text-[0.8125rem] font-medium ${stateFilter === state ? 'bg-glass-strong' : 'hover:bg-glass'}`}
                     style={{ color: STATE_COLOR[state] }}
                   >
                     {state} ({count})
@@ -127,11 +127,11 @@ export function ThreadDumpAnalyzerPage() {
                     <>
                       <div className="mb-2 flex items-center gap-2">
                         <span className="font-mono text-sm text-ink">{selectedThread.name}</span>
-                        <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[10px] font-medium" style={{ color: STATE_COLOR[selectedThread.state] }}>
+                        <span className="rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] font-medium" style={{ color: STATE_COLOR[selectedThread.state] }}>
                           {selectedThread.state}
                         </span>
                       </div>
-                      <pre className="whitespace-pre-wrap break-all font-mono text-[11px] leading-relaxed text-ink-soft">
+                      <pre className="whitespace-pre-wrap break-all font-mono text-[0.8125rem] leading-relaxed text-ink-soft">
                         {selectedThread.stack.join('\n') || '(no stack frames captured)'}
                       </pre>
                     </>

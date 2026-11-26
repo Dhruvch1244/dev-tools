@@ -53,6 +53,26 @@ import {
   Warning,
   Wrench,
   X,
+  Rocket,
+  ArrowsCounterClockwise,
+  FlowArrow,
+  Sliders,
+  Cube,
+  Package,
+  Tag,
+  NetworkSlash,
+  Heartbeat,
+  Info,
+  TerminalWindow,
+  LinkSimple,
+  Path,
+  Code,
+  Binary,
+  Palette,
+  Ruler,
+  NotePencil,
+  Timer,
+  Sparkle,
 } from '@phosphor-icons/react'
 import { FileSearchPage } from './pages/FileSearchPage'
 import { JsonXmlPage } from './pages/JsonXmlPage'
@@ -107,6 +127,28 @@ import { JacocoViewerPage } from './pages/JacocoViewerPage'
 import { JwtInspectorPage } from './pages/JwtInspectorPage'
 import { OpenApiImportPage } from './pages/OpenApiImportPage'
 import { MigrationTimelinePage } from './pages/MigrationTimelinePage'
+import { JenkinsStudioPage } from './pages/JenkinsStudioPage'
+import { RehydrationBoardPage } from './pages/RehydrationBoardPage'
+import { JenkinsfileVizPage } from './pages/JenkinsfileVizPage'
+import { HelmValuesPage } from './pages/HelmValuesPage'
+import { K8sLintPage } from './pages/K8sLintPage'
+import { DockerfileLintPage } from './pages/DockerfileLintPage'
+import { SemverPage } from './pages/SemverPage'
+import { CidrPage } from './pages/CidrPage'
+import { HealthBoardPage } from './pages/HealthBoardPage'
+import { HttpReferencePage } from './pages/HttpReferencePage'
+import { CurlConvertPage } from './pages/CurlConvertPage'
+import { UrlParserPage } from './pages/UrlParserPage'
+import { JsonPathPage } from './pages/JsonPathPage'
+import { SqlFormatPage } from './pages/SqlFormatPage'
+import { BaseConvertPage } from './pages/BaseConvertPage'
+import { ColorStudioPage } from './pages/ColorStudioPage'
+import { UnitConvertPage } from './pages/UnitConvertPage'
+import { ScratchpadPage } from './pages/ScratchpadPage'
+import { FocusTimerPage } from './pages/FocusTimerPage'
+import { Backdrop } from './components/Backdrop'
+import { CursorFx } from './components/CursorFx'
+import { cycleTheme } from './lib/themes'
 // lazy: it wildcard-imports every @phosphor-icons/react icon (1500+), which would otherwise
 // bloat the main bundle by ~5MB for every page load, not just when this tool is opened.
 const IconLibraryPage = lazy(() => import('./pages/IconLibraryPage').then((m) => ({ default: m.IconLibraryPage })))
@@ -170,8 +212,27 @@ export type Tool =
   | 'postman-import'
   | 'openapi-import'
   | 'icon-library'
+  | 'jenkins'
+  | 'rehydration'
+  | 'jenkinsfile-viz'
+  | 'helm-values'
+  | 'k8s-lint'
+  | 'dockerfile-lint'
+  | 'semver'
+  | 'cidr'
+  | 'health-board'
+  | 'http-reference'
+  | 'curl-convert'
+  | 'url-parser'
+  | 'jsonpath'
+  | 'sql-format'
+  | 'base-convert'
+  | 'color-studio'
+  | 'unit-convert'
+  | 'scratchpad'
+  | 'focus-timer'
 
-export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType }
+export type ToolDef = { id: Tool; label: string; hint: string; icon: React.ElementType; isNew?: boolean }
 export type ToolGroup = { label: string; tools: ToolDef[] }
 
 export const GROUPS: ToolGroup[] = [
@@ -185,6 +246,28 @@ export const GROUPS: ToolGroup[] = [
   {
     label: 'Vault',
     tools: [{ id: 'vault', label: 'Vault', hint: 'secrets · urls · per environment', icon: LockKey }],
+  },
+  {
+    label: 'CI/CD & Release',
+    tools: [
+      { id: 'jenkins', label: 'Jenkins Pipeline Studio', hint: 'CI → CD → proceed → helm tag', icon: Rocket, isNew: true },
+      { id: 'rehydration', label: 'Rehydration Board', hint: 'helm tags per env · snapshots · redeploy', icon: ArrowsCounterClockwise, isNew: true },
+      { id: 'jenkinsfile-viz', label: 'Jenkinsfile Visualizer', hint: 'stages · parallel · inputs · lint', icon: FlowArrow, isNew: true },
+      { id: 'helm-values', label: 'Helm Values Merge', hint: 'layer values files · diff envs', icon: Sliders, isNew: true },
+      { id: 'k8s-lint', label: 'Kubernetes Manifest Lint', hint: 'limits · probes · :latest · summary', icon: Cube, isNew: true },
+      { id: 'dockerfile-lint', label: 'Dockerfile Linter', hint: 'best practices · layer view', icon: Package, isNew: true },
+      { id: 'semver', label: 'Semver Toolkit', hint: 'compare · bump · ranges', icon: Tag, isNew: true },
+    ],
+  },
+  {
+    label: 'Network & Ops',
+    tools: [
+      { id: 'health-board', label: 'Env Health Board', hint: 'ping DIT/UAT/PROD health URLs', icon: Heartbeat, isNew: true },
+      { id: 'cidr', label: 'CIDR / Subnet Calculator', hint: 'ranges · masks · split · contains', icon: NetworkSlash, isNew: true },
+      { id: 'curl-convert', label: 'cURL Converter', hint: 'curl → fetch · Java · Python · Spring', icon: TerminalWindow, isNew: true },
+      { id: 'url-parser', label: 'URL Parser & Builder', hint: 'parts · query params · encode', icon: LinkSimple, isNew: true },
+      { id: 'http-reference', label: 'HTTP Reference', hint: 'status codes · headers · methods', icon: Info, isNew: true },
+    ],
   },
   {
     label: 'Visualizers',
@@ -232,6 +315,18 @@ export const GROUPS: ToolGroup[] = [
       },
       { id: 'data-gen', label: 'Data Generator', hint: 'uuid · ulid · fake data', icon: Fingerprint },
       { id: 'command-templates', label: 'Command Templates', hint: 'fill-in-the-blank commands · history', icon: Terminal },
+      { id: 'jsonpath', label: 'JSONPath Playground', hint: 'query JSON live · $..items[?(@.x)]', icon: Path, isNew: true },
+      { id: 'sql-format', label: 'SQL Formatter', hint: 'pretty-print · minify · uppercase', icon: Code, isNew: true },
+      { id: 'base-convert', label: 'Base & Bitwise', hint: 'hex · bin · oct · dec · bit ops', icon: Binary, isNew: true },
+      { id: 'unit-convert', label: 'Unit Converter', hint: 'bytes · durations · rates', icon: Ruler, isNew: true },
+    ],
+  },
+  {
+    label: 'Focus & Design',
+    tools: [
+      { id: 'scratchpad', label: 'Scratchpad', hint: 'multi-tab autosaving notes', icon: NotePencil, isNew: true },
+      { id: 'focus-timer', label: 'Focus Timer', hint: 'pomodoro · stopwatch · countdown', icon: Timer, isNew: true },
+      { id: 'color-studio', label: 'Color Studio', hint: 'contrast · palettes · convert', icon: Palette, isNew: true },
     ],
   },
   {
@@ -279,7 +374,7 @@ export const GROUPS: ToolGroup[] = [
   },
 ]
 
-const ALL_TOOLS: ToolDef[] = GROUPS.flatMap((g) => g.tools)
+export const ALL_TOOLS: ToolDef[] = GROUPS.flatMap((g) => g.tools)
 const TOOL_DEFS: Record<Tool, ToolDef> = Object.fromEntries(ALL_TOOLS.map((t) => [t.id, t])) as Record<Tool, ToolDef>
 
 const FAVOURITES_KEY = 'devtools.favourite-tools'
@@ -349,6 +444,25 @@ function renderPage(tool: Tool, homeProps: { favourites: Tool[]; recents: Tool[]
     case 'mock-server': return <MockServerPage />
     case 'postman-import': return <PostmanImportPage />
     case 'openapi-import': return <OpenApiImportPage />
+    case 'jenkins': return <JenkinsStudioPage onOpenTool={homeProps.onOpenTool} />
+    case 'rehydration': return <RehydrationBoardPage />
+    case 'jenkinsfile-viz': return <JenkinsfileVizPage />
+    case 'helm-values': return <HelmValuesPage />
+    case 'k8s-lint': return <K8sLintPage />
+    case 'dockerfile-lint': return <DockerfileLintPage />
+    case 'semver': return <SemverPage />
+    case 'cidr': return <CidrPage />
+    case 'health-board': return <HealthBoardPage />
+    case 'http-reference': return <HttpReferencePage />
+    case 'curl-convert': return <CurlConvertPage />
+    case 'url-parser': return <UrlParserPage />
+    case 'jsonpath': return <JsonPathPage />
+    case 'sql-format': return <SqlFormatPage />
+    case 'base-convert': return <BaseConvertPage />
+    case 'color-studio': return <ColorStudioPage />
+    case 'unit-convert': return <UnitConvertPage />
+    case 'scratchpad': return <ScratchpadPage />
+    case 'focus-timer': return <FocusTimerPage />
     case 'icon-library': return <Suspense fallback={<div className="flex h-full items-center justify-center text-sm text-ink-faint">Loading icon set…</div>}><IconLibraryPage /></Suspense>
   }
 }
@@ -448,6 +562,9 @@ function App() {
       if (e.key.toLowerCase() === 'w') {
         e.preventDefault()
         closeTab(activeTab)
+      } else if (e.key.toLowerCase() === 't') {
+        e.preventDefault()
+        cycleTheme(e.shiftKey ? -1 : 1)
       } else if (e.key.toLowerCase() === 'b') {
         e.preventDefault()
         setSidebarOpen((v) => !v)
@@ -462,6 +579,16 @@ function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [openTabs, activeTab])
+
+  // Cross-tool navigation (e.g. Rehydration Board → "open this build in Pipeline Studio").
+  useEffect(() => {
+    function onOpen(e: Event) {
+      const id = (e as CustomEvent<string>).detail as Tool
+      if (TOOL_DEFS[id]) openTool(id)
+    }
+    window.addEventListener('devtools:open-tool', onOpen)
+    return () => window.removeEventListener('devtools:open-tool', onOpen)
+  })
 
   const paletteItems: PaletteItem<Tool>[] = useMemo(
     () => GROUPS.flatMap((group) => group.tools.map((t) => ({ id: t.id, label: t.label, hint: t.hint, group: group.label, icon: t.icon }))),
@@ -483,44 +610,53 @@ function App() {
     return () => ro.disconnect()
   }, [openTabs])
 
+  const activeDef = TOOL_DEFS[activeTab]
+  const totalTools = ALL_TOOLS.filter((t) => t.id !== 'home').length
+
   return (
     <div className="relative flex h-screen w-screen overflow-hidden bg-void text-ink">
-      <div className="bg-glow" />
+      <Backdrop />
       <div className="noise-overlay" />
+      <CursorFx />
 
       <aside
-        className="relative z-10 flex shrink-0 flex-col overflow-hidden border-r border-rule-soft bg-surface transition-[width] duration-200 ease-out"
-        style={{ width: sidebarOpen ? 240 : 0 }}
+        className="app-sidebar relative z-10 flex shrink-0 flex-col overflow-hidden border-r border-rule-soft bg-surface transition-[width] duration-300 ease-out"
+        style={{ width: sidebarOpen ? '17.5rem' : 0 }}
       >
-        <div className="flex h-full w-60 shrink-0 flex-col overflow-hidden">
+        <div className="flex h-full w-[17.5rem] shrink-0 flex-col overflow-hidden">
         <div className="shrink-0 p-3 pb-0">
-          <div className="mb-4 flex items-center gap-2 px-2 pt-2">
-            <CircleDashed size={18} weight="light" className="text-cyan" />
-            <div>
-              <div className="text-sm font-semibold tracking-tight">Dev Tools</div>
-              <div className="text-[10px] uppercase tracking-[0.16em] text-ink-faint">local · offline</div>
+          <button onClick={() => openTool('home')} className="group mb-4 flex w-full items-center gap-2.5 px-2 pt-2 text-left">
+            <span className="relative grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-glass ring-1 ring-glass-strong">
+              <CircleDashed size={24} weight="bold" className="brand-mark text-cyan" />
+              <Sparkle size={11} weight="fill" className="absolute -right-0.5 -top-0.5 text-rose" />
+            </span>
+            <div className="min-w-0">
+              <div className="font-display gradient-text text-[1.75rem] leading-none">Dev Tools</div>
+              <div className="mt-0.5 whitespace-nowrap text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-ink-faint">{totalTools} tools · offline</div>
             </div>
-          </div>
+          </button>
           <div className="flex items-center gap-1.5">
             <div className="flex-1"><CommandPalette items={paletteItems} onSelect={openTool} favourites={favourites} recents={recents} /></div>
             <GlobalSearch onOpenTool={(id) => openTool(id as Tool)} />
           </div>
           <div className="relative mt-2">
-            <MagnifyingGlass size={13} weight="light" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-faint" />
+            <MagnifyingGlass size={15} weight="bold" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
             <input
               value={navFilter}
               onChange={(e) => setNavFilter(e.target.value)}
               placeholder="Filter tools…"
               aria-label="Filter tools"
-              className="w-full rounded-xl border border-rule bg-panel py-1.5 pl-7 pr-2 text-xs text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
+              className="w-full rounded-xl border border-rule bg-panel py-2 pl-9 pr-2 text-[0.875rem] text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 pb-2">
           {filteredFavourites.length > 0 && (
-            <nav className="flex flex-col gap-1 pb-2">
-              <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-warm">Favourites</div>
+            <nav className="flex flex-col gap-0.5 pb-2">
+              <div className="flex items-center gap-1.5 px-3 pb-1 pt-3 text-[0.75rem] font-bold uppercase tracking-[0.14em] text-warm">
+                <Star size={11} weight="fill" /> Favourites
+              </div>
               {filteredFavourites.map((t) => (
                 <NavRow key={t.id} tool={t} active={activeTab === t.id} isFavourite onOpen={openTool} onToggleFavourite={toggleFavourite} />
               ))}
@@ -528,12 +664,12 @@ function App() {
           )}
 
           {navQuery && filteredGroups.length === 0 && (
-            <div className="px-3 py-6 text-center text-xs text-ink-faint">No tools match "{navFilter.trim()}"</div>
+            <div className="px-3 py-6 text-center text-[0.875rem] text-ink-faint">No tools match "{navFilter.trim()}"</div>
           )}
 
           {filteredGroups.map((group) => (
-            <nav key={group.label} className="flex flex-col gap-1 pb-2">
-              <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
+            <nav key={group.label} className="flex flex-col gap-0.5 pb-2">
+              <div className="px-3 pb-1 pt-3 text-[0.75rem] font-bold uppercase tracking-[0.14em] text-ink-faint">
                 {group.label}
               </div>
               {group.tools.map((t) => (
@@ -556,15 +692,15 @@ function App() {
         </div>
       </aside>
 
-      <main className="relative z-10 flex flex-1 flex-col overflow-hidden p-3 md:p-5">
+      <main className="relative z-10 flex min-w-0 flex-1 flex-col overflow-hidden p-3 md:p-5">
         <div className="mb-3 flex shrink-0 items-center gap-1">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             title={`${sidebarOpen ? 'Hide' : 'Show'} sidebar (Alt+B)`}
             aria-label={`${sidebarOpen ? 'Hide' : 'Show'} sidebar`}
-            className="shrink-0 rounded-xl p-1.5 text-ink-faint transition-colors hover:bg-glass hover:text-ink"
+            className="shrink-0 rounded-xl p-2 text-ink-faint transition-colors hover:bg-glass hover:text-ink"
           >
-            <SidebarSimple size={16} weight="light" />
+            <SidebarSimple size={19} weight="bold" />
           </button>
           {openTabs.length > 1 && (
             <>
@@ -579,25 +715,32 @@ function App() {
                     key={id}
                     onClick={() => setActiveTab(id)}
                     title="Alt+] / Alt+[ to cycle tabs, Alt+W to close"
-                    className={`group flex shrink-0 items-center gap-2 rounded-xl px-3 py-1.5 text-xs transition-colors ${
-                      active ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:bg-glass hover:text-ink-soft'
+                    className={`group relative flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-[0.875rem] font-medium transition-colors ${
+                      active ? 'text-ink' : 'text-ink-faint hover:bg-glass hover:text-ink-soft'
                     }`}
                   >
-                    <Icon size={13} weight="light" className={active ? 'text-cyan' : ''} />
-                    {t.label}
+                    {active && (
+                      <motion.span
+                        layoutId="tab-active"
+                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                        className="nav-active-pill absolute inset-0 rounded-xl"
+                      />
+                    )}
+                    <Icon size={15} weight={active ? 'duotone' : 'light'} className={`relative ${active ? 'text-cyan' : ''}`} />
+                    <span className="relative">{t.label}</span>
                     <Star
-                      size={11}
+                      size={12}
                       weight={isFav ? 'fill' : 'light'}
-                      className={`transition-opacity ${isFav ? 'text-warm' : 'opacity-0 hover:text-warm group-hover:opacity-100'}`}
+                      className={`relative transition-opacity ${isFav ? 'text-warm' : 'opacity-0 hover:text-warm group-hover:opacity-100'}`}
                       onClick={(e) => {
                         e.stopPropagation()
                         toggleFavourite(id)
                       }}
                     />
                     <X
-                      size={11}
+                      size={12}
                       weight="bold"
-                      className="opacity-0 transition-opacity hover:text-rose group-hover:opacity-100"
+                      className="relative opacity-0 transition-opacity hover:text-rose group-hover:opacity-100"
                       onClick={(e) => {
                         e.stopPropagation()
                         closeTab(id)
@@ -611,15 +754,15 @@ function App() {
               <div className="relative shrink-0">
                 <button
                   onClick={() => setTabOverflowOpen((v) => !v)}
-                  className="flex items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] text-ink-faint transition-colors hover:bg-glass hover:text-ink-soft"
+                  className="flex items-center gap-0.5 rounded-xl px-2 py-2 text-[0.8125rem] text-ink-faint transition-colors hover:bg-glass hover:text-ink-soft"
                   title="More open tabs"
                 >
-                  <CaretDown size={11} weight="bold" />
+                  <CaretDown size={13} weight="bold" />
                 </button>
                 {tabOverflowOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setTabOverflowOpen(false)} />
-                    <div className="absolute right-0 top-full z-50 mt-1 flex max-h-72 w-56 flex-col gap-0.5 overflow-auto rounded-xl border border-rule bg-surface p-1.5 shadow-2xl">
+                    <div className="absolute right-0 top-full z-50 mt-1 flex max-h-80 w-64 flex-col gap-0.5 overflow-auto rounded-xl border border-rule bg-surface p-1.5 shadow-2xl">
                       {openTabs.map((id) => {
                         const t = TOOL_DEFS[id]
                         const Icon = t.icon
@@ -630,11 +773,11 @@ function App() {
                               setActiveTab(id)
                               setTabOverflowOpen(false)
                             }}
-                            className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs transition-colors ${
+                            className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[0.875rem] transition-colors ${
                               id === activeTab ? 'bg-glass-strong text-ink' : 'text-ink-soft hover:bg-glass'
                             }`}
                           >
-                            <Icon size={13} weight="light" className={id === activeTab ? 'text-cyan' : 'text-ink-faint'} />
+                            <Icon size={15} weight="light" className={id === activeTab ? 'text-cyan' : 'text-ink-faint'} />
                             <span className="truncate">{t.label}</span>
                           </button>
                         )
@@ -646,7 +789,7 @@ function App() {
             )}
             <button
               onClick={() => setOpenTabs([activeTab])}
-              className="shrink-0 whitespace-nowrap rounded-xl px-2.5 py-1.5 text-[11px] text-ink-faint transition-colors hover:bg-glass hover:text-ink-soft"
+              className="shrink-0 whitespace-nowrap rounded-xl px-2.5 py-2 text-[0.8125rem] text-ink-faint transition-colors hover:bg-glass hover:text-ink-soft"
               title="Close all other tabs"
             >
               Close others
@@ -655,14 +798,36 @@ function App() {
           )}
         </div>
 
-        <div className="relative flex-1 overflow-hidden">
+        {activeTab !== 'home' && activeDef && <ToolHeader key={activeTab} tool={activeDef} />}
+
+        <div className="relative min-h-0 flex-1 overflow-hidden">
           {openTabs.map((id) => (
-            <div key={id} className="absolute inset-0" style={{ display: id === activeTab ? 'block' : 'none' }}>
+            <div key={id} className="page-slot absolute inset-0" style={{ display: id === activeTab ? 'block' : 'none' }}>
               {renderPage(id, { favourites, recents, onOpenTool: openTool })}
             </div>
           ))}
         </div>
       </main>
+    </div>
+  )
+}
+
+function ToolHeader({ tool }: { tool: ToolDef }) {
+  const Icon = tool.icon
+  return (
+    <div className="mb-3 flex min-w-0 shrink-0 items-center gap-3">
+      <span className="tool-header-chip">
+        <Icon size={21} weight="duotone" />
+      </span>
+      <div className="tool-header-title min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <h1 className="font-display gradient-text m-0 truncate text-[1.85rem] leading-none">{tool.label}</h1>
+          {tool.isNew && (
+            <span className="shrink-0 rounded-full bg-rose px-2 py-0.5 text-[0.6875rem] font-extrabold uppercase tracking-wider text-[var(--on-accent)]">new</span>
+          )}
+        </div>
+        <div className="truncate text-[0.875rem] text-ink-faint">{tool.hint}</div>
+      </div>
     </div>
   )
 }
@@ -683,24 +848,27 @@ function NavRow({
   const Icon = tool.icon
   return (
     <motion.div
-      initial={{ opacity: 0, x: -8 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      whileHover={{ x: active ? 0 : 2 }}
-      className="group relative rounded-2xl"
+      whileHover={{ x: active ? 0 : 3 }}
+      className="nav-row group relative rounded-2xl"
     >
       {active && (
         <motion.div
           layoutId="nav-active"
           transition={{ type: 'spring', stiffness: 400, damping: 32 }}
-          className="absolute inset-0 rounded-2xl bg-glass-strong ring-1 ring-glass-strong"
+          className="nav-active-pill absolute inset-0 rounded-2xl"
         />
       )}
-      <button onClick={() => onOpen(tool.id)} className="relative flex w-full items-center gap-2.5 px-3 py-2.5 text-left">
-        <Icon size={16} weight="light" className={active ? 'text-cyan' : 'text-ink-faint'} />
-        <div className="flex-1">
-          <div className={`text-[13px] font-medium ${active ? 'text-ink' : 'text-ink-soft'}`}>{tool.label}</div>
-          <div className="text-[10.5px] text-ink-faint">{tool.hint}</div>
+      <button onClick={() => onOpen(tool.id)} className="relative flex w-full items-center gap-3 py-2 pl-3 pr-8 text-left">
+        <Icon size={19} weight={active ? 'duotone' : 'light'} className={`nav-icon shrink-0 ${active ? 'text-cyan' : 'text-ink-faint group-hover:text-ink-soft'}`} />
+        <div className="min-w-0 flex-1">
+          <div className={`flex items-center gap-1.5 text-[0.9375rem] font-semibold leading-tight ${active ? 'text-ink' : 'text-ink-soft'}`}>
+            <span className="truncate">{tool.label}</span>
+            {tool.isNew && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-rose pulse-dot" title="New" />}
+          </div>
+          <div className="truncate text-[0.8125rem] leading-snug text-ink-faint">{tool.hint}</div>
         </div>
       </button>
       <button
@@ -714,7 +882,7 @@ function NavRow({
         title={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
         aria-label={isFavourite ? `Remove ${tool.label} from favourites` : `Add ${tool.label} to favourites`}
       >
-        <Star size={13} weight={isFavourite ? 'fill' : 'light'} />
+        <Star size={14} weight={isFavourite ? 'fill' : 'light'} />
       </button>
     </motion.div>
   )

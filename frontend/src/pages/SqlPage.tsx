@@ -338,7 +338,7 @@ export function SqlPage() {
               </button>
             </div>
             {activeConnection && (
-              <div className="mb-1 flex items-center gap-1.5 text-[11px] text-ink-faint">
+              <div className="mb-1 flex items-center gap-1.5 text-[0.8125rem] text-ink-faint">
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: activeConnection.colorTag ?? '#2fe6f2' }} />
                 {activeConnection.driver} · {activeConnection.readOnly ? 'read-only' : 'read-write'}
               </div>
@@ -361,7 +361,7 @@ export function SqlPage() {
                 <button
                   key={id}
                   onClick={() => setTab(id)}
-                  className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-[10.5px] font-medium transition-colors ${
+                  className={`flex flex-1 items-center justify-center gap-1 rounded-lg py-1.5 text-[0.75rem] font-medium transition-colors ${
                     tab === id ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                   }`}
                 >
@@ -405,7 +405,7 @@ export function SqlPage() {
                 {schema.length === 0 && <div className="p-2 text-ink-faint">Pick a connection to browse its schema.</div>}
                 {schema.map((s) => (
                   <div key={s.name}>
-                    <div className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wide text-ink-faint">{s.name}</div>
+                    <div className="mb-1 px-1 text-[0.75rem] font-semibold uppercase tracking-wide text-ink-faint">{s.name}</div>
                     {s.tables.map((t) => (
                       <SchemaTableRow key={t.name} table={t} />
                     ))}
@@ -427,7 +427,7 @@ export function SqlPage() {
                   </div>
                 )}
                 {erActiveSchema && (
-                  <div className="text-[11px] text-ink-faint">
+                  <div className="text-[0.8125rem] text-ink-faint">
                     {erActiveSchema.tables.length} tables · {erFkCount} foreign key relationship{erFkCount === 1 ? '' : 's'}
                   </div>
                 )}
@@ -445,7 +445,7 @@ export function SqlPage() {
                     className="flex flex-col gap-0.5 rounded-xl border border-rule-soft bg-glass px-2.5 py-2 text-left text-xs hover:border-rule"
                   >
                     <span className="truncate font-mono text-ink-soft">{r.sqlText}</span>
-                    <span className={`text-[10px] ${r.status === 'ERROR' ? 'text-rose' : 'text-ink-faint'}`}>
+                    <span className={`text-[0.75rem] ${r.status === 'ERROR' ? 'text-rose' : 'text-ink-faint'}`}>
                       {r.status} · {r.rowCount} rows · {r.durationMs}ms · {new Date(r.executedAt).toLocaleTimeString()}
                     </span>
                   </button>
@@ -461,7 +461,7 @@ export function SqlPage() {
                     <button onClick={() => viewSample(s)} className="flex-1 truncate text-left text-ink-soft hover:text-ink">
                       {s.label}
                     </button>
-                    <span className="shrink-0 text-[10px] text-ink-faint">{s.rowCount} rows</span>
+                    <span className="shrink-0 text-[0.75rem] text-ink-faint">{s.rowCount} rows</span>
                     <button onClick={() => removeSample(s.id, s.label)} className="shrink-0 text-ink-faint opacity-0 transition-opacity hover:text-rose group-hover:opacity-100">
                       <Trash size={11} weight="light" />
                     </button>
@@ -508,7 +508,7 @@ export function SqlPage() {
               spellCheck={false}
               rows={7}
               placeholder="SELECT * FROM orders WHERE status = :status"
-              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
+              className="w-full resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] leading-relaxed text-ink outline-none transition-shadow focus:border-cyan/50 focus:shadow-[var(--focus-ring)]"
             />
             {suggest && filteredSuggestions.length > 0 && (
               <div
@@ -527,7 +527,7 @@ export function SqlPage() {
                     }`}
                   >
                     <span className="truncate font-mono text-cyan">{s.label}</span>
-                    <span className="shrink-0 truncate text-[10px] text-ink-faint">{s.detail}</span>
+                    <span className="shrink-0 truncate text-[0.75rem] text-ink-faint">{s.detail}</span>
                   </button>
                 ))}
               </div>
@@ -539,13 +539,13 @@ export function SqlPage() {
               {lintIssues.map((issue, i) => (
                 <div
                   key={i}
-                  className={`flex items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-[11.5px] ${
+                  className={`flex items-start gap-1.5 rounded-lg px-2.5 py-1.5 text-[0.8125rem] ${
                     issue.severity === 'error' ? 'bg-rose/[0.08] text-rose' : 'bg-warm/[0.08] text-warm'
                   }`}
                 >
                   <Warning size={13} weight="fill" className="mt-0.5 shrink-0" />
                   <span>
-                    <span className="font-mono opacity-70">L{issue.line}</span> {issue.message}
+                    <span className="font-mono font-semibold">L{issue.line}</span> {issue.message}
                   </span>
                 </div>
               ))}
@@ -605,7 +605,7 @@ export function SqlPage() {
                         <button
                           key={v}
                           onClick={() => setResultView(v)}
-                          className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10.5px] capitalize transition-colors ${
+                          className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[0.75rem] capitalize transition-colors ${
                             resultView === v ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                           }`}
                         >
@@ -635,7 +635,7 @@ export function SqlPage() {
                 </div>
               ) : (
                 <div className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel">
-                  <table className="w-full text-left text-[12.5px]">
+                  <table className="w-full text-left text-[0.875rem]">
                     <thead className="sticky top-0 bg-panel">
                       <tr>
                         {result.columns.map((c) => (
@@ -701,7 +701,7 @@ export function SqlPage() {
               </Button>
             </div>
             <div className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel">
-              <table className="w-full text-left text-[12.5px]">
+              <table className="w-full text-left text-[0.875rem]">
                 <thead className="sticky top-0 bg-panel">
                   <tr>
                     {sampleView.columns.map((c) => (

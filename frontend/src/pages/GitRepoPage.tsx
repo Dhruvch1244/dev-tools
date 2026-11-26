@@ -165,7 +165,7 @@ export function GitRepoPage() {
             <Button variant="primary" onClick={addRepo} disabled={!addPath.trim()}>
               <Plus size={14} weight="bold" /> Add
             </Button>
-            <div className="text-[10.5px] text-ink-faint">Read-only overview, fetch, and branch switching. Never commits or pushes.</div>
+            <div className="text-[0.75rem] text-ink-faint">Read-only overview, fetch, and branch switching. Never commits or pushes.</div>
           </div>
         </Panel>
 
@@ -210,13 +210,13 @@ export function GitRepoPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-ink">{overview.label}</div>
-                  <div className="truncate font-mono text-[10.5px] text-ink-faint">{overview.path}</div>
+                  <div className="truncate font-mono text-[0.75rem] text-ink-faint">{overview.path}</div>
                 </div>
-                <span className="flex items-center gap-1 rounded-full bg-glass-strong px-2.5 py-1 text-[11px] text-cyan">
+                <span className="flex items-center gap-1 rounded-full bg-glass-strong px-2.5 py-1 text-[0.8125rem] text-cyan">
                   <GitBranch size={12} weight="light" /> {overview.branch}
                 </span>
                 {(overview.ahead != null || overview.behind != null) && (
-                  <span className="flex items-center gap-1 rounded-full bg-glass px-2.5 py-1 text-[11px] text-ink-soft">
+                  <span className="flex items-center gap-1 rounded-full bg-glass px-2.5 py-1 text-[0.8125rem] text-ink-soft">
                     <ArrowsDownUp size={12} weight="light" />
                     {overview.ahead ? `↑${overview.ahead} ` : ''}{overview.behind ? `↓${overview.behind}` : ''}
                     {!overview.ahead && !overview.behind ? 'up to date' : ''}
@@ -244,7 +244,7 @@ export function GitRepoPage() {
                             status.includes('A') ? 'text-emerald' :
                             'text-warm'
                           return (
-                            <div key={i} title={f} className="flex items-center gap-2 rounded bg-glass px-2 py-1 text-[11px]">
+                            <div key={i} title={f} className="flex items-center gap-2 rounded bg-glass px-2 py-1 text-[0.8125rem]">
                               <span className={`w-6 shrink-0 font-mono font-semibold ${color}`}>{status}</span>
                               <span className="min-w-0 flex-1 truncate font-mono text-ink-soft">{path}</span>
                             </div>
@@ -262,7 +262,7 @@ export function GitRepoPage() {
                       <div className="text-xs text-ink-faint">No remotes configured.</div>
                     ) : (
                       overview.remotes.map((r, i) => (
-                        <div key={i} className="flex items-center justify-between gap-2 rounded bg-glass px-2 py-1 text-[11px]">
+                        <div key={i} className="flex items-center justify-between gap-2 rounded bg-glass px-2 py-1 text-[0.8125rem]">
                           <span className="shrink-0 font-medium text-ink-soft">{r.name}</span>
                           <span className="truncate font-mono text-ink-faint">{r.url}</span>
                         </div>
@@ -272,7 +272,7 @@ export function GitRepoPage() {
                       <>
                         <SectionLabel>Stash</SectionLabel>
                         {overview.stashes.map((s, i) => (
-                          <div key={i} className="truncate rounded bg-glass px-2 py-1 text-[11px] text-ink-soft">
+                          <div key={i} className="truncate rounded bg-glass px-2 py-1 text-[0.8125rem] text-ink-soft">
                             <span className="font-mono text-ink-faint">{s.ref}</span> {s.message}
                           </div>
                         ))}
@@ -291,14 +291,14 @@ export function GitRepoPage() {
                     <div className="flex items-center gap-2">
                       {overview.branches.length > 8 && (
                         <input
-                          className="devtools-input h-6 w-32 py-0 text-[10.5px]"
+                          className="devtools-input h-6 w-32 py-0 text-[0.75rem]"
                           placeholder="Filter branches…"
                           value={branchFilter}
                           onChange={(e) => setBranchFilter(e.target.value)}
                         />
                       )}
                       {overview.branches.length > 8 && !branchFilter.trim() && (
-                        <button onClick={() => setShowAllBranches((v) => !v)} className="text-[10.5px] text-cyan hover:underline">
+                        <button onClick={() => setShowAllBranches((v) => !v)} className="text-[0.75rem] text-cyan hover:underline">
                           {showAllBranches ? 'Show less' : `Show all ${overview.branches.length}`}
                         </button>
                       )}
@@ -308,7 +308,7 @@ export function GitRepoPage() {
                     {visibleBranches.map((b, i) => (
                       <span
                         key={i}
-                        className={`group flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] ${b.current ? 'bg-glass-strong text-cyan' : 'bg-glass text-ink-soft'}`}
+                        className={`group flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.8125rem] ${b.current ? 'bg-glass-strong text-cyan' : 'bg-glass text-ink-soft'}`}
                       >
                         {!b.current && (
                           <button
@@ -341,13 +341,13 @@ export function GitRepoPage() {
                       <div className="flex gap-0.5 rounded-lg border border-rule bg-panel p-0.5">
                         <button
                           onClick={() => setCommitView('list')}
-                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium ${commitView === 'list' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[0.75rem] font-medium ${commitView === 'list' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
                         >
                           <ListBullets size={12} weight="light" /> List
                         </button>
                         <button
                           onClick={() => setCommitView('graph')}
-                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium ${commitView === 'graph' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                          className={`flex items-center gap-1 rounded-md px-2 py-1 text-[0.75rem] font-medium ${commitView === 'graph' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
                         >
                           <ShareNetwork size={12} weight="light" /> Graph
                         </button>
@@ -359,10 +359,10 @@ export function GitRepoPage() {
                   {commitView === 'list' ? (
                     overview.recentCommits.map((c) => (
                       <div key={c.hash} className="flex items-center gap-3 border-l-2 border-rule-soft py-1 pl-3 text-xs">
-                        <span className="font-mono text-[10.5px] text-ink-faint">{c.hash.slice(0, 7)}</span>
+                        <span className="font-mono text-[0.75rem] text-ink-faint">{c.hash.slice(0, 7)}</span>
                         <span className="flex-1 truncate text-ink">{c.subject}</span>
-                        <span className="shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
-                        <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                        <span className="shrink-0 text-[0.75rem] text-ink-faint">{c.author}</span>
+                        <span className="shrink-0 text-[0.75rem] text-ink-faint">{c.date}</span>
                       </div>
                     ))
                   ) : commitGraph && commitGraph.commits.length > 0 ? (
@@ -401,10 +401,10 @@ export function GitRepoPage() {
                       <div className="flex-1">
                         {commitGraph.commits.map((c) => (
                           <div key={c.hash} className="flex items-center gap-3 pr-2 text-xs" style={{ height: ROW_H }}>
-                            <span className="font-mono text-[10.5px] text-ink-faint">{c.hash.slice(0, 7)}</span>
+                            <span className="font-mono text-[0.75rem] text-ink-faint">{c.hash.slice(0, 7)}</span>
                             <span className="flex-1 truncate text-ink">{c.subject}</span>
-                            <span className="shrink-0 text-[10.5px] text-ink-faint">{c.author}</span>
-                            <span className="shrink-0 text-[10.5px] text-ink-faint">{c.date}</span>
+                            <span className="shrink-0 text-[0.75rem] text-ink-faint">{c.author}</span>
+                            <span className="shrink-0 text-[0.75rem] text-ink-faint">{c.date}</span>
                           </div>
                         ))}
                       </div>

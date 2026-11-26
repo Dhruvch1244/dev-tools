@@ -57,6 +57,16 @@ jobs:
           version=${latest#v}
           IFS='.' read -r major minor patch <<< "$version"
           next="v${major}.${minor}.$((patch + 1))"
+          # A RELEASE_VERSION file (e.g. "6.1.0") requests a minor/major bump for a feature
+          # release. It's used only if that tag doesn't exist yet and it's newer than the latest
+          # tag — so once released, later merges fall back to plain patch bumps automatically.
+          if [ -f RELEASE_VERSION ]; then
+            wanted="v$(tr -d '[:space:]' < RELEASE_VERSION)"
+            if [[ "$wanted" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && ! git rev-parse -q --verify "refs/tags/$wanted" >/dev/null \
+               && [ "$(printf '%s\n%s\n' "${latest#v}" "${wanted#v}" | sort -V | tail -1)" = "${wanted#v}" ]; then
+              next="$wanted"
+            fi
+          fi
           echo "tag=$next" >> "$GITHUB_OUTPUT"
           echo "Next release: $next (previous: $latest)"
 

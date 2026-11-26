@@ -87,7 +87,7 @@ function OptimizeTab() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
           />
         </div>
       </Panel>
@@ -115,7 +115,7 @@ function OptimizeTab() {
                 readOnly
                 value={result.svg}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none"
               />
             </>
           )}
@@ -167,13 +167,13 @@ function ConvertTab() {
           <div className="flex gap-1 rounded-xl border border-rule bg-panel p-1">
             <button
               onClick={() => setDirection('svg-to-raster')}
-              className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium ${direction === 'svg-to-raster' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+              className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium ${direction === 'svg-to-raster' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
             >
               SVG → PNG/JPG
             </button>
             <button
               onClick={() => setDirection('raster-to-svg')}
-              className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium ${direction === 'raster-to-svg' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+              className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium ${direction === 'raster-to-svg' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
             >
               Raster → SVG (embed)
             </button>
@@ -186,19 +186,19 @@ function ConvertTab() {
                 value={svgInput}
                 onChange={(e) => setSvgInput(e.target.value)}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
               <div className="flex items-center gap-2">
                 {(['png', 'jpeg'] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setFormat(f)}
-                    className={`rounded-lg px-2.5 py-1.5 text-[11px] font-medium uppercase ${format === f ? 'bg-glass-strong text-ink' : 'bg-glass text-ink-faint hover:text-ink-soft'}`}
+                    className={`rounded-lg px-2.5 py-1.5 text-[0.8125rem] font-medium uppercase ${format === f ? 'bg-glass-strong text-ink' : 'bg-glass text-ink-faint hover:text-ink-soft'}`}
                   >
                     {f}
                   </button>
                 ))}
-                <label className="ml-auto flex items-center gap-2 text-[11px] text-ink-soft">
+                <label className="ml-auto flex items-center gap-2 text-[0.8125rem] text-ink-soft">
                   Scale
                   <input type="range" min={1} max={4} step={0.5} value={scale} onChange={(e) => setScale(Number(e.target.value))} className="accent-cyan" />
                   <span className="font-mono text-ink-faint">{scale}×</span>
@@ -213,7 +213,7 @@ function ConvertTab() {
                 <span className="truncate">{rasterFile ? rasterFile.name : 'Choose an image…'}</span>
                 <input type="file" accept="image/*" onChange={(e) => setRasterFile(e.target.files?.[0] ?? null)} className="hidden" />
               </label>
-              <div className="text-[10.5px] text-ink-faint">Wraps the raster in an SVG container (base64 embedded) — not a real vectorization. For that, use the Trace tab.</div>
+              <div className="text-[0.75rem] text-ink-faint">Wraps the raster in an SVG container (base64 embedded) — not a real vectorization. For that, use the Trace tab.</div>
             </>
           )}
 
@@ -244,7 +244,7 @@ function ConvertTab() {
               <div className="flex flex-1 items-center justify-center overflow-hidden rounded-2xl border border-rule bg-panel p-2">
                 <img src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(resultText)))}`} alt="result" className="max-h-full max-w-full object-contain" />
               </div>
-              <div className="flex items-center justify-between text-[11px] text-ink-faint">
+              <div className="flex items-center justify-between text-[0.8125rem] text-ink-faint">
                 <span>{formatBytes(resultText.length)}</span>
                 <div className="flex items-center gap-2">
                   <CopyButton text={resultText} />
@@ -283,7 +283,7 @@ function EditorTab() {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
           />
         </div>
       </Panel>
@@ -352,7 +352,7 @@ function TraceTab() {
             <input type="file" accept="image/*" onChange={(e) => pick(e.target.files?.[0] ?? null)} className="hidden" />
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+          <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
             <div className="flex items-center justify-between">
               <span>Colors</span>
               <span className="font-mono text-ink-faint">{colors}</span>
@@ -360,7 +360,7 @@ function TraceTab() {
             <input type="range" min={2} max={24} value={colors} onChange={(e) => setColors(Number(e.target.value))} className="accent-cyan" />
           </label>
 
-          <label className="flex flex-col gap-1 text-[11px] text-ink-soft">
+          <label className="flex flex-col gap-1 text-[0.8125rem] text-ink-soft">
             <div className="flex items-center justify-between">
               <span>Detail (working resolution)</span>
               <span className="font-mono text-ink-faint">{maxDimension}px</span>
@@ -368,7 +368,7 @@ function TraceTab() {
             <input type="range" min={24} max={256} step={8} value={maxDimension} onChange={(e) => setMaxDimension(Number(e.target.value))} className="accent-cyan" />
           </label>
 
-          <div className="text-[10.5px] text-ink-faint">
+          <div className="text-[0.75rem] text-ink-faint">
             Traces smooth curved outlines (contour tracing + Bezier fitting) around each flat color region, holes included —
             works best on flat-color logos/icons, not photos. Higher detail = more anchor points = larger file.
           </div>
@@ -400,7 +400,7 @@ function TraceTab() {
               >
                 <img src={previewUrl} alt="traced" className="max-h-full max-w-full object-contain" />
               </div>
-              <div className="mt-2 flex items-center justify-between text-[11px] text-ink-faint">
+              <div className="mt-2 flex items-center justify-between text-[0.8125rem] text-ink-faint">
                 <span>{formatBytes(result.svg.length)} · {result.width}×{result.height}</span>
                 <div className="flex items-center gap-2">
                   <CopyButton text={result.svg} />

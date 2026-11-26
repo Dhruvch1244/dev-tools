@@ -114,7 +114,7 @@ export function ErDiagram({ tables }: { tables: TableNode[] }) {
                 {t.columns.map((c) => {
                   const isFk = t.foreignKeys.some((fk) => fk.column === c.name)
                   return (
-                    <div key={c.name} className="flex items-center gap-1.5 border-b border-rule-soft px-2.5 py-1 text-[11px] last:border-b-0">
+                    <div key={c.name} className="flex items-center gap-1.5 border-b border-rule-soft px-2.5 py-1 text-[0.8125rem] last:border-b-0">
                       {c.primaryKey ? (
                         <Key size={10} weight="fill" className="shrink-0 text-warm" />
                       ) : isFk ? (
@@ -123,7 +123,7 @@ export function ErDiagram({ tables }: { tables: TableNode[] }) {
                         <span className="w-2.5 shrink-0" />
                       )}
                       <span className={`truncate ${c.primaryKey ? 'font-semibold text-ink' : 'text-ink-soft'}`}>{c.name}</span>
-                      <span className="ml-auto shrink-0 text-[10px] text-ink-faint">{c.type}</span>
+                      <span className="ml-auto shrink-0 text-[0.75rem] text-ink-faint">{c.type}</span>
                     </div>
                   )
                 })}

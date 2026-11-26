@@ -67,7 +67,7 @@ export function FormatConverterPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
             />
           </div>
         </Panel>
@@ -78,7 +78,7 @@ export function FormatConverterPage() {
               <SectionLabel>{FORMATS.find((f) => f.id === to)?.label} output</SectionLabel>
               {output && <CopyButton text={output} />}
             </div>
-            <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[12px] leading-relaxed text-ink">
+            <pre className="flex-1 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] leading-relaxed text-ink">
               {output || <span className="text-ink-faint">Converted output appears here.</span>}
             </pre>
           </div>

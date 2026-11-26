@@ -75,13 +75,13 @@ export function BundleStatsPage() {
             <div className="flex flex-col gap-1.5">
               {assets.map((a) => (
                 <div key={a.name} className="flex items-center gap-3">
-                  <span className="w-96 shrink-0 truncate font-mono text-[11.5px] text-ink-soft" title={a.name}>
+                  <span className="w-96 shrink-0 truncate font-mono text-[0.8125rem] text-ink-soft" title={a.name}>
                     {a.name}
                   </span>
                   <div className="relative h-4 flex-1 rounded bg-glass">
                     <div className="absolute top-0 h-4 rounded bg-cyan/50" style={{ width: `${(a.size / total) * 100}%` }} />
                   </div>
-                  <span className="w-20 shrink-0 text-right font-mono text-[11.5px] text-ink-faint">{formatBytes(a.size)}</span>
+                  <span className="w-20 shrink-0 text-right font-mono text-[0.8125rem] text-ink-faint">{formatBytes(a.size)}</span>
                 </div>
               ))}
             </div>

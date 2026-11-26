@@ -203,7 +203,7 @@ export function SpringVizPage() {
             <Button variant="primary" onClick={() => run(path)} disabled={!path.trim() || loading}>
               <GitBranch size={14} weight="light" /> {loading ? 'Scanning…' : 'Analyze'}
             </Button>
-            <div className="text-[11px] text-ink-faint">
+            <div className="text-[0.8125rem] text-ink-faint">
               Point it at one project's root, a multi-module project's root, or a folder
               containing several independent services — it auto-detects a workspace (2+
               subfolders with their own pom.xml/build.gradle) and analyzes all of them,
@@ -260,7 +260,7 @@ export function SpringVizPage() {
                     <button
                       key={t}
                       onClick={() => setTab(t)}
-                      className={`rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors ${
+                      className={`rounded-lg px-3 py-1.5 text-[0.8125rem] font-medium transition-colors ${
                         tab === t ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                       }`}
                     >
@@ -270,7 +270,7 @@ export function SpringVizPage() {
                 </div>
                 {result.workspace && (
                   <select
-                    className="devtools-input w-auto text-[11px]"
+                    className="devtools-input w-auto text-[0.8125rem]"
                     value={projectFilter ?? ''}
                     onChange={(e) => setProjectFilter(e.target.value || null)}
                   >
@@ -281,7 +281,7 @@ export function SpringVizPage() {
                   </select>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-[11px] text-ink-faint">
+              <div className="flex items-center gap-2 text-[0.8125rem] text-ink-faint">
                 <span>{result.javaFilesScanned} .java files scanned</span>
                 {!result.workspace && <> · base URL <span className="font-mono text-ink-soft">{baseUrl}</span></>}
                 {result.findings.some((f) => f.severity === 'high') && (
@@ -293,7 +293,7 @@ export function SpringVizPage() {
             </div>
 
             {result.cycles.length > 0 && (
-              <div className="flex shrink-0 items-start gap-2 border-b border-rule-soft bg-rose/[0.06] px-3.5 py-2.5 text-[11.5px] text-rose">
+              <div className="flex shrink-0 items-start gap-2 border-b border-rule-soft bg-rose/[0.06] px-3.5 py-2.5 text-[0.8125rem] text-rose">
                 <Warning size={14} weight="fill" className="mt-0.5 shrink-0" />
                 <div>
                   <span className="font-medium">{result.cycles.length} circular dependenc{result.cycles.length === 1 ? 'y' : 'ies'} found:</span>{' '}
@@ -346,14 +346,14 @@ export function SpringVizPage() {
                     >
                       <DownloadSimple size={13} weight="light" /> Export {selectedEndpoints.size || ''} as JSON
                     </Button>
-                    {importMsg && <span className="text-[11.5px] text-emerald">{importMsg}</span>}
+                    {importMsg && <span className="text-[0.8125rem] text-emerald">{importMsg}</span>}
                   </div>
                 )}
                 <div className="flex-1 overflow-auto p-4 pt-2">
                   {filteredEndpoints.length === 0 ? (
                     <div className="text-sm text-ink-faint">No @RestController/@Controller endpoints found.</div>
                   ) : (
-                    <table className="w-full text-left text-[12.5px]">
+                    <table className="w-full text-left text-[0.875rem]">
                       <thead className="sticky top-0 bg-panel">
                         <tr>
                           <th className="border-b border-rule px-3 py-2 font-medium text-ink-faint">
@@ -375,7 +375,7 @@ export function SpringVizPage() {
                                 <input type="checkbox" checked={selectedEndpoints.has(key)} onChange={() => toggleEndpoint(key)} />
                               </td>
                               <td className="px-3 py-1.5">
-                                <span className={`rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold ${methodColor(e.httpMethod)}`}>{e.httpMethod}</span>
+                                <span className={`rounded-md px-1.5 py-0.5 text-[0.75rem] font-semibold ${methodColor(e.httpMethod)}`}>{e.httpMethod}</span>
                               </td>
                               <td className="px-3 py-1.5 font-mono text-ink">
                                 {result.workspace ? '' : baseUrl}
@@ -478,7 +478,7 @@ function FindingsTab({ findings }: { findings: SpringVizFinding[] }) {
           <button
             key={sev}
             onClick={() => toggle(sev)}
-            className={`rounded-full px-2.5 py-1 text-[11px] font-medium capitalize transition-opacity ${SEVERITY_STYLE[sev]} ${activeSeverities.has(sev) ? '' : 'opacity-35'}`}
+            className={`rounded-full px-2.5 py-1 text-[0.8125rem] font-medium capitalize transition-opacity ${SEVERITY_STYLE[sev]} ${activeSeverities.has(sev) ? '' : 'opacity-35'}`}
           >
             {sev} · {counts[sev]}
           </button>
@@ -488,13 +488,13 @@ function FindingsTab({ findings }: { findings: SpringVizFinding[] }) {
         {visible.map((f, i) => (
           <div key={i} className="rounded-2xl border border-rule-soft bg-panel p-3.5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${SEVERITY_STYLE[f.severity]}`}>{f.severity}</span>
-              <span className="text-[10.5px] uppercase tracking-wide text-ink-faint">{f.category}</span>
-              <span className="text-[13px] font-medium text-ink">{f.title}</span>
+              <span className={`rounded-full px-2 py-0.5 text-[0.75rem] font-semibold uppercase tracking-wide ${SEVERITY_STYLE[f.severity]}`}>{f.severity}</span>
+              <span className="text-[0.75rem] uppercase tracking-wide text-ink-faint">{f.category}</span>
+              <span className="text-[0.9375rem] font-medium text-ink">{f.title}</span>
             </div>
-            <div className="mt-1.5 text-[12.5px] leading-relaxed text-ink-soft">{f.detail}</div>
+            <div className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-soft">{f.detail}</div>
             {(f.className || f.file) && (
-              <div className="mt-1.5 font-mono text-[11px] text-ink-faint">
+              <div className="mt-1.5 font-mono text-[0.8125rem] text-ink-faint">
                 {f.className}{f.methodName ? `.${f.methodName}()` : ''}{f.file ? ` — ${f.file}${f.line ? `:${f.line}` : ''}` : ''}
               </div>
             )}
@@ -521,23 +521,23 @@ function EntitiesTab({ entities }: { entities: SpringVizEntity[] }) {
         <div key={e.name} className="rounded-2xl border border-rule-soft bg-panel p-3.5">
           <div className="flex flex-wrap items-center gap-2">
             <Database size={13} weight="light" className="text-emerald" />
-            <span className="font-mono text-[13px] font-medium text-ink">{e.name}</span>
-            {e.table && <span className="rounded-md bg-glass px-1.5 py-0.5 font-mono text-[10.5px] text-ink-faint">{e.table}</span>}
-            <span className="text-[11px] text-ink-faint">{e.fieldCount} field{e.fieldCount === 1 ? '' : 's'}</span>
-            {e.idType && <span className="text-[11px] text-ink-faint">· id: {e.idType}</span>}
+            <span className="font-mono text-[0.9375rem] font-medium text-ink">{e.name}</span>
+            {e.table && <span className="rounded-md bg-glass px-1.5 py-0.5 font-mono text-[0.75rem] text-ink-faint">{e.table}</span>}
+            <span className="text-[0.8125rem] text-ink-faint">{e.fieldCount} field{e.fieldCount === 1 ? '' : 's'}</span>
+            {e.idType && <span className="text-[0.8125rem] text-ink-faint">· id: {e.idType}</span>}
           </div>
           {e.repositories.length > 0 && (
-            <div className="mt-1.5 text-[11.5px] text-ink-soft">
+            <div className="mt-1.5 text-[0.8125rem] text-ink-soft">
               Repositories: <span className="font-mono text-ink-faint">{e.repositories.join(', ')}</span>
             </div>
           )}
           {e.relations.length > 0 && (
             <div className="mt-1.5 flex flex-col gap-0.5">
               {e.relations.map((r, i) => (
-                <div key={i} className="font-mono text-[11.5px] text-ink-faint">
+                <div key={i} className="font-mono text-[0.8125rem] text-ink-faint">
                   <span className="text-ink-soft">{r.field}</span> — {r.kind}
                   {r.target ? ` → ${r.target}` : ''}
-                  {r.eager && <span className="ml-1.5 rounded bg-warm/12 px-1 text-[9.5px] text-warm">EAGER</span>}
+                  {r.eager && <span className="ml-1.5 rounded bg-warm/12 px-1 text-[0.6875rem] text-warm">EAGER</span>}
                 </div>
               ))}
             </div>
@@ -573,12 +573,12 @@ function EntryPointsTab({ entryPoints }: { entryPoints: SpringVizEntryPoint[] })
         const Icon = ENTRYPOINT_ICON[kind] ?? Lightning
         return (
           <div key={kind}>
-            <div className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-faint">
+            <div className="mb-1.5 flex items-center gap-1.5 text-[0.8125rem] font-semibold uppercase tracking-wide text-ink-faint">
               <Icon size={12} weight="light" /> {kind} ({items.length})
             </div>
             <div className="flex flex-col gap-1">
               {items.map((e, i) => (
-                <div key={i} className="rounded-xl border border-rule-soft bg-panel px-3 py-2 text-[12px]">
+                <div key={i} className="rounded-xl border border-rule-soft bg-panel px-3 py-2 text-[0.875rem]">
                   <span className="font-mono text-ink">{e.className}.{e.methodName}()</span>
                   {e.detail && <span className="ml-2 text-ink-faint">{e.detail}</span>}
                 </div>
@@ -610,7 +610,7 @@ function StatsTab({ result }: { result: SpringVizResponse }) {
         {tiles.map(([label, value]) => (
           <div key={label} className="rounded-2xl border border-rule-soft bg-panel p-3">
             <div className="text-lg font-semibold text-ink">{value}</div>
-            <div className="text-[10.5px] uppercase tracking-wide text-ink-faint">{label}</div>
+            <div className="text-[0.75rem] uppercase tracking-wide text-ink-faint">{label}</div>
           </div>
         ))}
       </div>
@@ -620,7 +620,7 @@ function StatsTab({ result }: { result: SpringVizResponse }) {
           <SectionLabel>Profiles found</SectionLabel>
           <div className="flex flex-wrap gap-1.5">
             {result.profiles.map((p) => (
-              <span key={p} className="rounded-full bg-glass px-2.5 py-1 text-[11px] font-mono text-ink-soft">{p}</span>
+              <span key={p} className="rounded-full bg-glass px-2.5 py-1 text-[0.8125rem] font-mono text-ink-soft">{p}</span>
             ))}
           </div>
         </div>
@@ -630,8 +630,8 @@ function StatsTab({ result }: { result: SpringVizResponse }) {
         <div>
           <SectionLabel>Referenced config keys ({result.configKeys.length})</SectionLabel>
           <div className="overflow-hidden rounded-2xl border border-rule-soft">
-            <table className="w-full text-left text-[12px]">
-              <thead className="bg-panel text-[10.5px] uppercase tracking-wide text-ink-faint">
+            <table className="w-full text-left text-[0.875rem]">
+              <thead className="bg-panel text-[0.75rem] uppercase tracking-wide text-ink-faint">
                 <tr>
                   <th className="px-3 py-2 font-medium">Key</th>
                   <th className="px-3 py-2 font-medium">Default</th>
@@ -665,7 +665,7 @@ function StatsTab({ result }: { result: SpringVizResponse }) {
           <SectionLabel>Files that failed to parse ({s.parseErrors.length})</SectionLabel>
           <div className="flex flex-col gap-1">
             {s.parseErrors.map((e, i) => (
-              <div key={i} className="rounded-xl border border-rule-soft bg-panel px-3 py-2 text-[11.5px]">
+              <div key={i} className="rounded-xl border border-rule-soft bg-panel px-3 py-2 text-[0.8125rem]">
                 <span className="font-mono text-ink-soft">{e.file}</span>
                 <div className="mt-0.5 text-ink-faint">{e.message}</div>
               </div>

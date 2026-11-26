@@ -80,7 +80,7 @@ export function DiagramStudioPage() {
                 <button
                   key={m}
                   onClick={() => setMode(m)}
-                  className={`flex-1 rounded-lg py-1.5 text-[11px] font-medium capitalize transition-colors ${
+                  className={`flex-1 rounded-lg py-1.5 text-[0.8125rem] font-medium capitalize transition-colors ${
                     mode === m ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
                   }`}
                 >
@@ -108,7 +108,7 @@ export function DiagramStudioPage() {
                   </button>
                 ))}
               </div>
-              <div className="mt-3 text-[11px] text-ink-faint">
+              <div className="mt-3 text-[0.8125rem] text-ink-faint">
                 Mermaid syntax — flowcharts, sequence/class/state/ER diagrams, gantt charts, pie charts. Renders as you type.
               </div>
             </div>
@@ -160,14 +160,14 @@ export function DiagramStudioPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 spellCheck={false}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12.5px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
               <CopyButton text={code} label="Copy code" />
             </div>
           </Panel></ResizablePanel>
 
           <Panel className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-center justify-end border-b border-rule-soft p-2">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-b border-rule-soft p-2">
               <Button variant="ghost" onClick={() => mermaidSvg && downloadMermaidPng(mermaidSvg)} disabled={!mermaidSvg}>
                 <DownloadSimple size={14} weight="light" /> Export PNG
               </Button>

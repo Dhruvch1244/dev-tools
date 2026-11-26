@@ -23,7 +23,7 @@ export function AwsHelpersPage() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors ${
+            className={`rounded-lg px-3 py-1.5 text-[0.8125rem] font-medium transition-colors ${
               tab === t.id ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'
             }`}
           >
@@ -120,7 +120,7 @@ function ArnTab() {
 
 function ArnField({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 text-[10px] uppercase tracking-wide text-ink-faint">
+    <label className="flex flex-col gap-1 text-[0.75rem] uppercase tracking-wide text-ink-faint">
       {label}
       {children}
     </label>
@@ -166,7 +166,7 @@ function IamTab() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             spellCheck={false}
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12.5px] text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] text-ink outline-none focus:border-cyan/50"
           />
           {error && <ErrorBanner message={error} />}
         </div>
@@ -260,7 +260,7 @@ function CertTab() {
             onChange={(e) => setPem(e.target.value)}
             spellCheck={false}
             placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"
-            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[11.5px] text-ink outline-none focus:border-cyan/50"
+            className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.8125rem] text-ink outline-none focus:border-cyan/50"
           />
           <Button variant="primary" onClick={run} disabled={!pem.trim() || loading}>
             {loading ? 'Decoding…' : 'Decode'}
@@ -284,7 +284,7 @@ function CertTab() {
                       {c.expired ? 'EXPIRED' : `${c.daysUntilExpiry} days left`}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11.5px]">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[0.8125rem]">
                     <CertField label="Issuer" value={c.issuer} />
                     <CertField label="Serial" value={c.serialNumber} />
                     <CertField label="Valid from" value={new Date(c.notBefore).toLocaleString()} />
@@ -294,8 +294,8 @@ function CertTab() {
                   </div>
                   {c.subjectAlternativeNames.length > 0 && (
                     <div className="mt-2">
-                      <div className="text-[10px] uppercase tracking-wide text-ink-faint">SAN</div>
-                      <div className="font-mono text-[11px] text-ink-soft">{c.subjectAlternativeNames.join(', ')}</div>
+                      <div className="text-[0.75rem] uppercase tracking-wide text-ink-faint">SAN</div>
+                      <div className="font-mono text-[0.8125rem] text-ink-soft">{c.subjectAlternativeNames.join(', ')}</div>
                     </div>
                   )}
                 </div>

@@ -186,14 +186,14 @@ export function JsonXmlPage() {
                     view === 'tree' ? (
                       <JsonTree data={jsonResult.data} />
                     ) : (
-                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
+                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink shadow-[var(--shadow-inset)]">
                         {jsonResult.pretty}
                       </pre>
                     )
                   ) : (
                     <div className="flex flex-col gap-2">
                       <ErrorBanner message={`Invalid JSON: ${jsonResult.error}`} />
-                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink-soft">
+                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink-soft">
                         {jsonResult.fallbackFormatted}
                       </pre>
                     </div>
@@ -204,13 +204,13 @@ export function JsonXmlPage() {
               {mode === 'xml' && xmlResult && (
                 <motion.div key="xml" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {xmlResult.valid ? (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink shadow-[var(--shadow-inset)]">
                       {xmlResult.pretty}
                     </pre>
                   ) : (
                     <div className="flex flex-col gap-2">
                       <ErrorBanner message={`Invalid XML: ${xmlResult.error}`} />
-                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink-soft">
+                      <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink-soft">
                         {xmlResult.fallbackFormatted}
                       </pre>
                     </div>
@@ -223,7 +223,7 @@ export function JsonXmlPage() {
                   {stringResult.error ? (
                     <ErrorBanner message={stringResult.error} />
                   ) : (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] text-ink shadow-[var(--shadow-inset)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] text-ink shadow-[var(--shadow-inset)]">
                       {stringResult.output}
                     </pre>
                   )}
@@ -235,7 +235,7 @@ export function JsonXmlPage() {
                   {tsResult.error ? (
                     <ErrorBanner message={tsResult.error} />
                   ) : (
-                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[13px] leading-relaxed text-ink shadow-[var(--shadow-inset)]">
+                    <pre className="whitespace-pre-wrap rounded-2xl border border-rule bg-panel p-4 font-mono text-[0.9375rem] leading-relaxed text-ink shadow-[var(--shadow-inset)]">
                       {tsResult.output}
                     </pre>
                   )}

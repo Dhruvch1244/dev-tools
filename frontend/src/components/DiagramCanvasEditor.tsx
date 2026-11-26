@@ -256,7 +256,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
         </button>
 
         {tool === 'connect' && (
-          <span className="text-[10.5px] text-ink-faint">{connectSource ? 'Click the target shape…' : 'Click the source shape…'}</span>
+          <span className="text-[0.75rem] text-ink-faint">{connectSource ? 'Click the target shape…' : 'Click the source shape…'}</span>
         )}
       </div>
 
@@ -308,7 +308,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
                 e.stopPropagation()
                 setEditingId(s.id)
               }}
-              className="absolute flex select-none items-center justify-center text-center text-[12.5px] text-[var(--on-accent)]"
+              className="absolute flex select-none items-center justify-center text-center text-[0.875rem] text-[var(--on-accent)]"
               style={{
                 left: s.x,
                 top: s.y,
@@ -333,7 +333,7 @@ export function DiagramCanvasEditor({ data, onChange }: { data: DiagramData; onC
                     setEditingId(null)
                   }}
                   onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
-                  className="w-[90%] bg-transparent text-center text-[12.5px] text-ink outline-none"
+                  className="w-[90%] bg-transparent text-center text-[0.875rem] text-ink outline-none"
                 />
               ) : (
                 <span className="px-1">{s.text}</span>

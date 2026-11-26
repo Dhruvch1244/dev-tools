@@ -180,7 +180,7 @@ export function CommandTemplatesPage() {
                 value={editTemplate}
                 onChange={(e) => setEditTemplate(e.target.value)}
               />
-              <div className="text-[10.5px] text-ink-faint">
+              <div className="text-[0.75rem] text-ink-faint">
                 Wrap variable parts in <code className="rounded bg-glass px-1">&lt;name&gt;</code> or{' '}
                 <code className="rounded bg-glass px-1">&lt;name=default value&gt;</code> — each unique name becomes an editable field.
               </div>
@@ -199,7 +199,7 @@ export function CommandTemplatesPage() {
                 <div className="text-sm font-medium text-ink">{selected.name}</div>
                 <Button variant="ghost" onClick={() => startEdit(selected)}>Edit</Button>
               </div>
-              <div className="rounded-xl border border-rule-soft bg-glass px-3 py-2 font-mono text-[11.5px] text-ink-faint">
+              <div className="rounded-xl border border-rule-soft bg-glass px-3 py-2 font-mono text-[0.8125rem] text-ink-faint">
                 {selected.template}
               </div>
 
@@ -229,7 +229,7 @@ export function CommandTemplatesPage() {
                     <Button variant="primary" onClick={generate} disabled={!rendered.trim()}>Add to history</Button>
                   </div>
                 </div>
-                <div className="rounded-xl border border-rule bg-panel px-3 py-2.5 font-mono text-[13px] text-ink">
+                <div className="rounded-xl border border-rule bg-panel px-3 py-2.5 font-mono text-[0.9375rem] text-ink">
                   {rendered || <span className="text-ink-faint">—</span>}
                 </div>
               </div>
@@ -251,12 +251,12 @@ export function CommandTemplatesPage() {
                   const canRerun = h.valuesJson != null && templates.some((t) => t.name === h.templateName)
                   return (
                     <div key={h.id} className="group flex items-center gap-2 rounded-lg bg-glass px-2.5 py-1.5">
-                      <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[10px] text-ink-faint">{h.templateName}</span>
+                      <span className="shrink-0 rounded-full bg-glass-strong px-2 py-0.5 text-[0.75rem] text-ink-faint">{h.templateName}</span>
                       <button
                         onClick={() => canRerun && rerunHistoryEntry(h)}
                         disabled={!canRerun}
                         title={canRerun ? 'Reopen this template with these exact field values' : 'Template no longer exists or predates re-run support'}
-                        className={`flex-1 truncate text-left font-mono text-[11.5px] ${canRerun ? 'text-ink-soft hover:text-cyan' : 'cursor-default text-ink-soft'}`}
+                        className={`flex-1 truncate text-left font-mono text-[0.8125rem] ${canRerun ? 'text-ink-soft hover:text-cyan' : 'cursor-default text-ink-soft'}`}
                       >
                         {h.renderedCommand}
                       </button>

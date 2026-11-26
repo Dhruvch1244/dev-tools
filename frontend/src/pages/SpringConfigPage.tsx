@@ -86,7 +86,7 @@ export function SpringConfigPage() {
               value={textA}
               onChange={(e) => setTextA(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
             />
             {a.error && <ErrorBanner message={a.error} />}
           </div>
@@ -98,7 +98,7 @@ export function SpringConfigPage() {
               value={textB}
               onChange={(e) => setTextB(e.target.value)}
               spellCheck={false}
-              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+              className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
             />
             {b.error && <ErrorBanner message={b.error} />}
           </div>
@@ -112,9 +112,9 @@ export function SpringConfigPage() {
                 onChange={(e) => setEnvText(e.target.value)}
                 spellCheck={false}
                 placeholder={'SERVER_PORT=9090\nAPP_DATASOURCE_URL=jdbc:...'}
-                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[13px] text-ink outline-none focus:border-cyan/50"
+                className="flex-1 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.9375rem] text-ink outline-none focus:border-cyan/50"
               />
-              <div className="mt-2 text-[11px] text-ink-faint">
+              <div className="mt-2 text-[0.8125rem] text-ink-faint">
                 Applies Spring Boot's relaxed binding: lowercased, <code>_</code> → <code>.</code> —{' '}
                 <code>SERVER_PORT</code> becomes <code>server.port</code>.
               </div>
@@ -129,7 +129,7 @@ export function SpringConfigPage() {
             {mode === 'diff' ? (
               <>
                 <SectionLabel>{textB.trim() ? 'Diff (A vs B)' : `Resolved placeholders (A)${resolvedA.unresolved.length ? ' — ' + resolvedA.unresolved.length + ' unresolved' : ''}`}</SectionLabel>
-                <div className="flex flex-col gap-0.5 font-mono text-[11.5px]">
+                <div className="flex flex-col gap-0.5 font-mono text-[0.8125rem]">
                   {textB.trim()
                     ? rows
                         .filter((r) => r.status !== 'same')
@@ -153,13 +153,13 @@ export function SpringConfigPage() {
                   </SectionLabel>
                   <CopyButton text={Object.entries(effective.resolved).map(([k, v]) => `${k}=${v}`).join('\n')} />
                 </div>
-                <div className="flex flex-col gap-0.5 font-mono text-[11.5px]">
+                <div className="flex flex-col gap-0.5 font-mono text-[0.8125rem]">
                   {Object.keys(effective.resolved).length === 0 ? (
                     <div className="text-ink-faint">Fill in Base (and optionally Profile/Env) to see the merged, resolved result.</div>
                   ) : (
                     Object.entries(effective.resolved).map(([k, v]) => (
                       <div key={k} className="flex items-baseline gap-2">
-                        <span className={`w-14 shrink-0 text-[9.5px] uppercase tracking-wide ${ORIGIN_COLOR[origin[k]] ?? 'text-ink-faint'}`}>
+                        <span className={`w-14 shrink-0 text-[0.6875rem] uppercase tracking-wide ${ORIGIN_COLOR[origin[k]] ?? 'text-ink-faint'}`}>
                           {origin[k]}
                         </span>
                         <span className={effective.unresolved.some((u) => v.includes('${' + u)) ? 'text-rose' : 'text-ink-soft'}>
@@ -179,7 +179,7 @@ export function SpringConfigPage() {
               <SectionLabel>Converted to {format === 'yaml' ? 'properties' : 'YAML'}</SectionLabel>
               <CopyButton text={converted} />
             </div>
-            <pre className="whitespace-pre-wrap font-mono text-[11.5px] text-ink-soft">{converted}</pre>
+            <pre className="whitespace-pre-wrap font-mono text-[0.8125rem] text-ink-soft">{converted}</pre>
           </div>
         </Panel>
       </div>

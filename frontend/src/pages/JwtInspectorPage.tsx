@@ -46,7 +46,7 @@ export function JwtInspectorPage() {
 
   return (
     <div className="flex h-full gap-4">
-      <div className="flex w-[420px] shrink-0 flex-col gap-4">
+      <div className="flex w-[min(420px,100%)] shrink-0 flex-col gap-4">
         <Panel>
           <div className="flex flex-col gap-2 p-4">
             <SectionLabel>Token</SectionLabel>
@@ -55,9 +55,9 @@ export function JwtInspectorPage() {
               onChange={(e) => { setToken(e.target.value); setVerifyResult(null) }}
               spellCheck={false}
               placeholder="eyJhbGciOiJI..."
-              className="h-40 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[12px] text-ink outline-none focus:border-cyan/50"
+              className="h-40 resize-none rounded-2xl border border-rule bg-panel p-3.5 font-mono text-[0.875rem] text-ink outline-none focus:border-cyan/50"
             />
-            <div className="text-[11px] text-ink-faint">
+            <div className="text-[0.8125rem] text-ink-faint">
               Decoded entirely in your browser — the token never leaves this page.
             </div>
             {parseError && <ErrorBanner message={parseError} />}
@@ -70,7 +70,7 @@ export function JwtInspectorPage() {
               <SectionLabel>Signature verification</SectionLabel>
               {canVerify ? (
                 <>
-                  <div className="text-[11px] text-ink-faint">{alg} — paste the shared secret to verify.</div>
+                  <div className="text-[0.8125rem] text-ink-faint">{alg} — paste the shared secret to verify.</div>
                   <input
                     className="devtools-input font-mono text-xs"
                     type="password"
@@ -89,7 +89,7 @@ export function JwtInspectorPage() {
                   )}
                 </>
               ) : (
-                <div className="text-[11px] text-ink-faint">
+                <div className="text-[0.8125rem] text-ink-faint">
                   {alg ? `${alg} needs a public/private key pair — verification isn't supported here, only HS256/384/512.` : 'No algorithm to verify against.'}
                 </div>
               )}
@@ -112,7 +112,7 @@ export function JwtInspectorPage() {
                 {notes.map((n, i) => {
                   const Icon = NOTE_ICON[n.severity]
                   return (
-                    <div key={i} className={`flex items-start gap-2 rounded-xl border px-3 py-2 text-[12px] ${NOTE_STYLE[n.severity]}`}>
+                    <div key={i} className={`flex items-start gap-2 rounded-xl border px-3 py-2 text-[0.875rem] ${NOTE_STYLE[n.severity]}`}>
                       <Icon size={14} weight="bold" className="mt-0.5 shrink-0" />
                       {n.message}
                     </div>
@@ -124,7 +124,7 @@ export function JwtInspectorPage() {
             <Panel>
               <div className="p-4">
                 <SectionLabel>Header</SectionLabel>
-                <pre className="max-h-40 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[12.5px] text-ink">
+                <pre className="max-h-40 overflow-auto rounded-2xl border border-rule bg-panel p-3 font-mono text-[0.875rem] text-ink">
                   {JSON.stringify(decoded.header, null, 2)}
                 </pre>
               </div>
@@ -136,11 +136,11 @@ export function JwtInspectorPage() {
                 <div className="flex flex-col gap-1">
                   {claimEntries.map(([k, v]) => (
                     <div key={k} className="flex items-start gap-3 rounded-lg px-2 py-1.5 hover:bg-glass">
-                      <span className="w-16 shrink-0 font-mono text-[11.5px] font-semibold text-cyan">{k}</span>
-                      <span className="w-56 shrink-0 break-all font-mono text-[11.5px] text-ink">
+                      <span className="w-16 shrink-0 font-mono text-[0.8125rem] font-semibold text-cyan">{k}</span>
+                      <span className="w-56 shrink-0 break-all font-mono text-[0.8125rem] text-ink">
                         {['exp', 'nbf', 'iat'].includes(k) && typeof v === 'number' ? `${v} (${new Date(v * 1000).toLocaleString()})` : JSON.stringify(v)}
                       </span>
-                      <span className="flex-1 text-[11px] text-ink-faint">{CLAIM_EXPLANATIONS[k] ?? '—'}</span>
+                      <span className="flex-1 text-[0.8125rem] text-ink-faint">{CLAIM_EXPLANATIONS[k] ?? '—'}</span>
                     </div>
                   ))}
                 </div>

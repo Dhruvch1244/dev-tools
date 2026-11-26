@@ -67,7 +67,7 @@ export function DiffPage() {
                 ref={beforeOverlayRef}
                 aria-hidden
                 dangerouslySetInnerHTML={{ __html: beforeHtml }}
-                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[13px] leading-relaxed text-transparent"
+                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[0.9375rem] leading-relaxed text-transparent"
               />
               <textarea
                 value={before}
@@ -75,7 +75,7 @@ export function DiffPage() {
                 onScroll={(e) => syncScroll(e.currentTarget, beforeOverlayRef.current)}
                 spellCheck={false}
                 placeholder="Paste the original text…"
-                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[0.9375rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </div>
@@ -88,7 +88,7 @@ export function DiffPage() {
                 ref={afterOverlayRef}
                 aria-hidden
                 dangerouslySetInnerHTML={{ __html: afterHtml }}
-                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[13px] leading-relaxed text-transparent"
+                className="diff-overlay pointer-events-none absolute inset-0 overflow-auto whitespace-pre-wrap break-all rounded-2xl p-3.5 font-mono text-[0.9375rem] leading-relaxed text-transparent"
               />
               <textarea
                 value={after}
@@ -96,7 +96,7 @@ export function DiffPage() {
                 onScroll={(e) => syncScroll(e.currentTarget, afterOverlayRef.current)}
                 spellCheck={false}
                 placeholder="Paste the changed text…"
-                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-ink outline-none focus:border-cyan/50"
+                className="relative h-full w-full resize-none rounded-2xl border border-rule bg-transparent p-3.5 font-mono text-[0.9375rem] leading-relaxed text-ink outline-none focus:border-cyan/50"
               />
             </div>
           </div>
@@ -111,7 +111,7 @@ export function DiffPage() {
             </div>
             <CopyButton text={ops.map((o) => (o.type === 'add' ? '+ ' : o.type === 'remove' ? '- ' : '  ') + o.line).join('\n')} />
           </div>
-          <div className="max-h-72 overflow-auto rounded-2xl border border-rule bg-panel font-mono text-[12.5px]">
+          <div className="max-h-72 overflow-auto rounded-2xl border border-rule bg-panel font-mono text-[0.875rem]">
             {before === '' && after === '' ? (
               <div className="p-3 text-ink-faint">Paste text in both panes to see the diff — differences highlight live in yellow as you type.</div>
             ) : (

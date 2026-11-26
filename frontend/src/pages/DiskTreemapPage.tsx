@@ -113,9 +113,9 @@ export function DiskTreemapPage() {
                 <ArrowLeft size={14} weight="light" /> Back
               </Button>
             )}
-            <div className="text-[11px] text-ink-faint">Click a box to drill into that folder. Runs entirely locally off disk.</div>
+            <div className="text-[0.8125rem] text-ink-faint">Click a box to drill into that folder. Runs entirely locally off disk.</div>
             {root && (
-              <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[11px] text-ink-soft">
+              <div className="rounded-xl border border-rule-soft bg-glass p-2.5 text-[0.8125rem] text-ink-soft">
                 <div className="truncate font-mono text-ink">{root.path}</div>
                 <div className="mt-1 text-ink-faint">
                   {formatSize(root.sizeBytes)} · {root.childCount} item{root.childCount === 1 ? '' : 's'}
@@ -142,7 +142,7 @@ export function DiskTreemapPage() {
         )}
         {!error && root && (
           <div className="flex flex-1 flex-col overflow-hidden p-4">
-            <div className="mb-2 flex h-5 shrink-0 items-center justify-between text-[11px] text-ink-faint">
+            <div className="mb-2 flex h-5 shrink-0 items-center justify-between text-[0.8125rem] text-ink-faint">
               {hovered ? (
                 <>
                   <span className="truncate font-mono text-ink-soft">{hovered.name}</span>
@@ -154,13 +154,13 @@ export function DiskTreemapPage() {
               <div className="flex shrink-0 gap-1 rounded-lg border border-rule bg-panel p-0.5">
                 <button
                   onClick={() => setView('treemap')}
-                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium transition-colors ${view === 'treemap' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-[0.75rem] font-medium transition-colors ${view === 'treemap' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
                 >
                   <SquaresFour size={12} weight="light" /> Treemap
                 </button>
                 <button
                   onClick={() => setView('pie')}
-                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10.5px] font-medium transition-colors ${view === 'pie' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
+                  className={`flex items-center gap-1 rounded-md px-2 py-1 text-[0.75rem] font-medium transition-colors ${view === 'pie' ? 'bg-glass-strong text-ink' : 'text-ink-faint hover:text-ink-soft'}`}
                 >
                   <ChartPie size={12} weight="light" /> Pie
                 </button>
@@ -198,7 +198,7 @@ export function DiskTreemapPage() {
                     .map((r) => (
                       <div
                         key={r.node.path}
-                        className={`absolute flex items-center gap-1 overflow-hidden px-1.5 py-1 text-[10.5px] ${isNoise(r.node) ? 'text-ink-faint' : 'text-ink'}`}
+                        className={`absolute flex items-center gap-1 overflow-hidden px-1.5 py-1 text-[0.75rem] ${isNoise(r.node) ? 'text-ink-faint' : 'text-ink'}`}
                         style={{ left: `${(r.x / 1000) * 100}%`, top: `${(r.y / 560) * 100}%`, width: `${(r.w / 1000) * 100}%`, height: `${(r.h / 560) * 100}%` }}
                       >
                         {r.node.directory ? <Folder size={11} weight="fill" className="shrink-0 opacity-70" /> : <FileIcon size={11} weight="light" className="shrink-0 opacity-70" />}
@@ -228,7 +228,7 @@ export function DiskTreemapPage() {
                     )
                   })}
                 </svg>
-                <div className="pointer-events-none absolute inset-x-0 bottom-2 flex flex-wrap justify-center gap-x-3 gap-y-1 px-3 text-[10.5px] text-ink-soft">
+                <div className="pointer-events-none absolute inset-x-0 bottom-2 flex flex-wrap justify-center gap-x-3 gap-y-1 px-3 text-[0.75rem] text-ink-soft">
                   {pieSlices.map((s, i) => (
                     <span key={s.node.path} className="flex items-center gap-1">
                       <span

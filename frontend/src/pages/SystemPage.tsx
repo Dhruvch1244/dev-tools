@@ -112,7 +112,7 @@ export function SystemPage() {
       <Panel>
         <div className="flex flex-col gap-3 p-4">
           <SectionLabel>Backup &amp; restore</SectionLabel>
-          <div className="text-[11.5px] text-ink-faint">
+          <div className="text-[0.8125rem] text-ink-faint">
             Exports every tool's data — history, vault, notes, tasks, command templates, everything — as one file.
             Restoring replaces all current local data with the contents of the backup.
           </div>
@@ -128,7 +128,7 @@ export function SystemPage() {
           </div>
 
           {restoredOk && (
-            <div className="flex items-center gap-2 rounded-xl border border-rule-soft bg-glass px-3 py-2 text-[11.5px] text-ink-soft">
+            <div className="flex items-center gap-2 rounded-xl border border-rule-soft bg-glass px-3 py-2 text-[0.8125rem] text-ink-soft">
               <Info size={14} weight="light" className="shrink-0 text-cyan" />
               Restore complete. Data in every tool has been replaced with the backup's contents.
             </div>
@@ -136,7 +136,7 @@ export function SystemPage() {
 
           {confirmRestore && (
             <div className="flex flex-col gap-2 rounded-xl border border-rose/40 bg-rose/5 p-3">
-              <div className="flex items-start gap-2 text-[11.5px] text-ink-soft">
+              <div className="flex items-start gap-2 text-[0.8125rem] text-ink-soft">
                 <Warning size={14} weight="bold" className="mt-0.5 shrink-0 text-rose" />
                 <span>
                   Restoring <span className="font-mono text-ink">{confirmRestore.name}</span> permanently replaces all current
@@ -161,7 +161,7 @@ export function SystemPage() {
 function Field({ label, value, mono, className = '' }: { label: string; value: string; mono?: boolean; className?: string }) {
   return (
     <div className={`flex flex-col gap-0.5 ${className}`}>
-      <span className="text-[10px] uppercase tracking-[0.1em] text-ink-faint">{label}</span>
+      <span className="text-[0.75rem] uppercase tracking-[0.1em] text-ink-faint">{label}</span>
       <span className={`truncate text-ink-soft ${mono ? 'font-mono' : ''}`} title={value}>{value}</span>
     </div>
   )

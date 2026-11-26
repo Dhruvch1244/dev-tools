@@ -112,7 +112,7 @@ export function LogTailerPage() {
       {error && <ErrorBanner message={error} />}
 
       <Panel className="flex flex-1 flex-col overflow-hidden">
-        <div ref={scrollRef} className="flex-1 overflow-auto p-3 font-mono text-[11.5px] leading-relaxed">
+        <div ref={scrollRef} className="flex-1 overflow-auto p-3 font-mono text-[0.8125rem] leading-relaxed">
           {visible.length === 0 ? (
             <div className="flex h-full items-center justify-center text-sm text-ink-faint">
               {running ? 'Waiting for new lines…' : 'Point this at a log file and hit Start. Polls every 1.5s for new lines.'}
